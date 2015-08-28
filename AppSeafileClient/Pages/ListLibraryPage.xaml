@@ -1,0 +1,272 @@
+﻿<phone:PhoneApplicationPage
+    x:Class="AppSeafileClient.Pages.ListLibraryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:AppSeafileClient"
+    xmlns:localClass="clr-namespace:AppSeafileClient.Class"
+    xmlns:amCharts="clr-namespace:AmCharts.Windows.QuickCharts;assembly=AmCharts.Windows.QuickCharts.WP"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d"
+    shell:SystemTray.IsVisible="True"   
+    ApplicationBar = "{StaticResource GlobalAppBar}"
+    >
+
+    <phone:PhoneApplicationPage.DataContext>
+        <local:MainViewModel />
+    </phone:PhoneApplicationPage.DataContext>
+
+    <phone:PhoneApplicationPage.Resources>
+        <DataTemplate x:Key="lib_crypt" x:FieldModifier="public">
+            <StackPanel Orientation="Horizontal">
+                <Border BorderBrush="#FF6C6C6A" BorderThickness="0,0,0,2" Margin="5,0,0,0" Padding="5" Width="1000">
+                   <Grid ShowGridLines="False">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>                       
+                        <Grid Grid.Column="0" Grid.RowSpan="2">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Grid.Column="0" Source="/Assets/lock_32.png" Stretch="None" Margin="0,0,0,0"/>
+                                <Image Grid.Column="1" Source="/Assets/user_32.png" Stretch="None" Margin="0,0,0,0"/>
+                            </Grid>
+                    </Grid>                        
+                        <Grid Grid.Row="0" Grid.Column="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="1" Text="{Binding name}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="1" Grid.Column="1">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Grid.Column="1" Text="{Binding desc}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="lib_nocrypt" x:FieldModifier="public">
+            <StackPanel Orientation="Horizontal">
+                <Border BorderBrush="#FF6C6C6A" BorderThickness="0,0,0,2" Margin="5,0,0,0" Padding="5" Width="1000">
+                    <Grid ShowGridLines="False">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0" Grid.RowSpan="2">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Grid.Column="0" Source="/Assets/lock_open_32.png" Stretch="None" Margin="0,0,0,0"/>
+                                <Image Grid.Column="1" Source="/Assets/user_32.png" Stretch="None" Margin="0,0,0,0"/>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="0" Grid.Column="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="1" Text="{Binding name}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="1" Grid.Column="1">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Grid.Column="1" Text="{Binding desc}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="slib_crypt" x:FieldModifier="public">
+            <StackPanel Orientation="Horizontal">
+                <Border BorderBrush="#FF6C6C6A" BorderThickness="0,0,0,2" Margin="5,0,0,0" Padding="5" Width="1000">
+                    <Grid ShowGridLines="False">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0" Grid.RowSpan="2">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Grid.Column="0" Source="/Assets/lock_32.png" Stretch="None" Margin="0,0,0,0"/>
+                                <Image Grid.Column="1" Source="/Assets/users_32.png" Stretch="None" Margin="0,0,0,0"/>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="0" Grid.Column="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="1" Text="{Binding name}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="1" Grid.Column="1">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Grid.Column="1" Text="{Binding desc}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="slib_nocrypt" x:FieldModifier="public">
+            <StackPanel Orientation="Horizontal">
+                <Border BorderBrush="#FF6C6C6A" BorderThickness="0,0,0,2" Margin="5,0,0,0" Padding="5" Width="1000">
+                    <Grid ShowGridLines="False">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0" Grid.RowSpan="2">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Grid.Column="0" Source="/Assets/lock_open_32.png" Stretch="None" Margin="0,0,0,0"/>
+                                <Image Grid.Column="1" Source="/Assets/users_32.png" Stretch="None" Margin="0,0,0,0"/>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="0" Grid.Column="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="1" Text="{Binding name}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="1" Grid.Column="1">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Grid.Column="1" Text="{Binding desc}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
+
+    </phone:PhoneApplicationPage.Resources>
+
+    <!--Pivot Control-->
+    <phone:Pivot Background="WhiteSmoke" Foreground="Black" Margin="0">
+        <phone:Pivot.Title>
+            <TextBlock Text="{Binding Path=LocalizedResources.AppTitle, Source={StaticResource LocalizedStrings}}"
+                        FontWeight="Bold" FontStyle="Italic" FontSize="{StaticResource PhoneFontSizeLarge}" 
+                       Foreground="#FFF39C03"
+             />
+        </phone:Pivot.Title>
+        <phone:PivotItem HorizontalAlignment="Left" Margin="0,0,0,0" Width="auto">
+            <phone:PivotItem.Header>
+                <TextBlock Text="{Binding Path=LocalizedResources.ListLibrary_PivotTitle_1, Source={StaticResource LocalizedStrings}}"
+                       FontSize="{StaticResource PivotHeaderFontSize}" 
+                       Foreground="{StaticResource PhoneAccentBrush}" />
+            </phone:PivotItem.Header>
+            <Grid x:Name="LayoutRoot" Background="Transparent"  HorizontalAlignment="Stretch" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                    <Grid Grid.Row="1">
+                        <ListBox x:Name="listBoxAllLibraries" SelectionChanged="listAllLibraries_SelectionChanged" 
+                                 HorizontalContentAlignment="Stretch" ItemsSource="{Binding Elements}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <local:TypeTemplateSelector Content="{Binding}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                
+                <StackPanel Grid.Row="2">
+                   <!--  -->
+                </StackPanel>
+            </Grid>
+        </phone:PivotItem>
+
+        <!--Pivot item two-->
+        <phone:PivotItem>
+            <phone:PivotItem.Header>
+                <TextBlock Text="{Binding Path=LocalizedResources.ListLibrary_PivotTitle_2, Source={StaticResource LocalizedStrings}}"
+                            FontSize="{StaticResource PivotHeaderFontSize}" 
+                               Foreground="{StaticResource PhoneAccentBrush}"/>
+            </phone:PivotItem.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Name="AccountInfosUsage" TextWrapping="Wrap" Text="{Binding Path=LocalizedResources.ListLibrary_AccountInfosUsage, Source={StaticResource LocalizedStrings}}" />
+                <TextBlock Grid.Row="1" Name="AccountInfosQuotaStatus" TextWrapping="Wrap" Text="{Binding Path=LocalizedResources.ListLibrary_AccountInfosQuotaStatus, Source={StaticResource LocalizedStrings}}" />
+
+                <amCharts:PieChart Grid.Row="2" Name="AccountInfosPieChart"
+                            TitleMemberPath="title"
+                            ValueMemberPath="value"
+                            >
+                    <amCharts:PieChart.Brushes>
+                    <SolidColorBrush Color="#FFE4A331" Opacity="0.8"/>
+                    <SolidColorBrush Color="#FFBDBDBD" Opacity="0.8"/>
+                </amCharts:PieChart.Brushes>
+                    
+                </amCharts:PieChart>
+            </Grid>
+        </phone:PivotItem>
+
+        <!--Pivot item three-->
+        <phone:PivotItem>
+            <phone:PivotItem.Header>
+                <TextBlock Text="{Binding Path=LocalizedResources.ListLibrary_PivotTitle_3, Source={StaticResource LocalizedStrings}}"
+                            FontSize="{StaticResource PivotHeaderFontSize}" 
+                               Foreground="{StaticResource PhoneAccentBrush}"
+                  />
+            </phone:PivotItem.Header>
+            <localClass:PivotHelpControl x:Name="myPivoteItemHelp"/>
+        </phone:PivotItem>
+
+    </phone:Pivot>
+</phone:PhoneApplicationPage>

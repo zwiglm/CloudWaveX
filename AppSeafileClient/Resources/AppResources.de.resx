@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppBarAbout" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="AppBarHome" xml:space="preserve">
+    <value>Start</value>
+  </data>
+  <data name="AppBarSettings" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="AppBarUpload" xml:space="preserve">
+    <value>Senden einer Datei</value>
+  </data>
+  <data name="AppTitle" xml:space="preserve">
+    <value>CloudWave for Seafile</value>
+  </data>
+  <data name="Certificate_Error_CNMissmatch" xml:space="preserve">
+    <value>Das Zertifikat ist für die angeforderte Nutzung nicht gültig. Dieser Fehler wird auch zurückgegeben, wenn das Zertifikat eine ungültigen Namen hat.</value>
+  </data>
+  <data name="Certificate_Error_Expired" xml:space="preserve">
+    <value>Ein notwendiges Zertifikat verfügt nicht über die entsprechende Gültigkeitsperiode, verglichen mit der aktuellen Systemzeit oder dem Zeitstempel in der signierten Datei.</value>
+  </data>
+  <data name="Certificate_Error_Invalid" xml:space="preserve">
+    <value>Das eingereichte Zertifkat ist ungültig. Dies kann mehrere Ursachen haben: Ein Personenzertifikat wird als CA benutzt oder umgekehrt. Eine Pfad-Längen-Beschränkung in der Zertifikatskette wurde verletzt. Ein Zertifikat enthält eine unbekannte Erweiterung, die als kritisch gekennzeichnet wird. Ein Zertifikat wird zu einem anderen, nicht durch die CA spezifizierten Zweck genutzt. Ein Herausgeber des Zertifikates hat das Zertifikat doch nicht herausgegeben. Ein Zertifikat fehlt oder hat einen leeren Wert für ein wichtiges Feld, wie Betreff oder  Aussteller-Name. Die Unterschrift des Zertifikates kann nicht nachgeprüft werden. Das Zertifikat hat eine ungültige Policy. Eine grundlegende Begrenzungsausdehnung des Zertifikates ist nicht beachtet worden.
+</value>
+  </data>
+  <data name="Certificate_Error_Revoked" xml:space="preserve">
+    <value>Ein Zertifikat wurde von seinem Aussteller explizit widerrufen.</value>
+  </data>
+  <data name="Certificate_Error_Title" xml:space="preserve">
+    <value>Zertifikatfehler!</value>
+  </data>
+  <data name="Certificate_Error_UntrustedRoot" xml:space="preserve">
+    <value>Eine Zertifikatskette wurde abgearbeitet, aber endete in einem Root Zertifikat, dem vom Trustprovider nicht vertraut wird.</value>
+  </data>
+  <data name="ContentLibrary_ContextMenu_Delete" xml:space="preserve">
+    <value>löschen</value>
+  </data>
+  <data name="ContentLibrary_ContextMenu_Detail" xml:space="preserve">
+    <value>Detail</value>
+  </data>
+  <data name="ContentLibrary_Error_Content_Content" xml:space="preserve">
+    <value>Beim Laden des Inhalts ist ein Fehler aufgetreten. Aktivieren Sie bitte das Log und senden Sie mir den Fehler.</value>
+  </data>
+  <data name="ContentLibrary_Error_Content_Title" xml:space="preserve">
+    <value>Fehler!</value>
+  </data>
+  <data name="ContentLibrary_Error_Delete_Content" xml:space="preserve">
+    <value>Beim Löschen der Datei ist ein Fehler aufgetreten.</value>
+  </data>
+  <data name="ContentLibrary_Error_Delete_Title" xml:space="preserve">
+    <value>Fehler!</value>
+  </data>
+  <data name="ContentLibrary_Error_Detail_Content" xml:space="preserve">
+    <value>Beim Laden der Dateidetails ist ein Fehler aufgetreten.</value>
+  </data>
+  <data name="ContentLibrary_Error_Detail_Title" xml:space="preserve">
+    <value>Fehler!</value>
+  </data>
+  <data name="ContentLibrary_Itemtemplate_LastUpdate" xml:space="preserve">
+    <value>, letzte Aktualisierung.</value>
+  </data>
+  <data name="ContentLibrary_MessagePrompt_Detail_1" xml:space="preserve">
+    <value>Name : </value>
+  </data>
+  <data name="ContentLibrary_MessagePrompt_Detail_2" xml:space="preserve">
+    <value>Größe:</value>
+  </data>
+  <data name="ContentLibrary_MessagePrompt_Detail_3" xml:space="preserve">
+    <value>Letzte Änderung :</value>
+  </data>
+  <data name="ContentLibrary_MessagePrompt_Detail_Title" xml:space="preserve">
+    <value>Detail</value>
+  </data>
+  <data name="ContentLibrary_PivotTitle_1" xml:space="preserve">
+    <value>Top</value>
+  </data>
+  <data name="ContentLibrary_PivotTitle_2" xml:space="preserve">
+    <value>Support</value>
+  </data>
+  <data name="ContentLibrary_Refresh_1" xml:space="preserve">
+    <value>Erfolgreich gelöscht !</value>
+  </data>
+  <data name="ContentLibrary_Upload_UploadingWaiting" xml:space="preserve">
+    <value>Laden in Bearbeitung</value>
+  </data>
+  <data name="ContentLibrary_Upload_UploadOK" xml:space="preserve">
+    <value>Herunterladen gelungen</value>
+  </data>
+  <data name="Download_Button_Cancel" xml:space="preserve">
+    <value>Abgebrochen</value>
+  </data>
+  <data name="Download_Button_Open" xml:space="preserve">
+    <value>Offen</value>
+  </data>
+  <data name="Download_Error_Download_Content" xml:space="preserve">
+    <value>Beim Download ist ein Fehler aufgetreten. Versuchen Sie es bitte noch einmal.</value>
+  </data>
+  <data name="Download_Error_Download_Title" xml:space="preserve">
+    <value>Fehler!</value>
+  </data>
+  <data name="Download_Error_StoreFile_Content_1" xml:space="preserve">
+    <value>Es gab eine Problem mit dem Dateinamen. Wenn der Name mit einem Sonderzeichen beginnt, löschen Sie bitte den Cache und versuchen es noch einmal.</value>
+  </data>
+  <data name="Download_Error_StoreFile_Content_2" xml:space="preserve">
+    <value>Es gab einen Fehler beim Download.</value>
+  </data>
+  <data name="Download_Result_Text_1" xml:space="preserve">
+    <value>Heruntergeladen</value>
+  </data>
+  <data name="Download_Result_Text_2" xml:space="preserve">
+    <value> / </value>
+  </data>
+  <data name="Download_Result_Text_3" xml:space="preserve">
+    <value> Kbytes, </value>
+  </data>
+  <data name="Download_Result_Text_4" xml:space="preserve">
+    <value> % fertig.</value>
+  </data>
+  <data name="Download_Result_Text_Title" xml:space="preserve">
+    <value>Download Ergebnis</value>
+  </data>
+  <data name="Download_Status_Text_1" xml:space="preserve">
+    <value>Herunterladen:</value>
+  </data>
+  <data name="Download_Status_Text_2" xml:space="preserve">
+    <value>... Bitte warten</value>
+  </data>
+  <data name="Download_Status_Text_3" xml:space="preserve">
+    <value>Download abgebrochen.</value>
+  </data>
+  <data name="Download_Status_Text_4" xml:space="preserve">
+    <value>Download Fehler.</value>
+  </data>
+  <data name="Download_Status_Text_5" xml:space="preserve">
+    <value>Download fertig !</value>
+  </data>
+  <data name="Download_Status_Text_Title" xml:space="preserve">
+    <value>Download Status</value>
+  </data>
+  <data name="Download_Title_1" xml:space="preserve">
+    <value>Download File</value>
+  </data>
+  <data name="ListLibrary_AccountInfosQuotaStatus" xml:space="preserve">
+    <value>Quota-Status: </value>
+  </data>
+  <data name="ListLibrary_AccountInfosUsage" xml:space="preserve">
+    <value>Nutzung:</value>
+  </data>
+  <data name="ListLibrary_Account_1" xml:space="preserve">
+    <value>Sie nutzen gerade </value>
+  </data>
+  <data name="ListLibrary_Account_2" xml:space="preserve">
+    <value>In Ihrem Konto. Dieser Wert entspricht </value>
+  </data>
+  <data name="ListLibrary_Account_3" xml:space="preserve">
+    <value> % Ihrer Quota.</value>
+  </data>
+  <data name="ListLibrary_Account_4" xml:space="preserve">
+    <value>Ihres Kontos.</value>
+  </data>
+  <data name="ListLibrary_Error_AccountInfos" xml:space="preserve">
+    <value>Beim Laden der Benutzerinformationen ist ein Fehler aufgetreten.</value>
+  </data>
+  <data name="ListLibrary_Error_ListLibrary_Content" xml:space="preserve">
+    <value>Beim Laden der Bibliotheken ist ein Fehler aufgetreten. Aktivieren Sie bitte die Fehleraufzeichnung und senden Sie mir den Fehlerbericht.</value>
+  </data>
+  <data name="ListLibrary_Error_ListLibrary_Title" xml:space="preserve">
+    <value>Fehler!</value>
+  </data>
+  <data name="ListLibrary_LibCrypt_Error_Content" xml:space="preserve">
+    <value>Das Bibliothek-Kennwort ist falsch.</value>
+  </data>
+  <data name="ListLibrary_LibCrypt_Error_Title" xml:space="preserve">
+    <value>Fehler!</value>
+  </data>
+  <data name="ListLibrary_LibCrypt_PasswordInput_Message" xml:space="preserve">
+    <value>Gehen Sie bitte das Kennwort für die Bibliothek ein</value>
+  </data>
+  <data name="ListLibrary_LibCrypt_PasswordInput_Title" xml:space="preserve">
+    <value>Bibliothek-Kennwort</value>
+  </data>
+  <data name="ListLibrary_Pie_Title_1" xml:space="preserve">
+    <value>Gegenwärtige Nutzung in %</value>
+  </data>
+  <data name="ListLibrary_Pie_Title_2" xml:space="preserve">
+    <value>Freier Speicher in %</value>
+  </data>
+  <data name="ListLibrary_Pie_Title_3" xml:space="preserve">
+    <value>Gegenwärtige Nutzung in %</value>
+  </data>
+  <data name="ListLibrary_PivotTitle_1" xml:space="preserve">
+    <value>Alle Bibliotheken</value>
+  </data>
+  <data name="ListLibrary_PivotTitle_2" xml:space="preserve">
+    <value>Konto</value>
+  </data>
+  <data name="ListLibrary_PivotTitle_3" xml:space="preserve">
+    <value>Support</value>
+  </data>
+  <data name="ListLibrary_Quota_Status_Disabled" xml:space="preserve">
+    <value>Quota ist für Ihr Konto deaktiviert.</value>
+  </data>
+  <data name="ListLibrary_Quota_Status_Enabled" xml:space="preserve">
+    <value>Quota ist für Ihr Konto aktiviert.</value>
+  </data>
+  <data name="Login_AccountName" xml:space="preserve">
+    <value>Konto</value>
+  </data>
+  <data name="Login_Address" xml:space="preserve">
+    <value>Server URL und Port</value>
+  </data>
+  <data name="Login_Address_Content" xml:space="preserve">
+    <value>http://</value>
+  </data>
+  <data name="Login_Button_Login" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Login_CheckBox_RemberMe" xml:space="preserve">
+    <value>Speichern</value>
+  </data>
+  <data name="Login_Error_NoInternet_Content" xml:space="preserve">
+    <value>Sie müssen Internetzugang haben, um die App nutzen zu können.</value>
+  </data>
+  <data name="Login_Error_NoInternet_Title" xml:space="preserve">
+    <value>Fehler!</value>
+  </data>
+  <data name="Login_Error_SSL_NotValidate_Content" xml:space="preserve">
+    <value>Sie müssen das SSL Zertifikat korrigieren oder die Warnung akzeptieren.</value>
+  </data>
+  <data name="Login_Error_SSL_NotValidate_Title" xml:space="preserve">
+    <value>Fehler!</value>
+  </data>
+  <data name="Login_Error_URL_NotValid_Content" xml:space="preserve">
+    <value>Die Url ist nicht gültig.</value>
+  </data>
+  <data name="Login_Error_URL_NotValid_Title" xml:space="preserve">
+    <value>Fehler!</value>
+  </data>
+  <data name="Login_Error_WrongUser_Content" xml:space="preserve">
+    <value>Benutzer oder Kennwort - inkorrekt</value>
+  </data>
+  <data name="Login_Error_WrongUser_Title" xml:space="preserve">
+    <value>Login Fehler!</value>
+  </data>
+  <data name="Login_Password" xml:space="preserve">
+    <value>Kennwort</value>
+  </data>
+  <data name="Login_PivotTitle_1" xml:space="preserve">
+    <value>Login</value>
+  </data>
+  <data name="Login_PivotTitle_2" xml:space="preserve">
+    <value>Support</value>
+  </data>
+  <data name="PivotHelpControl_Button" xml:space="preserve">
+    <value>Absenden</value>
+  </data>
+  <data name="PivotHelpControl_Off" xml:space="preserve">
+    <value>Aus</value>
+  </data>
+  <data name="PivotHelpControl_On" xml:space="preserve">
+    <value>An</value>
+  </data>
+  <data name="PivotHelpControl_Text_1" xml:space="preserve">
+    <value>Wenn Sie Probleme mit dieser App haben, können Sie den Schalter unten auf  'An' stellen. Dann werden Informationen über die Nutzung aufgezeichnet und an mich gesendet.</value>
+  </data>
+  <data name="PivotHelpControl_Text_2" xml:space="preserve">
+    <value>Sobald Sie mit dem Aufzeichnen fertig sind, ergänzen Sie noch einige Details zum Problem, dann senden Sie die Mail an mich durch Tippen auf 'Absenden', und ich werde in Verbindung bleiben:</value>
+  </data>
+  <data name="PivotHelpControl_Toggle_Header" xml:space="preserve">
+    <value>Aufzeichnung</value>
+  </data>
+  <data name="ResourceFlowDirection" xml:space="preserve">
+    <value>LeftToRight</value>
+    <comment>Do not translate</comment>
+  </data>
+  <data name="ResourceLanguage" xml:space="preserve">
+    <value>de</value>
+  </data>
+  <data name="Settings_Button_DeleteCache" xml:space="preserve">
+    <value>Löschen Sie den Cache</value>
+  </data>
+  <data name="Settings_Button_Logoff" xml:space="preserve">
+    <value>Logoff</value>
+  </data>
+  <data name="Settings_Button_RateApp" xml:space="preserve">
+    <value>Bewerten Sie diese App</value>
+  </data>
+  <data name="Settings_Text_DeleteCache" xml:space="preserve">
+    <value>Löschen Sie die in dieser App heruntergeladenen Dateien.</value>
+  </data>
+  <data name="Settings_Text_Logoff" xml:space="preserve">
+    <value>Löschen Sie die in der App gespeicherten Login-Infos. Diese App speichert weder Benutzer noch Kennwort, nur das Auth Token.</value>
+  </data>
+  <data name="Settings_Text_RateApp" xml:space="preserve">
+    <value>Bewerten Sie diese App</value>
+  </data>
+  <data name="Settings_Title" xml:space="preserve">
+    <value>Einstellungen</value>
+  </data>
+  <data name="ListLibrary_Error_NoUpload_Content" xml:space="preserve">
+    <value>Sie müssen in einer Bibliothek sein, um eine Datei zu senden.</value>
+  </data>
+  <data name="ListLibrary_Error_NoUpload_Title" xml:space="preserve">
+    <value>Fehler!</value>
+  </data>
+  <data name="ContentLibrary_Error_UploadForbidden_Content" xml:space="preserve">
+    <value>Sie haben keine Schreibrechte in dieser Bibliothek.</value>
+  </data>
+  <data name="ContentLibrary_Error_UploadForbidden_Title" xml:space="preserve">
+    <value>Fehler!</value>
+  </data>
+  <data name="ContentLibrary_Error_Upload_Content" xml:space="preserve">
+    <value>Ein Fehler ist beim Versenden Sie die Datei. Bitte versuchen Sie es erneut.</value>
+  </data>
+  <data name="ContentLibrary_Error_Upload_Title" xml:space="preserve">
+    <value>Fehler!</value>
+  </data>
+  <data name="ContentLibrary_Upload_UploadCancel" xml:space="preserve">
+    <value>Senden abgesagt</value>
+  </data>
+</root>

@@ -1,0 +1,161 @@
+﻿<phone:PhoneApplicationPage
+    x:Class="AppSeafileClient.Pages.ContentLibraryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:AppSeafileClient"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    xmlns:localClass="clr-namespace:AppSeafileClient.Class"
+    xmlns:WindowsPhone8="clr-namespace:Microsoft.AdMediator.WindowsPhone8;assembly=Microsoft.AdMediator.WindowsPhone8"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    mc:Ignorable="d"
+    shell:SystemTray.IsVisible="True"
+    ApplicationBar = "{StaticResource GlobalAppBar}"
+    >
+
+    <phone:PhoneApplicationPage.DataContext>
+        <local:MainViewModel />
+    </phone:PhoneApplicationPage.DataContext>
+    
+    <phone:PhoneApplicationPage.Resources>
+        <localClass:mtimeToDateConverter x:Key="mtimeToStringConverter"/>
+        <localClass:sizeToStringConverter x:Key="sizeToStringConverter"/>
+        
+        <DataTemplate x:Key="type_file" x:FieldModifier="public">
+            <StackPanel Orientation="Horizontal">
+                <Border BorderBrush="#FF6C6C6A" BorderThickness="0,0,0,2" Margin="5,0,0,0" Padding="5" Width="1000">
+                    <Grid ShowGridLines="False">
+                        <toolkit:ContextMenuService.ContextMenu>
+                            <toolkit:ContextMenu BorderThickness="0" BorderBrush="White">
+                                <toolkit:MenuItem Header="{Binding Path=LocalizedResources.ContentLibrary_ContextMenu_Detail, Source={StaticResource LocalizedStrings}}" Click="MenuItem_ContentLibrary_Detail" Foreground="Black"  />
+                                <toolkit:MenuItem Header="{Binding Path=LocalizedResources.ContentLibrary_ContextMenu_Delete, Source={StaticResource LocalizedStrings}}" Click="MenuItem_ContentLibrary_Delete" Foreground="Black"  />
+                            </toolkit:ContextMenu>
+                        </toolkit:ContextMenuService.ContextMenu>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0" Grid.RowSpan="2">
+                            <Image Grid.Column="0" Source="/Assets/page_text_32.png" Stretch="None" Margin="0,0,0,0"/>
+                        </Grid>
+                        <Grid Grid.Row="0" Grid.Column="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="1" Text="{Binding name}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="1" Grid.Column="1">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding size,
+                                   Converter={StaticResource sizeToStringConverter},
+                                   ConverterParameter=\{0:D\}}"
+                                   FontSize="{StaticResource PhoneFontSizeSmall}" FontStyle="Italic" Margin="5,0,0,0" Foreground="Black" />
+                                <TextBlock Text="{Binding Path=LocalizedResources.ContentLibrary_Itemtemplate_LastUpdate, Source={StaticResource LocalizedStrings}}"  
+                                   FontSize="{StaticResource PhoneFontSizeSmall}" FontStyle="Italic" Margin="0" Foreground="Black"/>
+                                <TextBlock Text="{Binding mtime,
+                                   Converter={StaticResource mtimeToStringConverter},
+                                   ConverterParameter=\{0:D\}}"
+                                   FontSize="{StaticResource PhoneFontSizeSmall}" FontStyle="Italic" Margin="0" Foreground="Black" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="type_dir" x:FieldModifier="public">
+            <StackPanel Orientation="Horizontal">
+                <Border BorderBrush="#FF6C6C6A" BorderThickness="0,0,0,2" Margin="5,0,0,0" Padding="5" Width="1000">
+                    <toolkit:ContextMenuService.ContextMenu>
+                        <toolkit:ContextMenu BorderThickness="0" BorderBrush="White">
+                            <toolkit:MenuItem Header="{Binding Path=LocalizedResources.ContentLibrary_ContextMenu_Delete, Source={StaticResource LocalizedStrings}}" Click="MenuItem_ContentLibrary_Delete" Foreground="Black"  />
+                        </toolkit:ContextMenu>
+                    </toolkit:ContextMenuService.ContextMenu>
+                    <Grid ShowGridLines="False">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
+                            <Image Source="/Assets/folder_32.png" Stretch="None" Margin="0,0,0,0"/>
+                        </Grid>
+                        <Grid Grid.Column="1">
+                            <TextBlock Text="{Binding name}" FontSize="{StaticResource PhoneFontSizeMedium}" Margin="5,0,0,0" Foreground="Black" />
+                        </Grid>
+                    </Grid>
+                </Border>
+            </StackPanel>                
+        </DataTemplate>
+        
+    </phone:PhoneApplicationPage.Resources>
+
+    <toolkit:WaitCursorService.WaitCursor>
+        <toolkit:WaitCursor x:Name="WaitIndicator" Text="{Binding Path=LocalizedResources.ContentLibrary_Upload_UploadingWaiting, Source={StaticResource LocalizedStrings}}"/>
+    </toolkit:WaitCursorService.WaitCursor>
+
+    <!--Pivot Control-->
+    <phone:Pivot Background="WhiteSmoke" Foreground="Black">
+        <phone:Pivot.Title>
+            <TextBlock Text="{Binding Path=LocalizedResources.AppTitle, Source={StaticResource LocalizedStrings}}"
+                       FontWeight="Bold" FontStyle="Italic" FontSize="{StaticResource PhoneFontSizeLarge}" 
+                       Foreground="#FFF39C03"/>
+        </phone:Pivot.Title>
+        <phone:PivotItem x:Name="PivotItemLibContent" HorizontalAlignment="Left" Width="auto" Margin="0,0,0,0">
+            <phone:PivotItem.Header>
+                <TextBlock Text="{Binding Path=LocalizedResources.ContentLibrary_PivotTitle_1, Source={StaticResource LocalizedStrings}}" 
+                       FontSize="{StaticResource PivotHeaderFontSize}" 
+                       Foreground="{StaticResource PhoneAccentBrush}"/> 
+            </phone:PivotItem.Header>
+            <Grid x:Name="LayoutRoot" Background="Transparent" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <Grid Grid.Row="1">
+                    <StackPanel>
+                        <Image Name="imgSelectedImage" />
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <ListBox x:Name="listContentLibrary" SelectionChanged="listContentLibrary_SelectionChanged" 
+                                 ItemsSource="{Binding Elements}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <local:TypeTemplateSelector Content="{Binding}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+
+                <StackPanel Grid.Row="3">
+                 <!--   -->
+                </StackPanel>
+            </Grid>
+        </phone:PivotItem>
+
+        <phone:PivotItem >
+            <phone:PivotItem.Header>
+                <TextBlock Text="{Binding Path=LocalizedResources.ContentLibrary_PivotTitle_2, Source={StaticResource LocalizedStrings}}" 
+                       FontSize="{StaticResource PivotHeaderFontSize}" 
+                       Foreground="{StaticResource PhoneAccentBrush}" />
+            </phone:PivotItem.Header>
+            <localClass:PivotHelpControl x:Name="myPivoteItemHelp" />
+        </phone:PivotItem>
+    </phone:Pivot>
+</phone:PhoneApplicationPage>
