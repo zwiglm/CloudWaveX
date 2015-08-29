@@ -23,6 +23,7 @@ using AppSeafileClient.Resources;
 using System.Text;
 using Windows.Web.Http.Filters;
 using Windows.Security.Cryptography.Certificates;
+using Windows.Storage.Streams;
 
 namespace AppSeafileClient.Pages
 {
@@ -48,7 +49,6 @@ namespace AppSeafileClient.Pages
         }
 
        
-
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -99,26 +99,6 @@ namespace AppSeafileClient.Pages
         }
 
 
-        //private void GetURLData(string token, string url, string idlib, string type, string path)
-        //{
-        //    Uri uristring = null;
-        //    WebClient webClientGetURLData = new WebClient();
-
-        //    if (!string.IsNullOrEmpty(path))
-        //    {
-        //        uristring = new Uri(url + "/api2/" + "repos/" + idlib + "/" + type + "/?p=/" + System.Net.HttpUtility.UrlEncode(path));
-        //    }
-
-
-        //    webClientGetURLData.Headers["Accept"] = "application/json; charset=utf-8; indent=4";
-        //    webClientGetURLData.Headers["Authorization"] = "Token " + token;
-
-        //    webClientGetURLData.AllowReadStreamBuffering = true;
-        //    webClientGetURLData.Encoding = Encoding.UTF8;
-
-        //    webClientGetURLData.DownloadStringCompleted += webClientGetURLData_DownloadStringCompleted;
-        //    webClientGetURLData.DownloadStringAsync(uristring);
-        //}
         private async void GetURLDataAsync(string token, string url, string idlib, string type, string path)
         {
             Uri uristring = null;
@@ -154,22 +134,6 @@ namespace AppSeafileClient.Pages
             }
         }
 
-        //private void webClientGetURLData_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        string json = e.Result;
-        //        this.saveDataFromUriString(json);
-        //    }
-        //    catch
-        //    {
-        //        if (GlobalVariables.IsDebugMode == true)
-        //        {
-        //            App.logger.log(LogLevel.critical, "Get url data error :  " + e.Error);
-        //        }
-        //        MessageBox.Show(AppResources.Download_Error_Download_Content, AppResources.Download_Error_Download_Title, MessageBoxButton.OK);
-        //    }
-        //}
         private async void saveDataFromUriString(string uriString)
         {
             if (!string.IsNullOrEmpty(uriString))
@@ -214,18 +178,6 @@ namespace AppSeafileClient.Pages
         }
 
 
-       // private void DownloadFileWithURLData()
-       // {
-       //     webClientDownloadFileURLData = new WebClient();
-       //     webClientDownloadFileURLData.DownloadStringCompleted += new DownloadStringCompletedEventHandler(webClientDownloadFileURLData_DownloadStringCompleted);
-       //     webClientDownloadFileURLData.DownloadProgressChanged += new DownloadProgressChangedEventHandler(webClientDownloadFileURLData_DownloadProgressChanged);
-       //     webClientDownloadFileURLData.DownloadStringAsync(new Uri(downloadUrl));
-
-       //     cancelbtn.Visibility = Visibility.Visible;
-
-       ////     DownloadStatusText.Text = "Downloading source from " + downloadUrl;
-       //     DownloadResultText.Text = string.Empty;
-       // }
         private async Task DownloadFileWithURLDataAsync()
         {
             var filter = new HttpBaseProtocolFilter();
@@ -264,76 +216,53 @@ namespace AppSeafileClient.Pages
             };
             await asyncResponse;
 
-            //String result = asyncResponse.GetResults();
             HttpResponseMessage respMessge = asyncResponse.GetResults();
             respMessge.EnsureSuccessStatusCode();
-            StoreFileToISF();
+            StoreFileToISF(respMessge.Content);
         }
-        //private void DwnldCompleted(IAsyncOperationWithProgress<string, HttpProgress> asyncInfo, AsyncStatus asyncStatus)
+
+        // MaZ attn: reference for error-handling
+        //void webClientDownloadFileURLData_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         //{
-        //    string dummy = "";
-        //}
-
-        //void webClientDownloadFileURLData_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        //{
-        //    var bc = e.BytesReceived;
-        //    var tb = e.TotalBytesToReceive;
-        //    var p = e.ProgressPercentage;
-
-        //    ProgressBarStatus.Value = bc;
-        //    ProgressBarStatus.Maximum = tb;
-
-        //    string t = AppResources.Download_Status_Text_1 + file + AppResources.Download_Status_Text_2;
-        //    DownloadStatusText.Text = t;
-        //    DownloadResultText.Text = AppResources.Download_Result_Text_1 + (bc/1024) + AppResources.Download_Result_Text_2 + (tb/1024) + AppResources.Download_Result_Text_3 + p + AppResources.Download_Result_Text_4;
-
-        //    if (GlobalVariables.IsDebugMode == true)
+        //    try
         //    {
-        //        App.logger.log(LogLevel.debug, "Download : " + (string)e.UserState + " downloaded " + e.BytesReceived + " of " + e.TotalBytesToReceive + " bytes. " + e.ProgressPercentage +  "% complete...");
+        //        cancelbtn.Visibility = Visibility.Collapsed;
+        //        if (e.Cancelled == true)
+        //        {
+        //            DownloadStatusText.Text = AppResources.Download_Status_Text_3;
+        //            return;
+        //        }
+
+        //        if (e.Error != null)
+        //        {
+        //            DownloadStatusText.Text = AppResources.Download_Status_Text_4;
+        //            DownloadResultText.Text = e.Error.ToString();
+        //            if (GlobalVariables.IsDebugMode == true)
+        //            {
+        //                App.logger.log(LogLevel.critical, "Download error :  " + e.Error.ToString());
+        //            }
+        //            return;
+        //        }
+        //        if (GlobalVariables.IsDebugMode == true)
+        //        {
+        //            App.logger.log(LogLevel.debug, "File download OK");
+        //        }
+        //        DownloadStatusText.Text = AppResources.Download_Status_Text_5;
+        //        DownloadResultText.Text = e.Result;
+
+        //        DownloadResultText.Visibility = Visibility.Collapsed;
+        //        cancelbtn.Visibility = Visibility.Collapsed;
+
+        //        StoreFileToISF();
+        //    }
+        //    catch
+        //    {
+        //        if (GlobalVariables.IsDebugMode == true)
+        //        {
+        //            App.logger.log(LogLevel.critical, "Download file error :  " + e.Error.ToString());
+        //        }
         //    }
         //}
-
-        void webClientDownloadFileURLData_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
-        {
-            try
-            {
-                cancelbtn.Visibility = Visibility.Collapsed;
-                if (e.Cancelled == true)
-                {
-                    DownloadStatusText.Text = AppResources.Download_Status_Text_3;
-                    return;
-                }
-
-                if (e.Error != null)
-                {
-                    DownloadStatusText.Text = AppResources.Download_Status_Text_4;
-                    DownloadResultText.Text = e.Error.ToString();
-                    if (GlobalVariables.IsDebugMode == true)
-                    {
-                        App.logger.log(LogLevel.critical, "Download error :  " + e.Error.ToString());
-                    }
-                    return;
-                }
-                if (GlobalVariables.IsDebugMode == true)
-                {
-                    App.logger.log(LogLevel.debug, "File download OK");
-                }
-                DownloadStatusText.Text = AppResources.Download_Status_Text_5;
-                DownloadResultText.Text = e.Result;
-
-                DownloadResultText.Visibility = Visibility.Collapsed;
-                cancelbtn.Visibility = Visibility.Collapsed;
-
-                StoreFileToISF();
-            }
-            catch
-            {
-                if (GlobalVariables.IsDebugMode == true)
-                {
-                    App.logger.log(LogLevel.critical, "Download file error :  " + e.Error.ToString());
-                }
-            }
-        }
 
         private void CancelButton_Click_1(object sender, RoutedEventArgs e)
         {
@@ -341,9 +270,9 @@ namespace AppSeafileClient.Pages
         }
 
    
-        private async void StoreFileToISF()
+        private async void StoreFileToISF(IHttpContent downloadContent)
         {
-            DownloadStatus fileDownloaded = await DownloadFileSimle(new Uri(downloadUrl, UriKind.Absolute), file, id, path);
+            DownloadStatus fileDownloaded = await StoreFileSimle(downloadContent, file, id, path);
             switch (fileDownloaded)
             {
                 case DownloadStatus.Ok:
@@ -358,23 +287,7 @@ namespace AppSeafileClient.Pages
                     break;
             }
         }
-
-        public static Task<Stream> DownloadStream(Uri url)
-        {
-            TaskCompletionSource<Stream> tcs = new TaskCompletionSource<Stream>();
-            WebClient wbc = new WebClient();
-
-            wbc.OpenReadCompleted += (s, e) =>
-            {
-                if (e.Error != null) tcs.TrySetException(e.Error);
-                else if (e.Cancelled) tcs.TrySetCanceled();
-                else tcs.TrySetResult(e.Result);
-            };
-            wbc.OpenReadAsync(url);
-            return tcs.Task;
-        }
-
-        public static async Task<DownloadStatus> DownloadFileSimle(Uri fileAdress, string f, string idlib, string path)
+        private async Task<DownloadStatus> StoreFileSimle(IHttpContent downloadContent, string f, string idlib, string path)
         {
             string pathInISF;
 
@@ -382,11 +295,11 @@ namespace AppSeafileClient.Pages
 
             if (path.StartsWith("/"))
             {
-                pathInISF = "cache" + "/" + idlib + path;  
+                pathInISF = "cache" + "/" + idlib + path;
             }
             else
             {
-                pathInISF = "cache" + "/" + idlib + "/" + path;  
+                pathInISF = "cache" + "/" + idlib + "/" + path;
             }
 
             try
@@ -396,12 +309,14 @@ namespace AppSeafileClient.Pages
                     GlobalVariables.ISF.CreateDirectory(pathInISF);
                 }
 
-                Stream response = await DownloadStream(fileAdress);
+                IInputStream dwnldStream = await downloadContent.ReadAsInputStreamAsync();
+                Stream ioStream = dwnldStream.AsStreamForRead();
+
 
                 if (GlobalVariables.ISF.FileExists(pathInISF + "/" + f)) return DownloadStatus.SameName;
                 if (pathInISF.EndsWith("/"))
                 {
-                    completePatahOnISF = pathInISF + f; 
+                    completePatahOnISF = pathInISF + f;
                 }
                 else
                 {
@@ -409,7 +324,7 @@ namespace AppSeafileClient.Pages
                 }
 
                 using (IsolatedStorageFileStream file = GlobalVariables.ISF.CreateFile(completePatahOnISF))
-                    response.CopyTo(file);
+                    ioStream.CopyTo(file);
 
 
                 return DownloadStatus.Ok;
@@ -421,8 +336,9 @@ namespace AppSeafileClient.Pages
                 {
                     App.logger.log(LogLevel.critical, "DownloadFileSimle error :  " + DownloadStatus.Error);
                 }
-                return DownloadStatus.Error; 
+                return DownloadStatus.Error;
             }
+
         }
 
         public void openFileDownloaded_Click(object sender, RoutedEventArgs e)

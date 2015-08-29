@@ -6,12 +6,12 @@ using System.Resources;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CloudWave for Seafile")]
+[assembly: AssemblyTitle("CloudWaveX for Seafile")]
 [assembly: AssemblyDescription("An unofficial seafile client")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("CloudWave for Seafile")]
-[assembly: AssemblyCopyright("Copyright ©  2014-2015")]
+[assembly: AssemblyProduct("CloudWaveX for Seafile")]
+[assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

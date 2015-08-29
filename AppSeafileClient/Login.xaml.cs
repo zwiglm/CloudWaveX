@@ -244,7 +244,7 @@ namespace AppSeafileClient
             var nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);
 
             HttpClientLogin.DefaultRequestHeaders.Add("Accept", "application/json;indent=4");
-            HttpClientLogin.DefaultRequestHeaders.Add("User-agent", "CloudWave for Seafile/" + nameHelper.Version);
+            HttpClientLogin.DefaultRequestHeaders.Add("User-agent", "CloudWaveX for Seafile/" + nameHelper.Version);
 
             var values = new[]
                     {

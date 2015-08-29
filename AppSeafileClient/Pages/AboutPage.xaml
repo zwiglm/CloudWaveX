@@ -27,7 +27,7 @@
                      FontWeight="Bold" FontStyle="Italic" FontSize="{StaticResource PhoneFontSizeLarge}" 
                      Foreground="#FFF39C03"
              >
-            	<Run Text="CloudWave"/>
+            	<Run Text="CloudWaveX"/>
             	<Run Text="X"/>
             </TextBlock>
             <TextBlock Text="About+Help" Margin="9,-7,0,0"   

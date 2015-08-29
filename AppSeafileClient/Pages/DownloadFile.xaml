@@ -27,8 +27,8 @@
             <TextBlock
                        FontWeight="Bold" FontStyle="Italic" FontSize="{StaticResource PhoneFontSizeLarge}" 
                        Foreground="#FFF39C03">
-            	<Run Text="CloudWave"/>
-            	<Run Text="X"/>
+            	<Run Text="CloudWav"/>
+            	<Run Text="eX"/>
             </TextBlock>
             <TextBlock Text="Download file" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"  
                         FontSize="{StaticResource PivotHeaderFontSize}" 
