@@ -130,7 +130,7 @@
     <value>Upload</value>
   </data>
   <data name="AppTitle" xml:space="preserve">
-    <value>CloudWave</value>
+    <value>CloudWaveX</value>
   </data>
   <data name="Certificate_Error_CNMissmatch" xml:space="preserve">
     <value>The certificate is not valid for the requested usage. This error is also returned if the certificate has an invalid name.</value>

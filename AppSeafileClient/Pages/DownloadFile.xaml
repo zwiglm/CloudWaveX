@@ -24,9 +24,12 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="12,17,0,28">
-            <TextBlock Text="{Binding Path=LocalizedResources.AppTitle, Source={StaticResource LocalizedStrings}}"
+            <TextBlock
                        FontWeight="Bold" FontStyle="Italic" FontSize="{StaticResource PhoneFontSizeLarge}" 
-                       Foreground="#FFF39C03"/>
+                       Foreground="#FFF39C03">
+            	<Run Text="CloudWave"/>
+            	<Run Text="X"/>
+            </TextBlock>
             <TextBlock Text="Download file" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"  
                         FontSize="{StaticResource PivotHeaderFontSize}" 
                        Foreground="{StaticResource PhoneAccentBrush}"/>
@@ -42,12 +45,12 @@
                 <TextBlock TextWrapping="Wrap" Text="{Binding Path=LocalizedResources.Download_Result_Text_Title, Source={StaticResource LocalizedStrings}}" Foreground="{StaticResource PhoneAccentBrush}" FontSize="{StaticResource PhoneFontSizeNormal}"/>
                 <TextBlock x:Name="DownloadResultText" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeNormal}" Foreground="Black"/>
                 <Button Name="openFileDownloaded" Content="{Binding Path=LocalizedResources.Download_Button_Open, Source={StaticResource LocalizedStrings}}" Click="openFileDownloaded_Click" Visibility="Collapsed" BorderBrush="Black" Foreground="#FF080202"/>
-            </StackPanel> 
+            </StackPanel>
         </Grid>
-            <!-- -->
+        <!-- -->
         <StackPanel Grid.Row="2">
             <!--  -->
-            </StackPanel>
+        </StackPanel>
     </Grid>
 
 </phone:PhoneApplicationPage>

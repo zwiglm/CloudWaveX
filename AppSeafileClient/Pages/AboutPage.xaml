@@ -23,10 +23,13 @@
 
         <!--TitlePanel contains the name of the application and page title-->
         <StackPanel Grid.Row="0" Margin="12,17,0,28" >
-            <TextBlock Text="{Binding Path=LocalizedResources.AppTitle, Source={StaticResource LocalizedStrings}}" 
+            <TextBlock 
                      FontWeight="Bold" FontStyle="Italic" FontSize="{StaticResource PhoneFontSizeLarge}" 
                      Foreground="#FFF39C03"
-             />
+             >
+            	<Run Text="CloudWave"/>
+            	<Run Text="X"/>
+            </TextBlock>
             <TextBlock Text="About+Help" Margin="9,-7,0,0"   
                        FontSize="{StaticResource PivotHeaderFontSize}" 
                        Foreground="{StaticResource PhoneAccentBrush}"/>
@@ -40,8 +43,12 @@
 
             <StackPanel Grid.Row="0" Width="Auto">
                 <TextBlock Text="About" TextDecorations="Underline" Foreground="Black" FontWeight="Bold" ></TextBlock>
-                <TextBlock TextWrapping="Wrap" x:Name="about" Text="Application made by Sebastien Girard. 
-                           This app use Newtonsoft.Json, WPClogger and Coding4Fun Toolkit." FontSize="{StaticResource PhoneFontSizeNormal}" Foreground="Black" />
+                <TextBlock TextWrapping="Wrap" x:Name="about" FontSize="{StaticResource PhoneFontSizeNormal}" Foreground="Black" >
+                	<Run Text="Application made by "/>
+                	<Run Text="Martin Zwigl (based on the code by "/>
+                	<Run Text="Sebastien Girard)                                    " />
+                    <Run Text="This app use Newtonsoft.Json, WPClogger and Coding4Fun Toolkit."/>
+                </TextBlock>
                 <TextBlock Text="Help" TextDecorations="Underline" Foreground="Black" FontWeight="Bold" ></TextBlock>
                 <Grid>
                     <Grid.ColumnDefinitions>

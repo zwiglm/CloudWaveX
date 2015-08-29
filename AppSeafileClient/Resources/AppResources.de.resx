@@ -130,7 +130,7 @@
     <value>Senden einer Datei</value>
   </data>
   <data name="AppTitle" xml:space="preserve">
-    <value>CloudWave for Seafile</value>
+    <value>CloudWaveX for Seafile</value>
   </data>
   <data name="Certificate_Error_CNMissmatch" xml:space="preserve">
     <value>Das Zertifikat ist für die angeforderte Nutzung nicht gültig. Dieser Fehler wird auch zurückgegeben, wenn das Zertifikat eine ungültigen Namen hat.</value>
@@ -206,10 +206,10 @@
     <value>Herunterladen gelungen</value>
   </data>
   <data name="Download_Button_Cancel" xml:space="preserve">
-    <value>Abgebrochen</value>
+    <value>Abrechen</value>
   </data>
   <data name="Download_Button_Open" xml:space="preserve">
-    <value>Offen</value>
+    <value>Öffnen</value>
   </data>
   <data name="Download_Error_Download_Content" xml:space="preserve">
     <value>Beim Download ist ein Fehler aufgetreten. Versuchen Sie es bitte noch einmal.</value>

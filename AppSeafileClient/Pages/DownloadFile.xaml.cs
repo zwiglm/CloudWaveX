@@ -154,23 +154,23 @@ namespace AppSeafileClient.Pages
             }
         }
 
-        private void webClientGetURLData_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
-        {
-            try
-            {
-                string json = e.Result;
-                this.saveDataFromUriString(json);
-            }
-            catch
-            {
-                if (GlobalVariables.IsDebugMode == true)
-                {
-                    App.logger.log(LogLevel.critical, "Get url data error :  " + e.Error);
-                }
-                MessageBox.Show(AppResources.Download_Error_Download_Content, AppResources.Download_Error_Download_Title, MessageBoxButton.OK);
-            }
-        }
-        private void saveDataFromUriString(string uriString)
+        //private void webClientGetURLData_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+        //{
+        //    try
+        //    {
+        //        string json = e.Result;
+        //        this.saveDataFromUriString(json);
+        //    }
+        //    catch
+        //    {
+        //        if (GlobalVariables.IsDebugMode == true)
+        //        {
+        //            App.logger.log(LogLevel.critical, "Get url data error :  " + e.Error);
+        //        }
+        //        MessageBox.Show(AppResources.Download_Error_Download_Content, AppResources.Download_Error_Download_Title, MessageBoxButton.OK);
+        //    }
+        //}
+        private async void saveDataFromUriString(string uriString)
         {
             if (!string.IsNullOrEmpty(uriString))
             {
@@ -206,44 +206,92 @@ namespace AppSeafileClient.Pages
                 }
                 else
                 {
-                    DownloadFileWithURLData();
+                    //DownloadFileWithURLData();
+                    await DownloadFileWithURLDataAsync();
                 }
 
             }
         }
 
 
-        private void DownloadFileWithURLData()
+       // private void DownloadFileWithURLData()
+       // {
+       //     webClientDownloadFileURLData = new WebClient();
+       //     webClientDownloadFileURLData.DownloadStringCompleted += new DownloadStringCompletedEventHandler(webClientDownloadFileURLData_DownloadStringCompleted);
+       //     webClientDownloadFileURLData.DownloadProgressChanged += new DownloadProgressChangedEventHandler(webClientDownloadFileURLData_DownloadProgressChanged);
+       //     webClientDownloadFileURLData.DownloadStringAsync(new Uri(downloadUrl));
+
+       //     cancelbtn.Visibility = Visibility.Visible;
+
+       ////     DownloadStatusText.Text = "Downloading source from " + downloadUrl;
+       //     DownloadResultText.Text = string.Empty;
+       // }
+        private async Task DownloadFileWithURLDataAsync()
         {
-            webClientDownloadFileURLData = new WebClient();
-            webClientDownloadFileURLData.DownloadStringCompleted += new DownloadStringCompletedEventHandler(webClientDownloadFileURLData_DownloadStringCompleted);
-            webClientDownloadFileURLData.DownloadProgressChanged += new DownloadProgressChangedEventHandler(webClientDownloadFileURLData_DownloadProgressChanged);
-            webClientDownloadFileURLData.DownloadStringAsync(new Uri(downloadUrl));
+            var filter = new HttpBaseProtocolFilter();
+            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
+            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
+            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
+            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
+            HttpClient webClientGetURLData = new HttpClient(filter);
 
             cancelbtn.Visibility = Visibility.Visible;
 
-       //     DownloadStatusText.Text = "Downloading source from " + downloadUrl;
-            DownloadResultText.Text = string.Empty;
-        }
-
-        void webClientDownloadFileURLData_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
-        {
-            var bc = e.BytesReceived;
-            var tb = e.TotalBytesToReceive;
-            var p = e.ProgressPercentage;
-
-            ProgressBarStatus.Value = bc;
-            ProgressBarStatus.Maximum = tb;
-
-            string t = AppResources.Download_Status_Text_1 + file + AppResources.Download_Status_Text_2;
-            DownloadStatusText.Text = t;
-            DownloadResultText.Text = AppResources.Download_Result_Text_1 + (bc/1024) + AppResources.Download_Result_Text_2 + (tb/1024) + AppResources.Download_Result_Text_3 + p + AppResources.Download_Result_Text_4;
-
-            if (GlobalVariables.IsDebugMode == true)
+            var asyncResponse = webClientGetURLData.GetAsync(new Uri(downloadUrl));
+            asyncResponse.Progress = (res, progress) =>
             {
-                App.logger.log(LogLevel.debug, "Download : " + (string)e.UserState + " downloaded " + e.BytesReceived + " of " + e.TotalBytesToReceive + " bytes. " + e.ProgressPercentage +  "% complete...");
-            }
+                var bc = progress.BytesReceived;
+                var tb = progress.TotalBytesToReceive;
+                var p = 0;
+                try
+                {
+                    p = Convert.ToInt32(tb / bc); 
+                }
+                catch {}
+
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    ProgressBarStatus.Value = bc;
+                    ProgressBarStatus.Maximum = Convert.ToDouble(tb);
+
+                    string t = AppResources.Download_Status_Text_1 + file + AppResources.Download_Status_Text_2;
+                    DownloadStatusText.Text = t;
+                    DownloadResultText.Text =
+                        //AppResources.Download_Result_Text_1 + (bc / 1024) + AppResources.Download_Result_Text_2 + (tb / 1024) + AppResources.Download_Result_Text_3 + p + AppResources.Download_Result_Text_4;
+                        AppResources.Download_Result_Text_1 + (bc / 1024) + AppResources.Download_Result_Text_2 + (tb / 1024) + AppResources.Download_Result_Text_3;
+                });
+
+            };
+            await asyncResponse;
+
+            //String result = asyncResponse.GetResults();
+            HttpResponseMessage respMessge = asyncResponse.GetResults();
+            respMessge.EnsureSuccessStatusCode();
+            StoreFileToISF();
         }
+        //private void DwnldCompleted(IAsyncOperationWithProgress<string, HttpProgress> asyncInfo, AsyncStatus asyncStatus)
+        //{
+        //    string dummy = "";
+        //}
+
+        //void webClientDownloadFileURLData_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        //{
+        //    var bc = e.BytesReceived;
+        //    var tb = e.TotalBytesToReceive;
+        //    var p = e.ProgressPercentage;
+
+        //    ProgressBarStatus.Value = bc;
+        //    ProgressBarStatus.Maximum = tb;
+
+        //    string t = AppResources.Download_Status_Text_1 + file + AppResources.Download_Status_Text_2;
+        //    DownloadStatusText.Text = t;
+        //    DownloadResultText.Text = AppResources.Download_Result_Text_1 + (bc/1024) + AppResources.Download_Result_Text_2 + (tb/1024) + AppResources.Download_Result_Text_3 + p + AppResources.Download_Result_Text_4;
+
+        //    if (GlobalVariables.IsDebugMode == true)
+        //    {
+        //        App.logger.log(LogLevel.debug, "Download : " + (string)e.UserState + " downloaded " + e.BytesReceived + " of " + e.TotalBytesToReceive + " bytes. " + e.ProgressPercentage +  "% complete...");
+        //    }
+        //}
 
         void webClientDownloadFileURLData_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
@@ -367,7 +415,8 @@ namespace AppSeafileClient.Pages
                 return DownloadStatus.Ok;
 
             }
-            catch {
+            catch (Exception ex)
+            {
                 if (GlobalVariables.IsDebugMode == true)
                 {
                     App.logger.log(LogLevel.critical, "DownloadFileSimle error :  " + DownloadStatus.Error);
