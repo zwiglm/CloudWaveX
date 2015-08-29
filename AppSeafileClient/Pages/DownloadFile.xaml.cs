@@ -21,6 +21,8 @@ using System.IO;
 using System.IO.IsolatedStorage;
 using AppSeafileClient.Resources;
 using System.Text;
+using Windows.Web.Http.Filters;
+using Windows.Security.Cryptography.Certificates;
 
 namespace AppSeafileClient.Pages
 {
@@ -85,7 +87,8 @@ namespace AppSeafileClient.Pages
 
             if (backFromView == false)
             {
-                GetURLData(authorization, address, id, "file", path); 
+                //GetURLData(authorization, address, id, "file", path); 
+                GetURLDataAsync(authorization, address, id, "file", path);
             }
             else
             {
@@ -96,10 +99,36 @@ namespace AppSeafileClient.Pages
         }
 
 
-        private void GetURLData(string token, string url, string idlib, string type, string path)
+        //private void GetURLData(string token, string url, string idlib, string type, string path)
+        //{
+        //    Uri uristring = null;
+        //    WebClient webClientGetURLData = new WebClient();
+
+        //    if (!string.IsNullOrEmpty(path))
+        //    {
+        //        uristring = new Uri(url + "/api2/" + "repos/" + idlib + "/" + type + "/?p=/" + System.Net.HttpUtility.UrlEncode(path));
+        //    }
+
+
+        //    webClientGetURLData.Headers["Accept"] = "application/json; charset=utf-8; indent=4";
+        //    webClientGetURLData.Headers["Authorization"] = "Token " + token;
+
+        //    webClientGetURLData.AllowReadStreamBuffering = true;
+        //    webClientGetURLData.Encoding = Encoding.UTF8;
+
+        //    webClientGetURLData.DownloadStringCompleted += webClientGetURLData_DownloadStringCompleted;
+        //    webClientGetURLData.DownloadStringAsync(uristring);
+        //}
+        private async void GetURLDataAsync(string token, string url, string idlib, string type, string path)
         {
             Uri uristring = null;
-            WebClient webClientGetURLData = new WebClient();
+
+            var filter = new HttpBaseProtocolFilter();
+            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
+            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
+            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
+            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
+            HttpClient webClientGetURLData = new HttpClient(filter);
 
             if (!string.IsNullOrEmpty(path))
             {
@@ -107,61 +136,30 @@ namespace AppSeafileClient.Pages
             }
 
 
-            webClientGetURLData.Headers["Accept"] = "application/json; charset=utf-8; indent=4";
-            webClientGetURLData.Headers["Authorization"] = "Token " + token;
+            webClientGetURLData.DefaultRequestHeaders.Add("Accept", "application/json; charset=utf-8; indent=4");
+            webClientGetURLData.DefaultRequestHeaders.Add("Authorization", "Token " + token);
 
-            webClientGetURLData.AllowReadStreamBuffering = true;
-            webClientGetURLData.Encoding = Encoding.UTF8;
-
-            webClientGetURLData.DownloadStringCompleted += webClientGetURLData_DownloadStringCompleted;
-            webClientGetURLData.DownloadStringAsync(uristring);
+            try
+            {
+                String dummy = await webClientGetURLData.GetStringAsync(uristring);
+                this.saveDataFromUriString(dummy);
+            }
+            catch (Exception ex)
+            {
+                if (GlobalVariables.IsDebugMode == true)
+                {
+                    App.logger.log(LogLevel.critical, "Get url data error :  " + ex.Message);
+                }
+                MessageBox.Show(AppResources.Download_Error_Download_Content, AppResources.Download_Error_Download_Title, MessageBoxButton.OK);
+            }
         }
 
         private void webClientGetURLData_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
             try
             {
-                Exception error = e.Error;
-
                 string json = e.Result;
-                if (!string.IsNullOrEmpty(json))
-                {
-                    if (GlobalVariables.IsDebugMode == true)
-                    {
-                        App.logger.log(LogLevel.debug, "JSON before : " + json);
-                    }
-                    string tmp = json;
-                    int l = tmp.Length - 2;
-                    tmp = tmp.Substring(1, l);
-
-                    if (GlobalVariables.IsDebugMode == true)
-                    {
-                        App.logger.log(LogLevel.debug, "JSON after : " + tmp);
-                    }
-
-                    downloadUrl = tmp;
-
-                    string pathInISF;
-                    if (path.StartsWith("/"))
-                    {
-                        pathInISF = "cache" + "/" + id + path;
-                    }
-                    else
-                    {
-                        pathInISF = "cache" + "/" + id + "/" + path;
-                    }
-
-                    if (GlobalVariables.ISF.FileExists(pathInISF))
-                    {                     
-                        completePatahOnISF = pathInISF;
-                        openFileFromISF();
-                    }
-                    else
-                    {
-                        DownloadFileWithURLData();
-                    }
-
-                }
+                this.saveDataFromUriString(json);
             }
             catch
             {
@@ -172,6 +170,48 @@ namespace AppSeafileClient.Pages
                 MessageBox.Show(AppResources.Download_Error_Download_Content, AppResources.Download_Error_Download_Title, MessageBoxButton.OK);
             }
         }
+        private void saveDataFromUriString(string uriString)
+        {
+            if (!string.IsNullOrEmpty(uriString))
+            {
+                if (GlobalVariables.IsDebugMode == true)
+                {
+                    App.logger.log(LogLevel.debug, "JSON before : " + uriString);
+                }
+                string tmp = uriString;
+                int l = tmp.Length - 2;
+                tmp = tmp.Substring(1, l);
+
+                if (GlobalVariables.IsDebugMode == true)
+                {
+                    App.logger.log(LogLevel.debug, "JSON after : " + tmp);
+                }
+
+                downloadUrl = tmp;
+
+                string pathInISF;
+                if (path.StartsWith("/"))
+                {
+                    pathInISF = "cache" + "/" + id + path;
+                }
+                else
+                {
+                    pathInISF = "cache" + "/" + id + "/" + path;
+                }
+
+                if (GlobalVariables.ISF.FileExists(pathInISF))
+                {
+                    completePatahOnISF = pathInISF;
+                    openFileFromISF();
+                }
+                else
+                {
+                    DownloadFileWithURLData();
+                }
+
+            }
+        }
+
 
         private void DownloadFileWithURLData()
         {
