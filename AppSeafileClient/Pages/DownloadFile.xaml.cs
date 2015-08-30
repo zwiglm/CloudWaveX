@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -30,6 +29,13 @@ namespace AppSeafileClient.Pages
     public partial class DownloadFile : PhoneApplicationPage
     {
 
+        public enum DownloadStatus
+        {
+            Ok,
+            SameName,
+            Error
+        };
+
         string authorization = "";
         string address = "";
         string id = "";
@@ -37,11 +43,12 @@ namespace AppSeafileClient.Pages
         string file = "";
         string downloadUrl = "";
         string timeLastUpdate = "";
-        WebClient webClientDownloadFileURLData;
-        public enum DownloadStatus { Ok, SameName, Error };
         bool backFromView = false;
 
+        CancellationTokenSource ctsDownload;
+
         static string completePatahOnISF;
+
 
         public DownloadFile()
         {
@@ -87,7 +94,6 @@ namespace AppSeafileClient.Pages
 
             if (backFromView == false)
             {
-                //GetURLData(authorization, address, id, "file", path); 
                 GetURLDataAsync(authorization, address, id, "file", path);
             }
             else
@@ -114,8 +120,6 @@ namespace AppSeafileClient.Pages
             {
                 uristring = new Uri(url + "/api2/" + "repos/" + idlib + "/" + type + "/?p=/" + System.Net.HttpUtility.UrlEncode(path));
             }
-
-
             webClientGetURLData.DefaultRequestHeaders.Add("Accept", "application/json; charset=utf-8; indent=4");
             webClientGetURLData.DefaultRequestHeaders.Add("Authorization", "Token " + token);
 
@@ -170,7 +174,6 @@ namespace AppSeafileClient.Pages
                 }
                 else
                 {
-                    //DownloadFileWithURLData();
                     await DownloadFileWithURLDataAsync();
                 }
 
@@ -189,84 +192,74 @@ namespace AppSeafileClient.Pages
 
             cancelbtn.Visibility = Visibility.Visible;
 
-            var asyncResponse = webClientGetURLData.GetAsync(new Uri(downloadUrl));
-            asyncResponse.Progress = (res, progress) =>
+            try
             {
-                var bc = progress.BytesReceived;
-                var tb = progress.TotalBytesToReceive;
-                var p = 0;
-                try
+                ctsDownload = new CancellationTokenSource();
+                var dwnldProgressHandler = new Progress<HttpProgress>(dwnldProgressCallback);
+                var asyncResponse = await webClientGetURLData.GetAsync(new Uri(downloadUrl)).AsTask(ctsDownload.Token, dwnldProgressHandler);
+
+                HttpResponseMessage errors = asyncResponse.EnsureSuccessStatusCode();
+                StoreFileToISF(asyncResponse.Content);
+            }
+            catch (TaskCanceledException tcEx)
+            {
+                if (ctsDownload.Token.IsCancellationRequested)
                 {
-                    p = Convert.ToInt32(tb / bc); 
+                    DownloadStatusText.Text = AppResources.Download_Status_Text_3;
+                    return;
                 }
-                catch {}
-
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                else
                 {
-                    ProgressBarStatus.Value = bc;
-                    ProgressBarStatus.Maximum = Convert.ToDouble(tb);
+                    // MaZ todo: from Resources....
+                    DownloadStatusText.Text = "Operation timed out";
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                DownloadStatusText.Text = AppResources.Download_Status_Text_4;
+                DownloadResultText.Text = ex.Message;
+                if (GlobalVariables.IsDebugMode == true)
+                {
+                    App.logger.log(LogLevel.critical, String.Format("Download error:  {0} {1}", ex.ToString(), ex.Message));
+                }
+                return;
+            }
 
-                    string t = AppResources.Download_Status_Text_1 + file + AppResources.Download_Status_Text_2;
-                    DownloadStatusText.Text = t;
-                    DownloadResultText.Text =
-                        //AppResources.Download_Result_Text_1 + (bc / 1024) + AppResources.Download_Result_Text_2 + (tb / 1024) + AppResources.Download_Result_Text_3 + p + AppResources.Download_Result_Text_4;
-                        AppResources.Download_Result_Text_1 + (bc / 1024) + AppResources.Download_Result_Text_2 + (tb / 1024) + AppResources.Download_Result_Text_3;
-                });
-
-            };
-            await asyncResponse;
-
-            HttpResponseMessage respMessge = asyncResponse.GetResults();
-            respMessge.EnsureSuccessStatusCode();
-            StoreFileToISF(respMessge.Content);
+            DownloadStatusText.Text = AppResources.Download_Status_Text_5;
+            // MaZ todo: seems there should be the name of the file to donwload...
+            //DownloadResultText.Text = e.Result;
+            DownloadResultText.Visibility = Visibility.Collapsed;
+            cancelbtn.Visibility = Visibility.Collapsed;
         }
 
-        // MaZ attn: reference for error-handling
-        //void webClientDownloadFileURLData_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
-        //{
-        //    try
-        //    {
-        //        cancelbtn.Visibility = Visibility.Collapsed;
-        //        if (e.Cancelled == true)
-        //        {
-        //            DownloadStatusText.Text = AppResources.Download_Status_Text_3;
-        //            return;
-        //        }
+        private void dwnldProgressCallback(HttpProgress progressInfo)
+        {
+            var bc = progressInfo.BytesReceived;
+            var tb = progressInfo.TotalBytesToReceive;
+            var p = 0;
+            try
+            {
+                p = Convert.ToInt32(tb / bc);
+            }
+            catch { }
 
-        //        if (e.Error != null)
-        //        {
-        //            DownloadStatusText.Text = AppResources.Download_Status_Text_4;
-        //            DownloadResultText.Text = e.Error.ToString();
-        //            if (GlobalVariables.IsDebugMode == true)
-        //            {
-        //                App.logger.log(LogLevel.critical, "Download error :  " + e.Error.ToString());
-        //            }
-        //            return;
-        //        }
-        //        if (GlobalVariables.IsDebugMode == true)
-        //        {
-        //            App.logger.log(LogLevel.debug, "File download OK");
-        //        }
-        //        DownloadStatusText.Text = AppResources.Download_Status_Text_5;
-        //        DownloadResultText.Text = e.Result;
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
+            {
+                ProgressBarStatus.Value = bc;
+                ProgressBarStatus.Maximum = Convert.ToDouble(tb);
 
-        //        DownloadResultText.Visibility = Visibility.Collapsed;
-        //        cancelbtn.Visibility = Visibility.Collapsed;
-
-        //        StoreFileToISF();
-        //    }
-        //    catch
-        //    {
-        //        if (GlobalVariables.IsDebugMode == true)
-        //        {
-        //            App.logger.log(LogLevel.critical, "Download file error :  " + e.Error.ToString());
-        //        }
-        //    }
-        //}
+                string t = AppResources.Download_Status_Text_1 + file + AppResources.Download_Status_Text_2;
+                DownloadStatusText.Text = t;
+                DownloadResultText.Text =
+                    //AppResources.Download_Result_Text_1 + (bc / 1024) + AppResources.Download_Result_Text_2 + (tb / 1024) + AppResources.Download_Result_Text_3 + p + AppResources.Download_Result_Text_4;
+                    AppResources.Download_Result_Text_1 + (bc / 1024) + AppResources.Download_Result_Text_2 + (tb / 1024) + AppResources.Download_Result_Text_3;
+            });
+        }
 
         private void CancelButton_Click_1(object sender, RoutedEventArgs e)
         {
-            webClientDownloadFileURLData.CancelAsync();
+            ctsDownload.Cancel();
         }
 
    
@@ -346,7 +339,7 @@ namespace AppSeafileClient.Pages
             openFileFromISF();
         }
 
-        public async void openFileFromISF()
+        private async void openFileFromISF()
         {
             backFromView = true;
             string t;
@@ -367,25 +360,25 @@ namespace AppSeafileClient.Pages
         }
         protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
         {
-            try
-            {
-                if (webClientDownloadFileURLData.IsBusy)
-                {
-                    webClientDownloadFileURLData.CancelAsync();
-                }
-            }
-            catch (Exception)
-            {
+            // MaZ todo: get httpClient from sort of factory...
+            //try
+            //{
+            //    if (webClientDownloadFileURLData.IsBusy)
+            //    {
+            //        webClientDownloadFileURLData.CancelAsync();
+            //    }
+            //}
+            //catch (Exception)
+            //{
 
-                if (GlobalVariables.IsDebugMode == true)
-                {
-                    App.logger.log(LogLevel.debug, "webClient is not busy");
-                }
-            }
-
+            //    if (GlobalVariables.IsDebugMode == true)
+            //    {
+            //        App.logger.log(LogLevel.debug, "webClient is not busy");
+            //    }
+            //}
          
             base.OnBackKeyPress(e);
         }
-                  
+
     }
 }

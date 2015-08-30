@@ -39,7 +39,7 @@
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="0">
             <StackPanel Margin="10,0">
                 <ProgressBar SmallChange="0.2" Minimum="0" Maximum="100" Name="ProgressBarStatus" Height="20" Background="#19ECA309"/>
-                <Button Name="cancelbtn" Content="{Binding Path=LocalizedResources.Download_Button_Cancel, Source={StaticResource LocalizedStrings}}" Visibility="Collapsed" BorderBrush="Black" Foreground="Black"/>
+                <Button Name="cancelbtn" Content="{Binding Path=LocalizedResources.Download_Button_Cancel, Source={StaticResource LocalizedStrings}}" Visibility="Collapsed" BorderBrush="Black" Foreground="Black" Click="CancelButton_Click_1"/>
                 <TextBlock TextWrapping="Wrap" Foreground="{StaticResource PhoneAccentBrush}" FontSize="{StaticResource PhoneFontSizeNormal}" Text="{Binding Path=LocalizedResources.Download_Status_Text_Title, Source={StaticResource LocalizedStrings}}"/>
                 <TextBlock x:Name="DownloadStatusText" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeNormal}" Foreground="Black"/>
                 <TextBlock TextWrapping="Wrap" Text="{Binding Path=LocalizedResources.Download_Result_Text_Title, Source={StaticResource LocalizedStrings}}" Foreground="{StaticResource PhoneAccentBrush}" FontSize="{StaticResource PhoneFontSizeNormal}"/>
