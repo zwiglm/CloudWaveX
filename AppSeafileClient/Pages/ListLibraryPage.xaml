@@ -202,7 +202,7 @@
             <phone:PivotItem.Header>
                 <TextBlock Text="{Binding Path=LocalizedResources.ListLibrary_PivotTitle_1, Source={StaticResource LocalizedStrings}}"
                        FontSize="{StaticResource PivotHeaderFontSize}" 
-                       Foreground="{StaticResource PhoneAccentBrush}" />
+                       Foreground="{StaticResource PhoneAccentBrush}" TextTrimming="WordEllipsis" />
             </phone:PivotItem.Header>
             <Grid x:Name="LayoutRoot" Background="Transparent"  HorizontalAlignment="Stretch" >
                 <Grid.RowDefinitions>
@@ -210,21 +210,17 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                
-                    <Grid Grid.Row="1">
-                        <ListBox x:Name="listBoxAllLibraries" SelectionChanged="listAllLibraries_SelectionChanged" 
+
+                <Grid Grid.Row="1">
+                    <ListBox x:Name="listBoxAllLibraries" SelectionChanged="listAllLibraries_SelectionChanged" 
                                  HorizontalContentAlignment="Stretch" ItemsSource="{Binding Elements}">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <local:TypeTemplateSelector Content="{Binding}" />
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </Grid>
-                
-                <StackPanel Grid.Row="2">
-                   <!--  -->
-                </StackPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <local:TypeTemplateSelector Content="{Binding}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
             </Grid>
         </phone:PivotItem>
 

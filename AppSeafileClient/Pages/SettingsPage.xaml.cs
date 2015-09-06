@@ -20,7 +20,7 @@ namespace AppSeafileClient.Pages
         {
             InitializeComponent();
 
-            if (!GlobalVariables.IsolatedStorageUserInformations.Contains("tokensaved") && !GlobalVariables.IsolatedStorageUserInformations.Contains("urlsaved"))
+            if (!GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.TOKEN_SAVED_SET) && !GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.URL_SAVED_SET))
             {
                 Debug.WriteLine("Button disabled because no session");
                 ButtonLogoff.IsEnabled = false;
@@ -32,7 +32,7 @@ namespace AppSeafileClient.Pages
         /// </summary>
         private void ButtonLogoff_Click(object sender, RoutedEventArgs e)
         {
-            if (GlobalVariables.IsolatedStorageUserInformations.Contains("tokensaved") && GlobalVariables.IsolatedStorageUserInformations.Contains("urlsaved"))
+            if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.TOKEN_SAVED_SET) && GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.URL_SAVED_SET))
             {
                 if (GlobalVariables.IsDebugMode == true)
                 {
@@ -54,7 +54,14 @@ namespace AppSeafileClient.Pages
             CleanAndDeleteDirectoryRecursive("cache");
         }
 
-        public static void CleanAndDeleteDirectoryRecursive(string directory)
+        private void ButtonReview_Click(object sender, RoutedEventArgs e)
+        {
+            MarketplaceReviewTask marketplaceReviewTask = new MarketplaceReviewTask();
+            marketplaceReviewTask.Show();
+        }
+
+
+        private static void CleanAndDeleteDirectoryRecursive(string directory)
         {
             IsolatedStorageFile iso = IsolatedStorageFile.GetUserStoreForApplication(); if (iso.DirectoryExists(directory))
             {
@@ -87,7 +94,7 @@ namespace AppSeafileClient.Pages
         /// </summary>
         protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
         {
-            if (!GlobalVariables.IsolatedStorageUserInformations.Contains("tokensaved"))
+            if (!GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.TOKEN_SAVED_SET))
             {
                 e.Cancel = true;
                 Application.Current.Terminate();
@@ -98,11 +105,5 @@ namespace AppSeafileClient.Pages
             }
         }
 
-
-        private void ButtonReview_Click(object sender, RoutedEventArgs e)
-        {
-            MarketplaceReviewTask marketplaceReviewTask = new MarketplaceReviewTask();
-            marketplaceReviewTask.Show();
-        }
     }
 }

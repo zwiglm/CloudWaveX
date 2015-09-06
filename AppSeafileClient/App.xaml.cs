@@ -209,12 +209,12 @@ namespace AppSeafileClient
             ((ApplicationBarMenuItem)appBar.MenuItems[3]).Text = AppResources.AppBarAbout;
            
 
-            if (IsolatedStorageSettings.ApplicationSettings.Contains("tokensaved"))
+            if (IsolatedStorageSettings.ApplicationSettings.Contains(GlobalVariables.TOKEN_SAVED_SET))
             {
-                if (GlobalVariables.IsolatedStorageUserInformations.Contains("tokensaved") && GlobalVariables.IsolatedStorageUserInformations.Contains("urlsaved"))
+                if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.TOKEN_SAVED_SET) && GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.URL_SAVED_SET))
                 {
-                    string t = GlobalVariables.IsolatedStorageUserInformations["tokensaved"] as string;
-                    string u = GlobalVariables.IsolatedStorageUserInformations["urlsaved"] as string;
+                    string t = GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.TOKEN_SAVED_SET] as string;
+                    string u = GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.URL_SAVED_SET] as string;
 
                     RootFrame.Navigate(new Uri("/Pages/ListLibraryPage.xaml?token=" + t + "&url=" + u, UriKind.Relative));
                 }
@@ -327,10 +327,10 @@ namespace AppSeafileClient
 
         private void ApplicationBarIconButtonBack_Click_1(object sender, EventArgs e)
         {
-            if (GlobalVariables.IsolatedStorageUserInformations.Contains("tokensaved") && GlobalVariables.IsolatedStorageUserInformations.Contains("urlsaved"))
+            if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.TOKEN_SAVED_SET) && GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.URL_SAVED_SET))
             {
-                GlobalVariables.IsolatedStorageUserInformations.Remove("tokensaved");
-                GlobalVariables.IsolatedStorageUserInformations.Remove("urlsaved");
+                GlobalVariables.IsolatedStorageUserInformations.Remove(GlobalVariables.TOKEN_SAVED_SET);
+                GlobalVariables.IsolatedStorageUserInformations.Remove(GlobalVariables.URL_SAVED_SET);
             }
         }
 
@@ -374,7 +374,7 @@ namespace AppSeafileClient
         {
             GlobalVariables.currentPath = "";
             GlobalVariables.FolderNamePivotItem = AppResources.ContentLibrary_PivotTitle_1;
-            (Application.Current.RootVisual as PhoneApplicationFrame).Navigate(new Uri("/Pages/ListLibraryPage.xaml?token=" + GlobalVariables.IsolatedStorageUserInformations["tokensaved"] as string + "&url=" + GlobalVariables.IsolatedStorageUserInformations["urlsaved"] as string, UriKind.Relative));
+            (Application.Current.RootVisual as PhoneApplicationFrame).Navigate(new Uri("/Pages/ListLibraryPage.xaml?token=" + GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.TOKEN_SAVED_SET] as string + "&url=" + GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.URL_SAVED_SET] as string, UriKind.Relative));
                    
         }
 

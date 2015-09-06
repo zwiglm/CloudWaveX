@@ -17,4 +17,18 @@ public static class GlobalVariables
     public static string FolderNamePivotItem = "";
     public static double AccountInfosUsage = 0;
     public static double AccountInfosTotalSpace = 0;
+
+
+    // setting tokens
+    public static string TOKEN_SAVED_SET = "tokensaved";
+    public static string URL_SAVED_SET = "urlsaved";
+    public static string IGNORE_SELF_SIGNED_SET = "ignoreSelfSignedSet";
+
+    // Seafile API request tokens
+    public static string SF_REQ_REPOS = "repos";
+    public static string SF_REQ_SHARED_REPOS = "shared-repos";          // those that I have shared to someone else
+    public static string SF_REQ_BE_SHARED_REPOS = "beshared-repos";     // those shared to me
+
+    // Seafile API json respons
+    public static string SF_RESP_GROUP_REPOS = "grepo";
 }

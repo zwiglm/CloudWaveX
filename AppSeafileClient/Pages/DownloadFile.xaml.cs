@@ -23,6 +23,7 @@ using System.Text;
 using Windows.Web.Http.Filters;
 using Windows.Security.Cryptography.Certificates;
 using Windows.Storage.Streams;
+using AppSeafileClient.Domain;
 
 namespace AppSeafileClient.Pages
 {
@@ -107,13 +108,8 @@ namespace AppSeafileClient.Pages
 
         private async void GetURLDataAsync(string token, string url, string idlib, string type, string path)
         {
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
             Uri uristring = null;
-
-            var filter = new HttpBaseProtocolFilter();
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
             HttpClient webClientGetURLData = new HttpClient(filter);
 
             if (!string.IsNullOrEmpty(path))
@@ -183,11 +179,7 @@ namespace AppSeafileClient.Pages
 
         private async Task DownloadFileWithURLDataAsync()
         {
-            var filter = new HttpBaseProtocolFilter();
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
             HttpClient webClientGetURLData = new HttpClient(filter);
 
             cancelbtn.Visibility = Visibility.Visible;

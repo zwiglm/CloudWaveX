@@ -101,7 +101,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Class\AppSeafileHelper.cs" />
+    <Compile Include="Class\SfResponseContainer.cs" />
     <Compile Include="Class\CustomMapping.cs" />
     <Compile Include="Class\GlobalVariables.cs" />
     <Compile Include="Class\mtimeToDateConverter.cs" />
@@ -110,6 +110,8 @@
     </Compile>
     <Compile Include="Class\sizeToStringConverter.cs" />
     <Compile Include="DataTemplateSelector.cs" />
+    <Compile Include="Domain\CloudHelper.cs" />
+    <Compile Include="Domain\HttpHelperFactory.cs" />
     <Compile Include="LocalizedStrings.cs" />
     <Compile Include="Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
@@ -291,6 +293,7 @@
       <HintPath>..\packages\Microsoft.Net.Http.2.2.28\lib\sl4-windowsphone71\System.Net.Http.Primitives.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

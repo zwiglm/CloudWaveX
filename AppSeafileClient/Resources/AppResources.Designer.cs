@@ -772,6 +772,15 @@ namespace AppSeafileClient.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ignore Self-Signed Certificate.
+        /// </summary>
+        public static string Login_Checkbox_IgnoreSelfSigned {
+            get {
+                return ResourceManager.GetString("Login_Checkbox_IgnoreSelfSigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Remember me.
         /// </summary>
         public static string Login_CheckBox_RemberMe {

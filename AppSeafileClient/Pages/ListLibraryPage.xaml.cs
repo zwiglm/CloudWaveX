@@ -22,6 +22,8 @@ using System.Globalization;
 using System.Threading;
 using Coding4Fun.Toolkit.Controls.Common;
 using System.Reflection;
+using AppSeafileClient.Domain;
+using System.Threading.Tasks;
 
 namespace AppSeafileClient.Pages
 {
@@ -29,30 +31,20 @@ namespace AppSeafileClient.Pages
     {
         string authorizationToken = "";
         string address = "";
-        Uri uristringGetLibrary = null;
-        Uri uristringGetInfos = null;
         Uri uristringRequestLibrary = null;
 
         PasswordInputPrompt passwordInputLibrary;
 
-        private const string MSG_VERSION_URL = "http://wp.sgir.ch/messages/{1}/message.{0}.txt";
-        private const string MSG_URL = "http://wp.sgir.ch/messages/message.{0}.txt";
-
         private static readonly Guid _cacheInvalidator = Guid.NewGuid();
-        private bool _isVersionedMessageChecked = false;
-
 
 
         public ListLibraryPage()
         {
             InitializeComponent();
-
         }
+     
 
-      
-
-
-        #region |pie chart|
+        #region Pie-Chart
         public class PData 
         { 
             public string title { get; set; } 
@@ -61,7 +53,7 @@ namespace AppSeafileClient.Pages
         #endregion 
     
 
-        protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
+        protected override async void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             string token = "";
@@ -89,27 +81,21 @@ namespace AppSeafileClient.Pages
                 address = url;
             }
 
-
             //Get Library
-            requestLibrary(authorizationToken, address, "repos");
+            var foundLibs = await requestLibrary(authorizationToken, address, GlobalVariables.SF_REQ_REPOS);
+            List<LibraryRootObject> mainLibsSource = this.filterMainLibs(foundLibs.Content.ToString());
+            displayListLibrary(mainLibsSource);
 
             //Get accounts infos
             requestAccountInfos(authorizationToken, address, "account/info");
         }
 
-        public async void requestAccountInfos(string token, string url, string type)
+
+        private async void requestAccountInfos(string token, string url, string type)
         {
-            var filter = new HttpBaseProtocolFilter();
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
+
             Uri uristringGetAccountInfos = new Uri(url + "/api2/" + type + "/");
-
-            // *******************
-            // IGNORING CERTIFACTE PROBLEMS
-            // *******************
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
-
             var HttpClientAccountInfos = new HttpClient(filter);
             var nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);
             HttpMultipartFormDataContent requestContentLogin = new HttpMultipartFormDataContent();
@@ -170,7 +156,7 @@ namespace AppSeafileClient.Pages
                                                             };
                 AccountInfosPieChart.DataSource = dataPieChart;
 
-                AccountInfosUsage.Text = AppResources.ListLibrary_Account_1 + BytesToString(resultAccountInfos.usage) + AppResources.ListLibrary_Account_2 + GlobalVariables.AccountInfosUsage + AppResources.ListLibrary_Account_3;
+                AccountInfosUsage.Text = AppResources.ListLibrary_Account_1 + CloudHelper.bytesToString(resultAccountInfos.usage) + AppResources.ListLibrary_Account_2 + GlobalVariables.AccountInfosUsage + AppResources.ListLibrary_Account_3;
                 AccountInfosQuotaStatus.Text = AppResources.ListLibrary_Quota_Status_Enabled;
             }
             else
@@ -181,39 +167,28 @@ namespace AppSeafileClient.Pages
                                                             };
                 AccountInfosPieChart.DataSource = dataPieChart;
 
-                AccountInfosUsage.Text = AppResources.ListLibrary_Account_1 + BytesToString(resultAccountInfos.usage) + AppResources.ListLibrary_Account_4;
+                AccountInfosUsage.Text = AppResources.ListLibrary_Account_1 + CloudHelper.bytesToString(resultAccountInfos.usage) + AppResources.ListLibrary_Account_4;
                 AccountInfosQuotaStatus.Text = AppResources.ListLibrary_Quota_Status_Disabled;
             }
         }
 
-        public async void requestLibrary(string token, string url, string type)
+
+        private async Task<HttpResponseMessage> requestLibrary(string token, string url, string type)
         {
-            var filter = new HttpBaseProtocolFilter();
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
             uristringRequestLibrary = new Uri(url + "/api2/" + type + "/");
-
-            // *******************
-            // IGNORING CERTIFACTE PROBLEMS
-            // *******************
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
-
             var HttpClientGetLibrary = new HttpClient(filter);
             var nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);   
-            HttpMultipartFormDataContent requestContentLogin = new HttpMultipartFormDataContent();
 
             HttpClientGetLibrary.DefaultRequestHeaders.Add("Accept", "application/json;indent=4");
             HttpClientGetLibrary.DefaultRequestHeaders.Add("Authorization", "token " + token);
             HttpClientGetLibrary.DefaultRequestHeaders.Add("User-agent", "CloudWave for Seafile/" + nameHelper.Version);
 
+            HttpResponseMessage libsResponse = null;
             try
             {
                 SetProgressIndicator(true);
-                HttpResponseMessage responseRequestLibrary = await HttpClientGetLibrary.GetAsync(uristringRequestLibrary);
-
-                displayListLibrary(responseRequestLibrary.Content.ToString());
-
+                libsResponse = await HttpClientGetLibrary.GetAsync(uristringRequestLibrary);
                 HttpClientGetLibrary.Dispose();
             }
             catch (Exception ex)
@@ -221,28 +196,34 @@ namespace AppSeafileClient.Pages
                 if (GlobalVariables.IsDebugMode == true)
                 {
                     App.logger.log(LogLevel.critical, "Download list library Exception err" + ex);
-
                     App.logger.log(LogLevel.critical, "Download list library uristringRequestLibrary : " + uristringRequestLibrary.ToString());
                     App.logger.log(LogLevel.critical, "Download list library informations address : " + address);
 
                 }
                 MessageBox.Show(AppResources.ListLibrary_Error_ListLibrary_Content, AppResources.ListLibrary_Error_ListLibrary_Title, MessageBoxButton.OK);
             }
+            return libsResponse;
         }
 
-        private void displayListLibrary(string p)
+        private List<LibraryRootObject> filterMainLibs(string httpResponse)
         {
-            var resultLibrary = JsonConvert.DeserializeObject<List<LibraryRootObject>>(p);
-            if (resultLibrary.Count == 0)
+            List<LibraryRootObject> resultLibrary = JsonConvert.DeserializeObject<List<LibraryRootObject>>(httpResponse);
+            resultLibrary.RemoveAll(q => q.@virtual);
+            resultLibrary.RemoveAll(q => (!string.IsNullOrEmpty(q.type) && q.type.Equals(GlobalVariables.SF_RESP_GROUP_REPOS)));
+            return resultLibrary;
+        }
+
+        private void displayListLibrary(List<LibraryRootObject> mainLibsSource)
+        {
+            if (mainLibsSource.Count == 0)
             {
-                //listBoxAllLibraries.Items.Add(new LibraryRootObject() { name = "Lib2", desc = "lib 2 public", type = "repo", encrypted = false, size = 100 });
                 SetProgressIndicator(false);
             }
             else
             {
                 SetProgressIndicator(false);
 
-                listBoxAllLibraries.ItemsSource = resultLibrary;
+                listBoxAllLibraries.ItemsSource = mainLibsSource;
                 if (GlobalVariables.IsDebugMode == true)
                 {
                     App.logger.log(LogLevel.debug, "List library OK");
@@ -251,54 +232,6 @@ namespace AppSeafileClient.Pages
 
         }
 
-        /// <summary>
-        /// Convert byte to string
-        /// </summary>
-        /// <param name="i"></param>
-        /// <returns></returns>
-        static String BytesToString(long i)
-        {
-            string sign = (i < 0 ? "-" : "");
-            double readable = (i < 0 ? -i : i);
-            string suffix;
-            if (i >= 0x1000000000000000) // Exabyte
-            {
-                suffix = "EB";
-                readable = (double)(i >> 50);
-            }
-            else if (i >= 0x4000000000000) // Petabyte
-            {
-                suffix = "PB";
-                readable = (double)(i >> 40);
-            }
-            else if (i >= 0x10000000000) // Terabyte
-            {
-                suffix = "TB";
-                readable = (double)(i >> 30);
-            }
-            else if (i >= 0x40000000) // Gigabyte
-            {
-                suffix = "GB";
-                readable = (double)(i >> 20);
-            }
-            else if (i >= 0x100000) // Megabyte
-            {
-                suffix = "MB";
-                readable = (double)(i >> 10);
-            }
-            else if (i >= 0x400) // Kilobyte
-            {
-                suffix = "KB";
-                readable = (double)i;
-            }
-            else
-            {
-                return i.ToString(sign + "0 B"); // Byte
-            }
-            readable /= 1024;
-
-            return sign + readable.ToString("0.### ") + suffix;
-        }
 
         /// <summary>
         /// Set ProgressIndicator status
@@ -310,7 +243,7 @@ namespace AppSeafileClient.Pages
             SystemTray.ProgressIndicator.IsVisible = value;
         }
 
-  
+
         /// <summary>
         /// Occurs when click on an item in a ListBox
         /// </summary>
@@ -373,18 +306,9 @@ namespace AppSeafileClient.Pages
         /// </summary>
         public async void decryptLibrary()
         {
-            var filter = new HttpBaseProtocolFilter();
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
             string t = uristringRequestLibrary + GlobalVariables.currentLibrary + "/";
-
             Uri a = new Uri(t);
-
-            // *******************
-            // IGNORING CERTIFACTE PROBLEMS
-            // *******************
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
 
             var HttpClientDecryptLibrary = new HttpClient(filter);
             HttpMultipartFormDataContent requestDecryptLibrary = new HttpMultipartFormDataContent();
@@ -428,7 +352,7 @@ namespace AppSeafileClient.Pages
 
         protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
         {
-            if (GlobalVariables.IsolatedStorageUserInformations.Contains("tokensaved") && GlobalVariables.IsolatedStorageUserInformations.Contains("urlsaved"))
+            if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.TOKEN_SAVED_SET) && GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.URL_SAVED_SET))
             {
                 e.Cancel = true;
                 Application.Current.Terminate();

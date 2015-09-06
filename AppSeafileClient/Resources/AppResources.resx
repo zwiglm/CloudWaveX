@@ -435,4 +435,7 @@
   <data name="ContentLibrary_Upload_UploadCancel" xml:space="preserve">
     <value>Upload canceled</value>
   </data>
+  <data name="Login_Checkbox_IgnoreSelfSigned" xml:space="preserve">
+    <value>Ignore Self-Signed Certificate</value>
+  </data>
 </root>

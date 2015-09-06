@@ -24,6 +24,7 @@ using Windows.Storage.Streams;
 using Windows.Web.Http.Headers;
 using System.Reflection;
 using System.Windows.Threading;
+using AppSeafileClient.Domain;
 
 namespace AppSeafileClient.Pages
 {
@@ -142,18 +143,9 @@ namespace AppSeafileClient.Pages
         /// <param name="path">Path in the library</param>
         private async void requestContentLibrary(string token, string url, string idlib, string type, string path)
         {
+
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
             Uri uristringContentLibrary = null;
-
-            var filter = new HttpBaseProtocolFilter();
-
-            // *******************
-            // IGNORING CERTIFACTE PROBLEMS
-            // *******************
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
-
             var HttpClientContentLibrary = new HttpClient(filter);
             var nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);           
 
@@ -248,17 +240,8 @@ namespace AppSeafileClient.Pages
                 SetProgressIndicator(true);
             }
 
-            var filter = new HttpBaseProtocolFilter();
-            Uri uristringGetUploadLink = new Uri(address + "/api2/" + "repos/" + id + "/" + "upload-link/");     
-
-            // *******************
-            // IGNORING CERTIFACTE PROBLEMS
-            // *******************
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
-
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
+            Uri uristringGetUploadLink = new Uri(address + "/api2/" + "repos/" + id + "/" + "upload-link/");
             var HttpClientGetUploadLink = new HttpClient(filter);
             var nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);    
           
@@ -306,20 +289,8 @@ namespace AppSeafileClient.Pages
 
             WaitIndicator.IsVisible = true;
 
-
-            var filter = new HttpBaseProtocolFilter();
-
-            Uri uristringForUpload = new Uri(url.Substring(1,url.Length-2));
-         
-            // *******************
-            // IGNORING CERTIFACTE PROBLEMS
-            // *******************
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
-
-                       
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
+            Uri uristringForUpload = new Uri(url.Substring(1, url.Length - 2));
             string boundary = "s---------" + DateTime.Today.Ticks.ToString("x");
             var HttpClientUpload = new HttpClient(filter);
 
@@ -651,17 +622,8 @@ namespace AppSeafileClient.Pages
         /// <param name="fileToDetail">File to detail</param>
         private async void GetFileDetail(string fileToDetail)
         {
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
             Uri uristringDetail = null;
-            var filter = new HttpBaseProtocolFilter();
-
-            // *******************
-            // IGNORING CERTIFACTE PROBLEMS
-            // *******************
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
-
             var HttpClientGetFileDetail = new HttpClient(filter);
             var nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);   
 
@@ -774,17 +736,8 @@ namespace AppSeafileClient.Pages
         /// <param name="fileToDelete">File to delete</param>
         public async void DeleteFile(string fileToDelete)
         {
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
             Uri uristringDelete = null;
-            var filter = new HttpBaseProtocolFilter();
-
-            // *******************
-            // IGNORING CERTIFACTE PROBLEMS
-            // *******************
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
-
             var HttpClientDeleteFile = new HttpClient(filter);
             var nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);   
 

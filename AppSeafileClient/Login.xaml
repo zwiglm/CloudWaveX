@@ -69,7 +69,7 @@
                         <TextBlock Grid.Row="4" FontSize="{StaticResource PhoneFontSizeNormal}" 
                                    TextWrapping="Wrap" Text="{Binding Path=LocalizedResources.Login_Password, Source={StaticResource LocalizedStrings}}" 
                                    Foreground="Black" Margin="5,0,0,0"/>
-                       <PasswordBox Grid.Row="5" FontSize="{StaticResource PhoneFontSizeNormal}" 
+                        <PasswordBox Grid.Row="5" FontSize="{StaticResource PhoneFontSizeNormal}" 
                                      Name="PasswordBox_Password" BorderBrush="#BF000000" Background="#BFD6D0D0"/> 
                         <Button Grid.Row="6" FontSize="{StaticResource PhoneFontSizeNormal}" 
                                 Content="{Binding Path=LocalizedResources.Login_Button_Login, Source={StaticResource LocalizedStrings}}"
@@ -80,7 +80,10 @@
                                   Name="CheckBox_RememberMe" Content="{Binding Path=LocalizedResources.Login_CheckBox_RemberMe, Source={StaticResource LocalizedStrings}}" 
                                   Click="CheckBox_RememberMe_Click" IsChecked="True" BorderBrush="Black" 
                                   Foreground="Black" Background="Transparent"/>
-                        
+                        <CheckBox Grid.Row="9" FontSize="{StaticResource PhoneFontSizeNormal}" 
+                                  Name="CB_IgnoreSelfSigned" Content="{Binding Path=LocalizedResources.Login_Checkbox_IgnoreSelfSigned, Source={StaticResource LocalizedStrings}}" 
+                                  IsChecked="True" BorderBrush="Black" Foreground="Black" Background="Transparent" Click="CB_IgnoreSelfSigned_Click"/>
+
                     </Grid>
                     <StackPanel Grid.Row="10"></StackPanel>
                 </Grid>

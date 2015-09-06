@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using Windows.Networking.Sockets;
 using Windows.Networking;
 using System.Reflection;
+using AppSeafileClient.Domain;
 
 namespace AppSeafileClient
 {
@@ -54,10 +55,10 @@ namespace AppSeafileClient
         {
             SystemTray.ProgressIndicator = new ProgressIndicator();
 
-            if (GlobalVariables.IsolatedStorageUserInformations.Contains("tokensaved") && GlobalVariables.IsolatedStorageUserInformations.Contains("urlsaved"))
+            if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.TOKEN_SAVED_SET) && GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.URL_SAVED_SET))
             {
-            string t = GlobalVariables.IsolatedStorageUserInformations["tokensaved"] as string;
-            string u = GlobalVariables.IsolatedStorageUserInformations["urlsaved"] as string;
+            string t = GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.TOKEN_SAVED_SET] as string;
+            string u = GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.URL_SAVED_SET] as string;
 
             NavigationService.Navigate(new Uri("/Pages/ListLibraryPage.xaml?token=" + t + "&url=" + u, UriKind.Relative));
             }
@@ -67,7 +68,7 @@ namespace AppSeafileClient
         /// Set ProgressIndicator status
         /// </summary>
         /// <param name="value">Value to display</param>
-        public void SetProgressIndicator(bool value)
+        private void SetProgressIndicator(bool value)
         {
             SystemTray.ProgressIndicator.IsIndeterminate = true;
             SystemTray.ProgressIndicator.IsVisible = value;
@@ -109,7 +110,7 @@ namespace AppSeafileClient
 
         }
 
-        public async void validateCertificate()
+        private async void validateCertificate()
         {
             // Define some variables and set values
             StreamSocket clientSocket = new StreamSocket();
@@ -228,17 +229,16 @@ namespace AppSeafileClient
      
         private async void loginRequestUser(string username, string password, string url, string type)
         {
-            var filter = new HttpBaseProtocolFilter();
-            Uri uristringLogin = new Uri(url + "/api2/" + type + "/");     
+            // set ignore Self-Signed to settings-store
+            if (CB_IgnoreSelfSigned.IsChecked == true)
+            {
+                if (!GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.IGNORE_SELF_SIGNED_SET))
+                    GlobalVariables.IsolatedStorageUserInformations.Add(GlobalVariables.IGNORE_SELF_SIGNED_SET, true);
+                else
+                    GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.IGNORE_SELF_SIGNED_SET] = true;
+            }
 
-            // *******************
-            // IGNORING CERTIFACTE PROBLEMS
-            // *******************
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.IncompleteChain);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Expired);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.Untrusted);
-            filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
-
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
             var HttpClientLogin = new HttpClient(filter);
             HttpMultipartFormDataContent requestContentLogin = new HttpMultipartFormDataContent();
             var nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);
@@ -257,6 +257,7 @@ namespace AppSeafileClient
                 requestContentLogin.Add(new HttpStringContent(keyValuePair.Value), keyValuePair.Key);
             }
 
+            Uri uristringLogin = new Uri(url + "/api2/" + type + "/");
             try
             {
                 HttpResponseMessage responseLogin = await HttpClientLogin.PostAsync(uristringLogin, requestContentLogin);
@@ -297,18 +298,18 @@ namespace AppSeafileClient
                 if (CheckBox_RememberMe.IsChecked == true)
                 {
                     //User want remember me
-                    if (!GlobalVariables.IsolatedStorageUserInformations.Contains("tokensaved") && !GlobalVariables.IsolatedStorageUserInformations.Contains("urlsaved"))
+                    if (!GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.TOKEN_SAVED_SET) && !GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.URL_SAVED_SET))
                     {
-                        GlobalVariables.IsolatedStorageUserInformations.Add("tokensaved", resultLogin.token);
-                        GlobalVariables.IsolatedStorageUserInformations.Add("urlsaved", TextBox_url.Text);
+                        GlobalVariables.IsolatedStorageUserInformations.Add(GlobalVariables.TOKEN_SAVED_SET, resultLogin.token);
+                        GlobalVariables.IsolatedStorageUserInformations.Add(GlobalVariables.URL_SAVED_SET, TextBox_url.Text);
                     }
                     else
                     {
-                        GlobalVariables.IsolatedStorageUserInformations["tokensaved"] = resultLogin.token;
-                        GlobalVariables.IsolatedStorageUserInformations["urlsaved"] = TextBox_url.Text;
+                        GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.TOKEN_SAVED_SET] = resultLogin.token;
+                        GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.URL_SAVED_SET] = TextBox_url.Text;
                     }
                     GlobalVariables.IsolatedStorageUserInformations.Save();
-                    NavigationService.Navigate(new Uri("/Pages/ListLibraryPage.xaml?token=" + GlobalVariables.IsolatedStorageUserInformations["tokensaved"] as string + "&url=" + GlobalVariables.IsolatedStorageUserInformations["urlsaved"] as string, UriKind.Relative));
+                    NavigationService.Navigate(new Uri("/Pages/ListLibraryPage.xaml?token=" + GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.TOKEN_SAVED_SET] as string + "&url=" + GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.URL_SAVED_SET] as string, UriKind.Relative));
                 }
                 else
                 {
@@ -324,10 +325,10 @@ namespace AppSeafileClient
         private void CheckBox_RememberMe_Click(object sender, RoutedEventArgs e)
         {
             //Login info already set, user want to delete login
-            if (GlobalVariables.IsolatedStorageUserInformations.Contains("tokensaved") && GlobalVariables.IsolatedStorageUserInformations.Contains("urlsaved"))
+            if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.TOKEN_SAVED_SET) && GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.URL_SAVED_SET))
             {
-                GlobalVariables.IsolatedStorageUserInformations.Remove("tokensaved");
-                GlobalVariables.IsolatedStorageUserInformations.Remove("urlsaved");
+                GlobalVariables.IsolatedStorageUserInformations.Remove(GlobalVariables.TOKEN_SAVED_SET);
+                GlobalVariables.IsolatedStorageUserInformations.Remove(GlobalVariables.URL_SAVED_SET);
                 TextBox_login.Text = "";
                 TextBox_url.Text = "";
                 PasswordBox_Password.Password = "";
@@ -335,6 +336,12 @@ namespace AppSeafileClient
                 TextBox_url.IsEnabled = true;
                 PasswordBox_Password.IsEnabled = true;
             }
+        }
+
+        private void CB_IgnoreSelfSigned_Click(object sender, RoutedEventArgs e)
+        {
+            if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.IGNORE_SELF_SIGNED_SET))
+                GlobalVariables.IsolatedStorageUserInformations.Remove(GlobalVariables.IGNORE_SELF_SIGNED_SET);
         } 
     }
 }
