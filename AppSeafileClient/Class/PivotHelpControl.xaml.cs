@@ -7,9 +7,9 @@ using System.Windows.Controls;
 using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
-using AppSeafileClient.Resources;
+using PlasticWonderland.Resources;
 
-namespace AppSeafileClient.Class
+namespace PlasticWonderland.Class
 {
     public partial class PivotHelpControl : UserControl
     {

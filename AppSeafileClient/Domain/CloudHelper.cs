@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AppSeafileClient.Domain
+namespace PlasticWonderland.Domain
 {
     public static class CloudHelper
     {

@@ -12,7 +12,7 @@ using System.IO.IsolatedStorage;
 using System.IO;
 using Microsoft.Phone.Tasks;
 
-namespace AppSeafileClient.Pages
+namespace PlasticWonderland.Pages
 {
     public partial class SettingsPage : PhoneApplicationPage
     {

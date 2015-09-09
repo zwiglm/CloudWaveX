@@ -1,5 +1,5 @@
 ﻿<Application
-    x:Class="AppSeafileClient.App"
+    x:Class="PlasticWonderland.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
@@ -8,7 +8,7 @@
 
     <!--Application Resources-->
     <Application.Resources>
-        <local:LocalizedStrings xmlns:local="clr-namespace:AppSeafileClient" x:Key="LocalizedStrings" />
+        <local:LocalizedStrings xmlns:local="clr-namespace:PlasticWonderland" x:Key="LocalizedStrings" />
 
         <shell:ApplicationBar x:Key="GlobalAppBar" Mode="Minimized" IsVisible="True" IsMenuEnabled="True" Opacity="90">
             <shell:ApplicationBar.MenuItems>

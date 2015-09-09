@@ -19,14 +19,14 @@ using Windows.Web.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO.IsolatedStorage;
-using AppSeafileClient.Resources;
+using PlasticWonderland.Resources;
 using Windows.Storage.Streams;
 using Windows.Web.Http.Headers;
 using System.Reflection;
 using System.Windows.Threading;
-using AppSeafileClient.Domain;
+using PlasticWonderland.Domain;
 
-namespace AppSeafileClient.Pages
+namespace PlasticWonderland.Pages
 {
 
 
@@ -38,25 +38,23 @@ namespace AppSeafileClient.Pages
         string path = "";
         string completePath = "";
 
-        public enum DownloadStatus { Ok, SameName, Error };
+        int HttpErrorCode_GetUploadLink;
 
-        string downloadUrl = "";
-        static string completePatahOnISF;
+        public enum DownloadStatus 
+        { 
+            Ok, 
+            SameName, 
+            Error 
+        };
 
         StorageFile fileChoosenFromFilePicker;
-
-        private MemoryStream photoStream;
-
         CancellationTokenSource cts;
 
-
-        int HttpErrorCode_GetUploadLink;
 
         public ContentLibraryPage()
         {
             InitializeComponent();
         }
-
     
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
@@ -461,8 +459,7 @@ namespace AppSeafileClient.Pages
                 cts.Dispose();
             }
             catch (Exception ex)
-            {
-                
+            {                
             }
 
             
@@ -480,6 +477,7 @@ namespace AppSeafileClient.Pages
             str = GlobalVariables.currentPath;
             char[] splitchar = { '/' };
             strArr = str.Split(splitchar);
+
             if (str.StartsWith("/") == true)
             {
                 l = (strArr.Length - 2);
@@ -506,6 +504,7 @@ namespace AppSeafileClient.Pages
                     mypath = mypath + "/" + strArr[count];
                 }
             }
+
 
             GlobalVariables.currentPath = mypath;
 
@@ -659,7 +658,7 @@ namespace AppSeafileClient.Pages
 
                 string sizeReadable = "0";
 
-                sizeReadable = BytesToString(resultDetail.size);
+                sizeReadable = CloudHelper.bytesToString(resultDetail.size);
 
 
                 var messagePrompt = new MessagePrompt
@@ -679,55 +678,6 @@ namespace AppSeafileClient.Pages
                 }
                 MessageBox.Show(AppResources.ContentLibrary_Error_Detail_Content, AppResources.ContentLibrary_Error_Detail_Title, MessageBoxButton.OK);
             }
-        }
-
-        /// <summary>
-        /// Convert byte to string
-        /// </summary>
-        /// <param name="i"></param>
-        /// <returns></returns>
-        static String BytesToString(long i)
-        {
-            string sign = (i < 0 ? "-" : "");
-            double readable = (i < 0 ? -i : i);
-            string suffix;
-            if (i >= 0x1000000000000000) // Exabyte
-            {
-                suffix = "EB";
-                readable = (double)(i >> 50);
-            }
-            else if (i >= 0x4000000000000) // Petabyte
-            {
-                suffix = "PB";
-                readable = (double)(i >> 40);
-            }
-            else if (i >= 0x10000000000) // Terabyte
-            {
-                suffix = "TB";
-                readable = (double)(i >> 30);
-            }
-            else if (i >= 0x40000000) // Gigabyte
-            {
-                suffix = "GB";
-                readable = (double)(i >> 20);
-            }
-            else if (i >= 0x100000) // Megabyte
-            {
-                suffix = "MB";
-                readable = (double)(i >> 10);
-            }
-            else if (i >= 0x400) // Kilobyte
-            {
-                suffix = "KB";
-                readable = (double)i;
-            }
-            else
-            {
-                return i.ToString(sign + "0 B"); // Byte
-            }
-            readable /= 1024;
-
-            return sign + readable.ToString("0.### ") + suffix;
         }
 
         /// <summary>

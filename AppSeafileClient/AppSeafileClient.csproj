@@ -9,18 +9,18 @@
     <ProjectTypeGuids>{C089C8C0-30E0-4E22-80C0-CE093F111A43};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>AppSeafileClient</RootNamespace>
+    <RootNamespace>PlasticWonderland</RootNamespace>
     <AssemblyName>AppSeafileClient</AssemblyName>
     <TargetFrameworkIdentifier>WindowsPhone</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v8.1</TargetFrameworkVersion>
     <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
     <SilverlightApplication>true</SilverlightApplication>
-    <SupportedCultures>fr%3bes%3bde</SupportedCultures>
+    <SupportedCultures>de</SupportedCultures>
     <XapOutputs>true</XapOutputs>
     <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
     <XapFilename>AppSeafileClient_$(Configuration)_$(Platform).xap</XapFilename>
     <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
-    <SilverlightAppEntry>AppSeafileClient.App</SilverlightAppEntry>
+    <SilverlightAppEntry>PlasticWonderland.App</SilverlightAppEntry>
     <ValidateXaml>true</ValidateXaml>
     <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>

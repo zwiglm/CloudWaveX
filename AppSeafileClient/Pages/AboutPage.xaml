@@ -1,5 +1,5 @@
 ﻿<phone:PhoneApplicationPage
-    x:Class="AppSeafileClient.Pages.AboutPage"
+    x:Class="PlasticWonderland.Pages.AboutPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
@@ -28,7 +28,6 @@
                      Foreground="#FFF39C03"
              >
             	<Run Text="CloudWaveX"/>
-            	<Run Text="X"/>
             </TextBlock>
             <TextBlock Text="About+Help" Margin="9,-7,0,0"   
                        FontSize="{StaticResource PivotHeaderFontSize}" 
@@ -42,14 +41,13 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Width="Auto">
-                <TextBlock Text="About" TextDecorations="Underline" Foreground="Black" FontWeight="Bold" ></TextBlock>
-                <TextBlock TextWrapping="Wrap" x:Name="about" FontSize="{StaticResource PhoneFontSizeNormal}" Foreground="Black" >
+                <TextBlock Text="About" Foreground="Black" FontWeight="Bold" />
+                <TextBlock TextWrapping="Wrap" x:Name="about" FontSize="{StaticResource PhoneFontSizeNormal}" Foreground="Black" Margin="0,0,0,10" >
                 	<Run Text="Application made by "/>
-                	<Run Text="Martin Zwigl (based on the code by "/>
-                	<Run Text="Sebastien Girard)                                    " />
-                    <Run Text="This app use Newtonsoft.Json, WPClogger and Coding4Fun Toolkit."/>
+                	<Run Text="Martin Zwigl                                    " />
+                    <Run Text="This app uses Newtonsoft.Json, WPClogger and the Coding4Fun Toolkit."/>
                 </TextBlock>
-                <TextBlock Text="Help" TextDecorations="Underline" Foreground="Black" FontWeight="Bold" ></TextBlock>
+                <TextBlock Text="Help" Foreground="Black" FontWeight="Bold" />
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -75,22 +73,8 @@
 
 
                 </Grid>
-                <TextBlock x:Name="ChangelogTitle" Text="Changelog" TextDecorations="Underline" Foreground="Black" FontWeight="Bold" />
-                <TextBlock  TextWrapping="Wrap" x:Name="ChangelogContent" Text="Version 2.0 : Add upload support  
-                            
-                           Version 1.9 : Add German support and shared folders                            
-                            
-                           Version 1.8.8.1 : Minor bugfix and rebranding
-                           
-                           Version 1.8.7 : Add French and spanish support. 
-                            
-                           Version 1.8.0 : UI Update, go to home, more displayed informations, accounts informations...
-                           
-                           Version 1.7.5 : Minor bugfix (Thanks to Apollox)
-   
-                           
-
-            " Foreground="Black"/>
+                <TextBlock x:Name="ChangelogTitle" Text="Changelog" Foreground="Black" FontWeight="Bold" Margin="0,15,0,0" />
+                <TextBlock  TextWrapping="Wrap" x:Name="ChangelogContent" Text="Version 1.0.1 None - It's the first of its kind" Foreground="Black"/>
             </StackPanel>
         </Grid>
     </Grid>

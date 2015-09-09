@@ -8,7 +8,7 @@ using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
 
-namespace AppSeafileClient.Pages
+namespace PlasticWonderland.Pages
 {
     public partial class AboutPage : PhoneApplicationPage
     {

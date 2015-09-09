@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Windows.Security.Cryptography.Certificates;
 using Windows.Web.Http.Filters;
 
-namespace AppSeafileClient.Domain
+namespace PlasticWonderland.Domain
 {
     public class HttpHelperFactory
     {

@@ -18,14 +18,14 @@ using System.Windows.Media.Imaging;
 using Windows.Storage;
 using System.IO;
 using System.IO.IsolatedStorage;
-using AppSeafileClient.Resources;
+using PlasticWonderland.Resources;
 using System.Text;
 using Windows.Web.Http.Filters;
 using Windows.Security.Cryptography.Certificates;
 using Windows.Storage.Streams;
-using AppSeafileClient.Domain;
+using PlasticWonderland.Domain;
 
-namespace AppSeafileClient.Pages
+namespace PlasticWonderland.Pages
 {
     public partial class DownloadFile : PhoneApplicationPage
     {

@@ -18,7 +18,7 @@ using Microsoft.Phone.Tasks;
 using System.Xml;
 
 
-namespace AppSeafileClient
+namespace PlasticWonderland
 {
     /// <summary>
     /// Custom LogLevel enum accessible from the rest of the app

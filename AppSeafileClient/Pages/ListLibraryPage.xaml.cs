@@ -16,22 +16,23 @@ using Windows.Web.Http.Filters;
 using Windows.Security.Cryptography.Certificates;
 using Windows.Web.Http;
 
-using AppSeafileClient.Resources;
+using PlasticWonderland.Resources;
 using System.IO.IsolatedStorage;
 using System.Globalization;
 using System.Threading;
 using Coding4Fun.Toolkit.Controls.Common;
 using System.Reflection;
-using AppSeafileClient.Domain;
+using PlasticWonderland.Domain;
 using System.Threading.Tasks;
 
-namespace AppSeafileClient.Pages
+namespace PlasticWonderland.Pages
 {
     public partial class ListLibraryPage : PhoneApplicationPage
     {
-        string authorizationToken = "";
-        string address = "";
-        Uri uristringRequestLibrary = null;
+        private string authorizationToken = "";
+        private string address = "";
+        private Uri currentRequestUri = null;
+        private Uri currentDecryptUri = null;
 
         PasswordInputPrompt passwordInputLibrary;
 
@@ -81,12 +82,20 @@ namespace AppSeafileClient.Pages
                 address = url;
             }
 
-            //Get Library
+            // SET decrypt Uri
+            currentDecryptUri = new Uri(address + "/api2/" + GlobalVariables.SF_REQ_REPOS + "/");
+
+            // Get Main-Libraries
             var foundLibs = await requestLibrary(authorizationToken, address, GlobalVariables.SF_REQ_REPOS);
             List<LibraryRootObject> mainLibsSource = this.filterMainLibs(foundLibs.Content.ToString());
+            // Get Be-Shared-Libraries
+            var beSharedLibs = await requestLibrary(authorizationToken, address, GlobalVariables.SF_REQ_BE_SHARED_REPOS);
+            List<LibraryRootObject> beSharedLibsSourece = this.filterBeSharedLibs(beSharedLibs.Content.ToString());
+            // add them up
+            mainLibsSource.AddRange(beSharedLibsSourece);
             displayListLibrary(mainLibsSource);
 
-            //Get accounts infos
+            // Get accounts infos
             requestAccountInfos(authorizationToken, address, "account/info");
         }
 
@@ -176,7 +185,7 @@ namespace AppSeafileClient.Pages
         private async Task<HttpResponseMessage> requestLibrary(string token, string url, string type)
         {
             var filter = HttpHelperFactory.Instance.getHttpFilter();
-            uristringRequestLibrary = new Uri(url + "/api2/" + type + "/");
+            currentRequestUri = new Uri(url + "/api2/" + type + "/");
             var HttpClientGetLibrary = new HttpClient(filter);
             var nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);   
 
@@ -188,7 +197,7 @@ namespace AppSeafileClient.Pages
             try
             {
                 SetProgressIndicator(true);
-                libsResponse = await HttpClientGetLibrary.GetAsync(uristringRequestLibrary);
+                libsResponse = await HttpClientGetLibrary.GetAsync(currentRequestUri);
                 HttpClientGetLibrary.Dispose();
             }
             catch (Exception ex)
@@ -196,7 +205,7 @@ namespace AppSeafileClient.Pages
                 if (GlobalVariables.IsDebugMode == true)
                 {
                     App.logger.log(LogLevel.critical, "Download list library Exception err" + ex);
-                    App.logger.log(LogLevel.critical, "Download list library uristringRequestLibrary : " + uristringRequestLibrary.ToString());
+                    App.logger.log(LogLevel.critical, "Download list library uristringRequestLibrary : " + currentRequestUri.ToString());
                     App.logger.log(LogLevel.critical, "Download list library informations address : " + address);
 
                 }
@@ -210,6 +219,13 @@ namespace AppSeafileClient.Pages
             List<LibraryRootObject> resultLibrary = JsonConvert.DeserializeObject<List<LibraryRootObject>>(httpResponse);
             resultLibrary.RemoveAll(q => q.@virtual);
             resultLibrary.RemoveAll(q => (!string.IsNullOrEmpty(q.type) && q.type.Equals(GlobalVariables.SF_RESP_GROUP_REPOS)));
+            return resultLibrary;
+        }
+        private List<LibraryRootObject> filterBeSharedLibs(string httpResponse)
+        {
+            List<LibraryRootObject> resultLibrary = JsonConvert.DeserializeObject<List<LibraryRootObject>>(httpResponse);
+            foreach (var item in resultLibrary)
+                item.type = GlobalVariables.SHARED_REPO_HELPER;
             return resultLibrary;
         }
 
@@ -307,7 +323,7 @@ namespace AppSeafileClient.Pages
         public async void decryptLibrary()
         {
             var filter = HttpHelperFactory.Instance.getHttpFilter();
-            string t = uristringRequestLibrary + GlobalVariables.currentLibrary + "/";
+            string t = currentDecryptUri + GlobalVariables.currentLibrary + "/";
             Uri a = new Uri(t);
 
             var HttpClientDecryptLibrary = new HttpClient(filter);

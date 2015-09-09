@@ -1,3 +1,1 @@
-﻿1. Check the existing functionality
-2. Thumbnails
-3. Show data from the Cache - that is the downloaded local data - directly on request.
+﻿Obsolete - everything moved to Cloud @Zwigl under Group "Seasucker"

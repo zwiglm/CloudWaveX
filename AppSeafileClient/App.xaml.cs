@@ -6,7 +6,7 @@ using System.Windows.Markup;
 using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
-using AppSeafileClient.Resources;
+using PlasticWonderland.Resources;
 using System.Threading;
 using System.IO.IsolatedStorage;
 using Windows.ApplicationModel.Activation;
@@ -15,7 +15,7 @@ using Windows.Storage;
 using System.Xml;
 using Coding4Fun.Toolkit.Controls;
 
-namespace AppSeafileClient
+namespace PlasticWonderland
 {
     public partial class App : Application
     {

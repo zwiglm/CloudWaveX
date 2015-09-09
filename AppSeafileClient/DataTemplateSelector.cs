@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace AppSeafileClient
+namespace PlasticWonderland
 {
     public abstract class DataTemplateSelector : ContentControl
     {

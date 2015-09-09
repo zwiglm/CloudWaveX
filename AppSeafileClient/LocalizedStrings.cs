@@ -1,6 +1,6 @@
-﻿using AppSeafileClient.Resources;
+﻿using PlasticWonderland.Resources;
 
-namespace AppSeafileClient
+namespace PlasticWonderland
 {
     /// <summary>
     /// Provides access to string resources.

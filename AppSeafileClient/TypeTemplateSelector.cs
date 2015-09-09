@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 
-namespace AppSeafileClient
+namespace PlasticWonderland
 {
     public class TypeTemplateSelector : DataTemplateSelector
     {
@@ -21,19 +21,19 @@ namespace AppSeafileClient
                 {
                     return GetDataTemplate("type_dir", container);
                 }
-                else if ((typeItem.type == "repo") && (typeItem.encrypted == true))
+                else if ((typeItem.type == GlobalVariables.SF_RESP_REPOS) && (typeItem.encrypted == true))
                 {
                     return GetDataTemplate("lib_crypt", container);
                 }
-                else if ((typeItem.type == "repo") && (typeItem.encrypted == false))
+                else if ((typeItem.type == GlobalVariables.SF_RESP_REPOS) && (typeItem.encrypted == false))
                 {
                      return GetDataTemplate("lib_nocrypt", container);
                 }
-                else if ((typeItem.type == "srepo") && (typeItem.encrypted == false))
+                else if ((typeItem.type == GlobalVariables.SHARED_REPO_HELPER) && (typeItem.encrypted == false))
                 {
                     return GetDataTemplate("slib_nocrypt", container);
                 }
-                else if ((typeItem.type == "srepo") && (typeItem.encrypted == true))
+                else if ((typeItem.type == GlobalVariables.SHARED_REPO_HELPER) && (typeItem.encrypted == true))
                 {
                     return GetDataTemplate("slib_crypt", container);
                 }

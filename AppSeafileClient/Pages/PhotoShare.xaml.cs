@@ -6,7 +6,7 @@ using Microsoft.Phone.Controls;
 using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Media.PhoneExtensions; 
 
-namespace AppSeafileClient.Pages
+namespace PlasticWonderland.Pages
 {
     public partial class PhotoShare : PhoneApplicationPage
     {

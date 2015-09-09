@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace AppSeafileClient
+namespace PlasticWonderland
 {
     public class MainViewModel
     {

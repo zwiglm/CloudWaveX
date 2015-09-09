@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Controls.Primitives;
 using System.Windows.Shapes;
 using Microsoft.Phone.Net.NetworkInformation;
-using AppSeafileClient.Resources;
+using PlasticWonderland.Resources;
 using Coding4Fun.Toolkit.Controls;
 using Windows.Web.Http.Filters;
 using Windows.Security.Cryptography.Certificates;
@@ -24,9 +24,9 @@ using System.Threading.Tasks;
 using Windows.Networking.Sockets;
 using Windows.Networking;
 using System.Reflection;
-using AppSeafileClient.Domain;
+using PlasticWonderland.Domain;
 
-namespace AppSeafileClient
+namespace PlasticWonderland
 {
     public partial class MainPage : PhoneApplicationPage
     {
