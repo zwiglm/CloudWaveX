@@ -40,23 +40,37 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
+                            <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Grid Grid.Column="0" Grid.RowSpan="2">
-                            <Image Grid.Column="0" Source="/Assets/page_text_32.png" Stretch="None" Margin="0,0,0,0"/>
+                        
+                        
+                        <Grid Grid.Column="0" Grid.RowSpan="3" VerticalAlignment="Top">
+                            <Image Source="/Assets/page_text_32.png" Stretch="None" Margin="0,0,0,0"/>
                         </Grid>
-                        <Grid Grid.Row="0" Grid.Column="1">
+
+                        <Grid Name="DownloadedCheckGrid" Grid.Row="0" Grid.Column="1" VerticalAlignment="Center">
                             <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="1" Text="{Binding name}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
+                                
+                                <Grid Grid.Row="0" Grid.Column="0">
+                                    <TextBlock Text="C" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
+                                </Grid>
+                                <Grid Grid.Row="0" Grid.Column="1">
+                                    <TextBlock Grid.Column="1" Text="{Binding name}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
+                                </Grid>
                             </Grid>
                         </Grid>
+
                         <Grid Grid.Row="1" Grid.Column="1">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="{Binding size,
@@ -71,6 +85,13 @@
                                    FontSize="{StaticResource PhoneFontSizeSmall}" FontStyle="Italic" Margin="0" Foreground="Black" />
                             </StackPanel>
                         </Grid>
+                        <Grid Grid.Row="2" Grid.Column="1" Visibility="Collapsed" Name="DwnldProgGrid">
+                            <StackPanel>
+                                <ProgressBar SmallChange="0.2" Minimum="0" Maximum="100" Name="DownloadProgress" Height="20" Background="#19ECA309"/>
+                            </StackPanel>
+                        </Grid>
+                        
+                        
                     </Grid>
                 </Border>
             </StackPanel>

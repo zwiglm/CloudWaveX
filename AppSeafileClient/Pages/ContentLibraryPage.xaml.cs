@@ -221,8 +221,7 @@ namespace PlasticWonderland.Pages
                 {
                     App.logger.log(LogLevel.debug, "Load content library OK");
                 }
-            }
-            
+            }            
         }
 
         #region | Upload file |
@@ -443,7 +442,16 @@ namespace PlasticWonderland.Pages
                     {
                         App.logger.log(LogLevel.debug, " GlobalVariables.currentPWD " + GlobalVariables.currentPWD);
                     }
-                    NavigationService.Navigate(new Uri("/Pages/DownloadFile.xaml?token=" + authorization + "&url=" + address + "&idlibrary=" + GlobalVariables.currentLibrary + "&pathFolder=" + System.Net.HttpUtility.UrlEncode(GlobalVariables.currentPWD) + "&fileName=" + lib.name + "&timestamp=" + lib.mtime, UriKind.Relative));
+                    NavigationService.Navigate(
+                        new Uri("/Pages/DownloadFile.xaml?token=" + authorization + 
+                                "&url=" + address + 
+                                "&idlibrary=" + GlobalVariables.currentLibrary + 
+                                "&pathFolder=" + System.Net.HttpUtility.UrlEncode(GlobalVariables.currentPWD) + 
+                                "&fileName=" + lib.name + 
+                                "&timestamp=" + lib.mtime +
+                                "&fileSize=" + lib.size +
+                                "&sfUniqueId=" + lib.id, 
+                                UriKind.Relative));
                 }
             }
         }

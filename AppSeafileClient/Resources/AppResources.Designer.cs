@@ -988,6 +988,15 @@ namespace PlasticWonderland.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Download Thumbnails.
+        /// </summary>
+        public static string Settings_Check_GetThumbs {
+            get {
+                return ResourceManager.GetString("Settings_Check_GetThumbs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete files downloaded in this app..
         /// </summary>
         public static string Settings_Text_DeleteCache {

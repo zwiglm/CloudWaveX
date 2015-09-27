@@ -14,6 +14,7 @@ using Windows.Storage.Pickers;
 using Windows.Storage;
 using System.Xml;
 using Coding4Fun.Toolkit.Controls;
+using PlasticWonderland.Class;
 
 namespace PlasticWonderland
 {
@@ -66,11 +67,39 @@ namespace PlasticWonderland
                 PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
             }
 
-            
 
+            // Create the database if it does not exist.
+            this.createLocalDatabase();
         }
 
-        
+
+        #region DB Stuff
+
+        private void createLocalDatabase()
+        {
+            using (CacheFileEntryContext db = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
+            {
+                bool DEBUG = false;
+                if (!db.DatabaseExists() || DEBUG)
+                {
+                    //Create the database
+                    try
+                    {
+                        if (DEBUG)
+                            db.DeleteDatabase();
+
+                        db.CreateDatabase();
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+
         // Code to execute when a contract activation such as a file open or save picker returns 
         // with the picked file or other return values
         private void Application_ContractActivated(object sender, Windows.ApplicationModel.Activation.IActivatedEventArgs e)

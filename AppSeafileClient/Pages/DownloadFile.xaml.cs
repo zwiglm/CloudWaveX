@@ -24,6 +24,8 @@ using Windows.Web.Http.Filters;
 using Windows.Security.Cryptography.Certificates;
 using Windows.Storage.Streams;
 using PlasticWonderland.Domain;
+using PlasticWonderland.Class;
+using System.Collections.ObjectModel;
 
 namespace PlasticWonderland.Pages
 {
@@ -37,6 +39,8 @@ namespace PlasticWonderland.Pages
             Error
         };
 
+        //private ObservableCollection<CacheFileEntry> _cacheFileEntries;
+
         string authorization = "";
         string address = "";
         string id = "";
@@ -44,11 +48,13 @@ namespace PlasticWonderland.Pages
         string file = "";
         string downloadUrl = "";
         string timeLastUpdate = "";
+        long fileSize;
+        string sfUniqueId = "";
         bool backFromView = false;
 
         CancellationTokenSource ctsDownload;
 
-        static string completePatahOnISF;
+        static string completePathOnISF;
 
 
         public DownloadFile()
@@ -56,16 +62,94 @@ namespace PlasticWonderland.Pages
             InitializeComponent();
         }
 
-       
+
+        #region DB Stuff
+
+        //public ObservableCollection<CacheFileEntry> CacheFileEntries
+        //{
+        //    get
+        //    {
+        //        return _cacheFileEntries;
+        //    }
+        //    set
+        //    {
+        //        if (_cacheFileEntries != value)
+        //        {
+        //            _cacheFileEntries = value;
+        //            //NotifyPropertyChanged("ToDoItems");
+        //        }
+        //    }
+        //}
+
+        private void loadCacheFileEntries()
+        {
+            // Define the query to gather all of the to-do items.
+            //var cacheFileEnties = 
+            //    from CacheFileEntry cfe in _cacheFileEntryDB.CacheFileEntries
+            //    select cfe;
+
+            // Execute the query and place the results into a collection.
+            //CacheFileEntries = new ObservableCollection<CacheFileEntry>(cacheFileEnties);
+        }
+
+        private void saveNewCacheFileEntry(string fileName)
+        {
+            using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
+            {
+                CacheFileEntry newCacheFileEntry = new CacheFileEntry()
+                {
+                    UniqueId = sfUniqueId,
+                    Filename = fileName,
+                    Mtime = timeLastUpdate,
+                    FileSize = fileSize,
+                };
+
+                // Add a to-do item to the observable collection.
+                //CacheFileEntries.Add(newCacheFileEntry);
+
+                // Add a to-do item to the local database.
+                cfeDbContetxt.CacheFileEntries.InsertOnSubmit(newCacheFileEntry);
+
+                // Save changes to the database.
+                cfeDbContetxt.SubmitChanges();
+
+            }
+        }
+
+        private void updateCachFileEntry(CacheFileEntry cfe)
+        {
+            using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
+            {
+                cfe.FileSize = fileSize;
+                cfe.Mtime = timeLastUpdate;
+                cfeDbContetxt.SubmitChanges();
+            }
+        }
+
+        private CacheFileEntry findCfeById(string id)
+        {
+            using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
+            {
+                IQueryable<CacheFileEntry> cfeQuery = from cfe in cfeDbContetxt.CacheFileEntries where cfe.UniqueId == id select cfe;
+                return cfeQuery.FirstOrDefault();
+            }
+        }
+
+        #endregion
+
+
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+
             string token = "";
             string url = "";
             string idlibrary = "";
             string pathFolder = "";
             string fileName = "";
             string timestamp = "";
+            string strSize;
+            string uniqueId = "";
 
             //Get variables
             if (NavigationContext.QueryString.TryGetValue("token", out token))
@@ -91,6 +175,14 @@ namespace PlasticWonderland.Pages
             if (NavigationContext.QueryString.TryGetValue("timestamp", out timestamp))
             {
                 timeLastUpdate = timestamp;
+            }
+            if (NavigationContext.QueryString.TryGetValue("fileSize", out strSize))
+            {
+                bool done = long.TryParse(strSize, out fileSize);
+            }
+            if (NavigationContext.QueryString.TryGetValue("sfUniqueId", out uniqueId))
+            {
+                sfUniqueId = uniqueId;
             }
 
             if (backFromView == false)
@@ -165,7 +257,7 @@ namespace PlasticWonderland.Pages
 
                 if (GlobalVariables.ISF.FileExists(pathInISF))
                 {
-                    completePatahOnISF = pathInISF;
+                    completePathOnISF = pathInISF;
                     openFileFromISF();
                 }
                 else
@@ -219,7 +311,7 @@ namespace PlasticWonderland.Pages
             }
 
             DownloadStatusText.Text = AppResources.Download_Status_Text_5;
-            // MaZ todo: seems there should be the name of the file to donwload...
+            // MaZ todo: seems there should be ab label with the name of the file to donwload...
             //DownloadResultText.Text = e.Result;
             DownloadResultText.Visibility = Visibility.Collapsed;
             cancelbtn.Visibility = Visibility.Collapsed;
@@ -298,18 +390,26 @@ namespace PlasticWonderland.Pages
                 Stream ioStream = dwnldStream.AsStreamForRead();
 
 
-                if (GlobalVariables.ISF.FileExists(pathInISF + "/" + f)) return DownloadStatus.SameName;
+                if (GlobalVariables.ISF.FileExists(pathInISF + "/" + f)) 
+                    return DownloadStatus.SameName;
+
                 if (pathInISF.EndsWith("/"))
                 {
-                    completePatahOnISF = pathInISF + f;
+                    completePathOnISF = pathInISF + f;
                 }
                 else
                 {
-                    completePatahOnISF = pathInISF + "/" + f;
+                    completePathOnISF = pathInISF + "/" + f;
                 }
 
-                using (IsolatedStorageFileStream file = GlobalVariables.ISF.CreateFile(completePatahOnISF))
+                using (IsolatedStorageFileStream file = GlobalVariables.ISF.CreateFile(completePathOnISF))
+                {
                     ioStream.CopyTo(file);
+                    // MaZ attn: also store version or timestamp to be able to identify if newer or not.....
+                    //           either insert or update
+                    // MaZ todo: add found flag to differ
+                    this.saveNewCacheFileEntry(f);
+                }
 
 
                 return DownloadStatus.Ok;
@@ -337,7 +437,7 @@ namespace PlasticWonderland.Pages
             string t;
             string q;
 
-            q = completePatahOnISF.Replace("/", "\\");
+            q = completePathOnISF.Replace("/", "\\");
 
             t = "\\" + q;
 
@@ -350,25 +450,9 @@ namespace PlasticWonderland.Pages
                 await Windows.System.Launcher.LaunchFileAsync(file, urlOptions);
             }
         }
+
         protected override void OnBackKeyPress(System.ComponentModel.CancelEventArgs e)
         {
-            // MaZ todo: get httpClient from sort of factory...
-            //try
-            //{
-            //    if (webClientDownloadFileURLData.IsBusy)
-            //    {
-            //        webClientDownloadFileURLData.CancelAsync();
-            //    }
-            //}
-            //catch (Exception)
-            //{
-
-            //    if (GlobalVariables.IsDebugMode == true)
-            //    {
-            //        App.logger.log(LogLevel.debug, "webClient is not busy");
-            //    }
-            //}
-         
             base.OnBackKeyPress(e);
         }
 

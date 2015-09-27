@@ -35,14 +35,13 @@
         <!--ContentPanel - place additional content here-->
         <Grid x:Name="ContentPanel" Grid.Row="2" Margin="12,0,12,0">
             <StackPanel>
-                <TextBlock Text="{Binding Path=LocalizedResources.Settings_Text_Logoff, Source={StaticResource LocalizedStrings}}" TextWrapping="Wrap" Foreground="Black"></TextBlock>
                 <Button x:Name="ButtonLogoff" Content="{Binding Path=LocalizedResources.Settings_Button_Logoff, Source={StaticResource LocalizedStrings}}" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="436" Click="ButtonLogoff_Click" BorderBrush="Black" Foreground="Black"/>
-
-                <TextBlock Text="{Binding Path=LocalizedResources.Settings_Text_DeleteCache, Source={StaticResource LocalizedStrings}}" TextWrapping="Wrap" Margin="0,20,0,0" Foreground="Black"></TextBlock>
                 <Button x:Name="ButtonDeleteCache" Content="{Binding Path=LocalizedResources.Settings_Button_DeleteCache, Source={StaticResource LocalizedStrings}}" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="436" Click="ButtonDeleteCache_Click" BorderBrush="Black" Foreground="Black"/>
-
-                <TextBlock Text="{Binding Path=LocalizedResources.Settings_Button_RateApp, Source={StaticResource LocalizedStrings}}" TextWrapping="Wrap" Margin="0,20,0,0" Foreground="Black"></TextBlock>
                 <Button x:Name="ButtonReview" Content="{Binding Path=LocalizedResources.Settings_Button_RateApp, Source={StaticResource LocalizedStrings}}" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="436" Click="ButtonReview_Click" BorderBrush="Black" Foreground="Black" Background="Transparent"/>
+                
+                <CheckBox FontSize="{StaticResource PhoneFontSizeNormal}" Name="CbGetThumbs" 
+                          Content="{Binding Path=LocalizedResources.Settings_Check_GetThumbs, Source={StaticResource LocalizedStrings}}" 
+                          IsChecked="False" BorderBrush="Black" Foreground="Black" Background="Transparent" Click="CbGetThumbs_Click" Visibility="Collapsed"/>
             </StackPanel>
         </Grid>
     </Grid>

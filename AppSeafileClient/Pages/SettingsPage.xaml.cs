@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.IO.IsolatedStorage;
 using System.IO;
 using Microsoft.Phone.Tasks;
+using PlasticWonderland.Class;
 
 namespace PlasticWonderland.Pages
 {
@@ -52,6 +53,8 @@ namespace PlasticWonderland.Pages
         private void ButtonDeleteCache_Click(object sender, RoutedEventArgs e)
         {
             CleanAndDeleteDirectoryRecursive("cache");
+            // also remove from local db
+            this.deleteAllCacheFileEntries();
         }
 
         private void ButtonReview_Click(object sender, RoutedEventArgs e)
@@ -104,6 +107,33 @@ namespace PlasticWonderland.Pages
                 base.OnBackKeyPress(e);
             }
         }
+
+        private void CbGetThumbs_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+
+        #region DB STuff
+
+        private void deleteAllCacheFileEntries()
+        {
+            using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
+            {
+                try
+                {
+                    IQueryable<CacheFileEntry> cfeQuery = from cfe in cfeDbContetxt.CacheFileEntries select cfe;
+                    IList<CacheFileEntry> entitiesToDelete = cfeQuery.ToList();
+                    cfeDbContetxt.CacheFileEntries.DeleteAllOnSubmit(entitiesToDelete);
+                    cfeDbContetxt.SubmitChanges();
+                }
+                catch (Exception ex)
+                {
+                }
+            }
+        }
+
+        #endregion
 
     }
 }

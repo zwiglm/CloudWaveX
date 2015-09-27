@@ -438,4 +438,7 @@
   <data name="Login_Checkbox_IgnoreSelfSigned" xml:space="preserve">
     <value>Ignore Self-Signed Certificate</value>
   </data>
+  <data name="Settings_Check_GetThumbs" xml:space="preserve">
+    <value>Download Thumbnails</value>
+  </data>
 </root>
