@@ -9,7 +9,6 @@
     xmlns:local="clr-namespace:PlasticWonderland"
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     xmlns:localClass="clr-namespace:PlasticWonderland.Class"
-    xmlns:WindowsPhone8="clr-namespace:Microsoft.AdMediator.WindowsPhone8;assembly=Microsoft.AdMediator.WindowsPhone8"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -18,6 +17,7 @@
     shell:SystemTray.IsVisible="True"
     ApplicationBar = "{StaticResource GlobalAppBar}"
     >
+    <!--xmlns:WindowsPhone8="clr-namespace:Microsoft.AdMediator.WindowsPhone8;assembly=Microsoft.AdMediator.WindowsPhone8"-->
 
     <phone:PhoneApplicationPage.DataContext>
         <local:MainViewModel />
@@ -28,7 +28,7 @@
         <localClass:sizeToStringConverter x:Key="sizeToStringConverter"/>
         
         <DataTemplate x:Key="type_file" x:FieldModifier="public">
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal" Name="DtTypeFileStackP">
                 <Border BorderBrush="#FF6C6C6A" BorderThickness="0,0,0,2" Margin="5,0,0,0" Padding="5" Width="1000">
                     <Grid ShowGridLines="False">
                         <toolkit:ContextMenuService.ContextMenu>
@@ -63,7 +63,7 @@
                                 </Grid.ColumnDefinitions>
                                 
                                 <Grid Grid.Row="0" Grid.Column="0">
-                                    <TextBlock Text="C" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
+                                    <!--<TextBlock Text="C" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />-->
                                 </Grid>
                                 <Grid Grid.Row="0" Grid.Column="1">
                                     <TextBlock Grid.Column="1" Text="{Binding name}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />
@@ -72,7 +72,7 @@
                         </Grid>
 
                         <Grid Grid.Row="1" Grid.Column="1">
-                            <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Horizontal" Name="FileMainRowStackP">
                                 <TextBlock Text="{Binding size,
                                    Converter={StaticResource sizeToStringConverter},
                                    ConverterParameter=\{0:D\}}"
@@ -86,7 +86,7 @@
                             </StackPanel>
                         </Grid>
                         <Grid Grid.Row="2" Grid.Column="1" Visibility="Collapsed" Name="DwnldProgGrid">
-                            <StackPanel>
+                            <StackPanel Name="DwnldProgrStackP" Loaded="DwnldProgrStackP_Loaded">
                                 <ProgressBar SmallChange="0.2" Minimum="0" Maximum="100" Name="DownloadProgress" Height="20" Background="#19ECA309"/>
                             </StackPanel>
                         </Grid>

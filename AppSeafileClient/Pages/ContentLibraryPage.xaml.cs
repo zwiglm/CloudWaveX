@@ -25,6 +25,7 @@ using Windows.Web.Http.Headers;
 using System.Reflection;
 using System.Windows.Threading;
 using PlasticWonderland.Domain;
+using PlasticWonderland.Class;
 
 namespace PlasticWonderland.Pages
 {
@@ -49,6 +50,7 @@ namespace PlasticWonderland.Pages
 
         StorageFile fileChoosenFromFilePicker;
         CancellationTokenSource cts;
+        ProgressBar _selectedItemProgress;
 
 
         public ContentLibraryPage()
@@ -432,6 +434,10 @@ namespace PlasticWonderland.Pages
                 }
                 else if (lib.type == "file")
                 {
+                    DependencyObject dummyCt = this.listContentLibrary.ItemContainerGenerator.ContainerFromItem(lib);
+                    //var dummy = UIChildFinder.FindChild(dummyCt, "DwnldProgrStackP", typeof(StackPanel));
+                    _selectedItemProgress = (ProgressBar) UIChildFinder.FindChild(dummyCt, "DownloadProgress", typeof(ProgressBar));
+
                     if (GlobalVariables.currentPath.StartsWith("/") == true)
                     {
                         GlobalVariables.currentPath = GlobalVariables.currentPath.Substring(1, GlobalVariables.currentPath.Length - 1);
@@ -442,16 +448,21 @@ namespace PlasticWonderland.Pages
                     {
                         App.logger.log(LogLevel.debug, " GlobalVariables.currentPWD " + GlobalVariables.currentPWD);
                     }
-                    NavigationService.Navigate(
-                        new Uri("/Pages/DownloadFile.xaml?token=" + authorization + 
-                                "&url=" + address + 
-                                "&idlibrary=" + GlobalVariables.currentLibrary + 
-                                "&pathFolder=" + System.Net.HttpUtility.UrlEncode(GlobalVariables.currentPWD) + 
-                                "&fileName=" + lib.name + 
-                                "&timestamp=" + lib.mtime +
-                                "&fileSize=" + lib.size +
-                                "&sfUniqueId=" + lib.id, 
-                                UriKind.Relative));
+
+                    //NavigationService.Navigate(
+                    //    new Uri("/Pages/DownloadFile.xaml?token=" + authorization + 
+                    //            "&url=" + address + 
+                    //            "&idlibrary=" + GlobalVariables.currentLibrary + 
+                    //            "&pathFolder=" + System.Net.HttpUtility.UrlEncode(GlobalVariables.currentPWD) + 
+                    //            "&fileName=" + lib.name + 
+                    //            "&timestamp=" + lib.mtime +
+                    //            "&fileSize=" + lib.size +
+                    //            "&sfUniqueId=" + lib.id, 
+                    //            UriKind.Relative));
+
+                    // MaZ todo: instead download and add progress-bar.....
+                    this.GetURLDataAsync(authorization, address, GlobalVariables.currentLibrary, "file", GlobalVariables.currentPWD, lib.name);
+                    // MaZ continue....
                 }
             }
         }
@@ -758,6 +769,15 @@ namespace PlasticWonderland.Pages
                 toast.Show(); 
             }
 
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DwnldProgrStackP_Loaded(object sender, RoutedEventArgs e)
+        {
         }
 
     }

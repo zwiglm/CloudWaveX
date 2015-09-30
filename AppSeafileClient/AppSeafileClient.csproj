@@ -111,6 +111,7 @@
       <DependentUpon>PivotHelpControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Class\sizeToStringConverter.cs" />
+    <Compile Include="Class\UIChildFinder.cs" />
     <Compile Include="DataTemplateSelector.cs" />
     <Compile Include="Domain\CloudHelper.cs" />
     <Compile Include="Domain\HttpHelperFactory.cs" />
