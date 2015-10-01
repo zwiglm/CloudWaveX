@@ -11,6 +11,8 @@ using Microsoft.Phone.Controls;
 using PlasticWonderland.Class;
 using PlasticWonderland.Domain;
 using PlasticWonderland.Resources;
+using Windows.Security.Cryptography;
+using Windows.Security.Cryptography.Core;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.Web.Http;
@@ -24,32 +26,17 @@ namespace PlasticWonderland.Pages
         private string _completePathOnISF;
         CancellationTokenSource _ctsDownload;
 
+        /// <summary>
+        /// <see cref="StoreFileToISF(IHttpContent downloadContent)"/>
+        /// </summary>
         private string _filePath;
         private string _repoId;
-
         private string _fileName = "";
-        private string _timeLastUpdate = "";
-        private long _fileSize;
-        private string _sfUniqueId = "";
+
+        private string _hashValue;
 
 
         #region DB Stuff
-
-        //public ObservableCollection<CacheFileEntry> CacheFileEntries
-        //{
-        //    get
-        //    {
-        //        return _cacheFileEntries;
-        //    }
-        //    set
-        //    {
-        //        if (_cacheFileEntries != value)
-        //        {
-        //            _cacheFileEntries = value;
-        //            //NotifyPropertyChanged("ToDoItems");
-        //        }
-        //    }
-        //}
 
         private void loadCacheFileEntries()
         {
@@ -62,16 +49,19 @@ namespace PlasticWonderland.Pages
             //CacheFileEntries = new ObservableCollection<CacheFileEntry>(cacheFileEnties);
         }
 
-        private void saveNewCacheFileEntry(string fileName)
+        private void saveNewCacheFileEntry(string hashValue, string timeUpdated, long fileSize, string fileName, string filePath, string library)
         {
             using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
             {
                 CacheFileEntry newCacheFileEntry = new CacheFileEntry()
                 {
-                    UniqueId = _sfUniqueId,
-                    Filename = fileName,
-                    Mtime = _timeLastUpdate,
-                    FileSize = _fileSize,
+                    ZwstHashValue = hashValue,
+                    Mtime = timeUpdated,
+                    FileSize = fileSize,
+
+                    FileName = fileName,
+                    FilePath = filePath,
+                    Library = library,
                 };
 
                 // Add a to-do item to the observable collection.
@@ -86,21 +76,21 @@ namespace PlasticWonderland.Pages
             }
         }
 
-        private void updateCachFileEntry(CacheFileEntry cfe)
+        private void updateCachFileEntry(CacheFileEntry cfe, long fileSize, string timeUpdated)
         {
             using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
             {
-                cfe.FileSize = _fileSize;
-                cfe.Mtime = _timeLastUpdate;
+                cfe.FileSize = fileSize;
+                cfe.Mtime = timeUpdated;
                 cfeDbContetxt.SubmitChanges();
             }
         }
 
-        private CacheFileEntry findCfeById(string id)
+        private CacheFileEntry findCfeById(string hashValue)
         {
             using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
             {
-                IQueryable<CacheFileEntry> cfeQuery = from cfe in cfeDbContetxt.CacheFileEntries where cfe.UniqueId == id select cfe;
+                IQueryable<CacheFileEntry> cfeQuery = from cfe in cfeDbContetxt.CacheFileEntries where cfe.ZwstHashValue == hashValue select cfe;
                 return cfeQuery.FirstOrDefault();
             }
         }
@@ -118,6 +108,8 @@ namespace PlasticWonderland.Pages
             _fileName = fileName;
             _filePath = path;
             _repoId = idlib;
+            string strConc = string.Format("{0};{1};{2}", _repoId, _filePath, _fileName);
+            _hashValue = this.CalculateHashForString(strConc, "SHA-256");
 
             var filter = HttpHelperFactory.Instance.getHttpFilter();
             Uri uristring = null;
@@ -258,6 +250,7 @@ namespace PlasticWonderland.Pages
 
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
+                _selectedItemProgress.Visibility = System.Windows.Visibility.Visible;
                 _selectedItemProgress.Value = bc;
                 _selectedItemProgress.Maximum = Convert.ToDouble(tb);
             });
@@ -272,6 +265,7 @@ namespace PlasticWonderland.Pages
                 case DownloadStatus.Ok:
                     // MaZ attn: nothing to open here now... only in old view
                     //openFileDownloaded.Visibility = Visibility.Visible;
+                    this.openFileFromISF();
                     break;
                 case DownloadStatus.SameName:
                     MessageBox.Show(AppResources.Download_Error_StoreFile_Content_1);
@@ -323,10 +317,11 @@ namespace PlasticWonderland.Pages
                 using (IsolatedStorageFileStream file = GlobalVariables.ISF.CreateFile(_completePathOnISF))
                 {
                     ioStream.CopyTo(file);
+
                     // MaZ attn: also store version or timestamp to be able to identify if newer or not.....
                     //           either insert or update
                     // MaZ todo: add found flag to differ
-                    this.saveNewCacheFileEntry(f);
+                    //this.saveNewCacheFileEntry(f);
                 }
 
 
@@ -365,5 +360,48 @@ namespace PlasticWonderland.Pages
 
         #endregion
 
+
+        #region Helper
+
+        private string CalculateHashForString(string DataString, string hashType)
+        {
+            string dataHash = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(DataString))
+                return null;
+
+            if (string.IsNullOrWhiteSpace(hashType))
+                hashType = "MD5";
+            try
+            {
+                ///Hash Algorithm Provider is Created 
+                HashAlgorithmProvider Algorithm = HashAlgorithmProvider.OpenAlgorithm(hashType);
+                ///Creating a Buffer Stream using the Cryptographic Buffer class and UTF8 encoding 
+                IBuffer vector = CryptographicBuffer.ConvertStringToBinary(DataString, BinaryStringEncoding.Utf8);
+
+
+                IBuffer digest = Algorithm.HashData(vector);////Hashing The Data 
+
+                if (digest.Length != Algorithm.HashLength)
+                {
+                    throw new System.InvalidOperationException(
+                      "HashAlgorithmProvider failed to generate a hash of proper length!");
+                }
+                else
+                {
+
+                    dataHash = CryptographicBuffer.EncodeToHexString(digest);//Encoding it to a Hex String 
+                    return dataHash;
+                }
+            }
+            catch (Exception ex)
+            {
+                ///
+            }
+
+            return null;
+        } 
+
+        #endregion
     }
 }

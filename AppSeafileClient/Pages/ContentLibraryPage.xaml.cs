@@ -454,7 +454,8 @@ namespace PlasticWonderland.Pages
                     //            "&url=" + address + 
                     //            "&idlibrary=" + GlobalVariables.currentLibrary + 
                     //            "&pathFolder=" + System.Net.HttpUtility.UrlEncode(GlobalVariables.currentPWD) + 
-                    //            "&fileName=" + lib.name + 
+                    //            "&fileName=" + lib.name +
+                    //
                     //            "&timestamp=" + lib.mtime +
                     //            "&fileSize=" + lib.size +
                     //            "&sfUniqueId=" + lib.id, 

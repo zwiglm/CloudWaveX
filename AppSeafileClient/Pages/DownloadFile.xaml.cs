@@ -98,8 +98,7 @@ namespace PlasticWonderland.Pages
             {
                 CacheFileEntry newCacheFileEntry = new CacheFileEntry()
                 {
-                    UniqueId = sfUniqueId,
-                    Filename = fileName,
+                    ZwstHashValue = sfUniqueId,
                     Mtime = timeLastUpdate,
                     FileSize = fileSize,
                 };
@@ -126,11 +125,11 @@ namespace PlasticWonderland.Pages
             }
         }
 
-        private CacheFileEntry findCfeById(string id)
+        private CacheFileEntry findCfeByHash(string hashValue)
         {
             using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
             {
-                IQueryable<CacheFileEntry> cfeQuery = from cfe in cfeDbContetxt.CacheFileEntries where cfe.UniqueId == id select cfe;
+                IQueryable<CacheFileEntry> cfeQuery = from cfe in cfeDbContetxt.CacheFileEntries where cfe.ZwstHashValue == hashValue select cfe;
                 return cfeQuery.FirstOrDefault();
             }
         }

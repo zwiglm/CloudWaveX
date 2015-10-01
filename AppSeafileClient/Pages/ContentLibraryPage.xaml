@@ -85,9 +85,9 @@
                                    FontSize="{StaticResource PhoneFontSizeSmall}" FontStyle="Italic" Margin="0" Foreground="Black" />
                             </StackPanel>
                         </Grid>
-                        <Grid Grid.Row="2" Grid.Column="1" Visibility="Collapsed" Name="DwnldProgGrid">
+                        <Grid Grid.Row="2" Grid.Column="1" Name="DwnldProgGrid">
                             <StackPanel Name="DwnldProgrStackP" Loaded="DwnldProgrStackP_Loaded">
-                                <ProgressBar SmallChange="0.2" Minimum="0" Maximum="100" Name="DownloadProgress" Height="20" Background="#19ECA309"/>
+                                <ProgressBar SmallChange="0.2" Minimum="0" Maximum="100" Name="DownloadProgress" Height="20" Background="#19ECA309" Visibility="Collapsed"/>
                             </StackPanel>
                         </Grid>
                         

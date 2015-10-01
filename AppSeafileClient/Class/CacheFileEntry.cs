@@ -12,15 +12,18 @@ namespace PlasticWonderland.Class
 {
  
     [Table]
-    [Index(Columns = "UniqueId", IsUnique = true)]
+    [Index(Columns = "ZwstHashValue", IsUnique = true)]
     public class CacheFileEntry : INotifyPropertyChanged, INotifyPropertyChanging
     {
         private int _dummyId;
 
-        private string _uniqueId;
-        private string _fileName;
+        private string _hashValue;
         private long _size;
         private string _mtime;
+
+        private string _fileName;
+        private string _path;
+        private string _library;
 
 
         [Column(IsPrimaryKey = true, IsDbGenerated = true, DbType = "INT NOT NULL Identity", CanBeNull = false, AutoSync = AutoSync.OnInsert)]
@@ -38,38 +41,23 @@ namespace PlasticWonderland.Class
             }
         }
 
+        /// <summary>
+        /// Builds hash of Seafile-Lib, Seafile-Directory and Filename concatenated
+        /// </summary>
         [Column(CanBeNull = false)]
-        public string UniqueId
+        public string ZwstHashValue
         {
             get
             {
-                return _uniqueId;
+                return _hashValue;
             }
             set
             {
-                if (_uniqueId != value)
+                if (_hashValue != value)
                 {
-                    NotifyPropertyChanging("UniqueId");
-                    _uniqueId = value;
-                    NotifyPropertyChanged("UniqueId");
-                }
-            }
-        }
-
-        [Column]
-        public string Filename
-        {
-            get
-            {
-                return _fileName;
-            }
-            set
-            {
-                if (_fileName != value)
-                {
-                    NotifyPropertyChanging("Filename");
-                    _fileName = value;
-                    NotifyPropertyChanged("Filename");
+                    NotifyPropertyChanging("ZwstHashValue");
+                    _hashValue = value;
+                    NotifyPropertyChanged("ZwstHashValue");
                 }
             }
         }
@@ -106,6 +94,60 @@ namespace PlasticWonderland.Class
                     NotifyPropertyChanging("FileSize");
                     _size = value;
                     NotifyPropertyChanged("FileSize");
+                }
+            }
+        }
+
+        [Column]
+        public string FileName
+        {
+            get
+            {
+                return _fileName;
+            }
+            set
+            {
+                if (_fileName != value)
+                {
+                    NotifyPropertyChanging("FileName");
+                    _fileName = value;
+                    NotifyPropertyChanged("FileName");
+                }
+            }
+        }
+
+        [Column]
+        public string FilePath
+        {
+            get
+            {
+                return _path;
+            }
+            set
+            {
+                if (_path != value)
+                {
+                    NotifyPropertyChanging("FilePath");
+                    _path = value;
+                    NotifyPropertyChanged("FilePath");
+                }
+            }
+        }
+
+        [Column]
+        public string Library
+        {
+            get
+            {
+                return _library;
+            }
+            set
+            {
+                if (_library != value)
+                {
+                    NotifyPropertyChanging("Library");
+                    _library = value;
+                    NotifyPropertyChanged("Library");
                 }
             }
         }
