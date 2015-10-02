@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Linq;
@@ -19,8 +21,9 @@ using Windows.Web.Http;
 
 namespace PlasticWonderland.Pages
 {
-    public partial class ContentLibraryPage
+    public partial class ContentLibraryPage : INotifyPropertyChanged
     {
+        const string CACHE_FILE_ENTRIES_OC_PROP = "CacheFileEntriesOC";
 
         private string _downloadUrl = "";
         private string _completePathOnISF;
@@ -38,18 +41,56 @@ namespace PlasticWonderland.Pages
 
         #region DB Stuff
 
-        private void loadCacheFileEntries()
+        private ObservableCollection<CacheFileEntry> _cacheFileEntriesOC;
+        public event PropertyChangedEventHandler PropertyChanged;
+        
+        private void NotifyPropertyChanged(string propertyName)
         {
-            // Define the query to gather all of the to-do items.
-            //var cacheFileEnties = 
-            //    from CacheFileEntry cfe in _cacheFileEntryDB.CacheFileEntries
-            //    select cfe;
-
-            // Execute the query and place the results into a collection.
-            //CacheFileEntries = new ObservableCollection<CacheFileEntry>(cacheFileEnties);
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
 
-        private void saveNewCacheFileEntry(string hashValue, string timeUpdated, long fileSize, string fileName, string filePath, string library)
+        public ObservableCollection<CacheFileEntry> CacheFileEntriesOC
+        {
+            get
+            {
+                return _cacheFileEntriesOC;
+            }
+            set
+            {
+                if (_cacheFileEntriesOC != value)
+                {
+                    _cacheFileEntriesOC = value;
+                    NotifyPropertyChanged(ContentLibraryPage.CACHE_FILE_ENTRIES_OC_PROP);
+                }
+            }
+        }
+
+        private void loadDatabase()
+        {
+            using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
+            {
+                // Define the query to gather all of the to-do items.
+                var cacheFileEnties =
+                    from CacheFileEntry cfe in cfeDbContetxt.CacheFileEntries
+                    select cfe;
+
+                // Execute the query and place the results into a collection.
+                this.CacheFileEntriesOC = new ObservableCollection<CacheFileEntry>(cacheFileEnties);
+            }            
+        }
+
+        private void submitDatabase()
+        {
+            using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
+            {
+                cfeDbContetxt.SubmitChanges();
+            }
+        }
+
+        private void insertCacheFileEntry(string hashValue, string timeUpdated, long fileSize, string fileName, string filePath, string library)
         {
             using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
             {
@@ -65,33 +106,25 @@ namespace PlasticWonderland.Pages
                 };
 
                 // Add a to-do item to the observable collection.
-                //CacheFileEntries.Add(newCacheFileEntry);
+                CacheFileEntriesOC.Add(newCacheFileEntry);
 
                 // Add a to-do item to the local database.
                 cfeDbContetxt.CacheFileEntries.InsertOnSubmit(newCacheFileEntry);
-
-                // Save changes to the database.
-                cfeDbContetxt.SubmitChanges();
-
             }
         }
 
-        private void updateCachFileEntry(CacheFileEntry cfe, long fileSize, string timeUpdated)
-        {
-            using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
-            {
-                cfe.FileSize = fileSize;
-                cfe.Mtime = timeUpdated;
-                cfeDbContetxt.SubmitChanges();
-            }
-        }
-
-        private CacheFileEntry findCfeById(string hashValue)
+        private void updateCachFileEntry(string hashValue, long fileSize, string timeUpdated)
         {
             using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
             {
                 IQueryable<CacheFileEntry> cfeQuery = from cfe in cfeDbContetxt.CacheFileEntries where cfe.ZwstHashValue == hashValue select cfe;
-                return cfeQuery.FirstOrDefault();
+                CacheFileEntry found = cfeQuery.FirstOrDefault();
+                found.FileSize = fileSize;
+                found.Mtime = timeUpdated;
+
+                CacheFileEntry fromOC = CacheFileEntriesOC.First(q => q.DummyId == found.DummyId);
+                fromOC.FileSize = fileSize;
+                fromOC.Mtime = timeUpdated;
             }
         }
 
@@ -263,8 +296,7 @@ namespace PlasticWonderland.Pages
             switch (fileDownloaded)
             {
                 case DownloadStatus.Ok:
-                    // MaZ attn: nothing to open here now... only in old view
-                    //openFileDownloaded.Visibility = Visibility.Visible;
+                    //_tickedFileDownloaded......
                     this.openFileFromISF();
                     break;
                 case DownloadStatus.SameName:
@@ -403,5 +435,6 @@ namespace PlasticWonderland.Pages
         } 
 
         #endregion
+
     }
 }

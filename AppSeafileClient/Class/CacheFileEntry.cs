@@ -156,6 +156,7 @@ namespace PlasticWonderland.Class
         [Column(IsVersion = true)]
         private Binary _version;
 
+
         #region INotifyPropertyChanged Members
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -170,6 +171,7 @@ namespace PlasticWonderland.Class
         }
 
         #endregion
+
 
         #region INotifyPropertyChanging Members
 

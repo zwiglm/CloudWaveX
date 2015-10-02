@@ -51,6 +51,7 @@ namespace PlasticWonderland.Pages
         StorageFile fileChoosenFromFilePicker;
         CancellationTokenSource cts;
         ProgressBar _selectedItemProgress;
+        TextBlock _tickedFileDownloaded;
 
 
         public ContentLibraryPage()
@@ -131,7 +132,18 @@ namespace PlasticWonderland.Pages
             {
                 requestContentLibrary(authorization, address, id, "dir", completePath);
             }
+
+            // load DB
+            this.loadDatabase();
         }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+            // save db
+            this.submitDatabase();
+        }
+
 
         /// <summary>
         /// Get content of the library from the server
@@ -434,9 +446,10 @@ namespace PlasticWonderland.Pages
                 }
                 else if (lib.type == "file")
                 {
+                    // MaZ attn: find stuff in DataTemplate via VisualTreeHelper
                     DependencyObject dummyCt = this.listContentLibrary.ItemContainerGenerator.ContainerFromItem(lib);
-                    //var dummy = UIChildFinder.FindChild(dummyCt, "DwnldProgrStackP", typeof(StackPanel));
                     _selectedItemProgress = (ProgressBar) UIChildFinder.FindChild(dummyCt, "DownloadProgress", typeof(ProgressBar));
+                    _tickedFileDownloaded = (TextBlock)UIChildFinder.FindChild(dummyCt, "TickFileDownloaded", typeof(TextBlock));
 
                     if (GlobalVariables.currentPath.StartsWith("/") == true)
                     {
@@ -461,9 +474,7 @@ namespace PlasticWonderland.Pages
                     //            "&sfUniqueId=" + lib.id, 
                     //            UriKind.Relative));
 
-                    // MaZ todo: instead download and add progress-bar.....
                     this.GetURLDataAsync(authorization, address, GlobalVariables.currentLibrary, "file", GlobalVariables.currentPWD, lib.name);
-                    // MaZ continue....
                 }
             }
         }
@@ -770,15 +781,6 @@ namespace PlasticWonderland.Pages
                 toast.Show(); 
             }
 
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DwnldProgrStackP_Loaded(object sender, RoutedEventArgs e)
-        {
         }
 
     }

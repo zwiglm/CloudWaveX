@@ -1,11 +1,16 @@
 ﻿public class LibraryRootObject
 {
     /// <summary>
+    /// Behavior from outside
+    /// </summary>
+    public bool AlreadyDownloaded { get; set; }
+
+    /// <summary>
     /// Common props
     /// </summary>
     public string permission { get; set; }
     public bool encrypted { get; set; }
-
+    
     /// <summary>
     /// Response from List Libraries
     /// </summary>
