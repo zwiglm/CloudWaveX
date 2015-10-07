@@ -373,7 +373,7 @@ namespace PlasticWonderland.Pages
                             _completePathOnISF = pathInISF + "/" + f;
                         }
 
-                        using (IsolatedStorageFileStream file = GlobalVariables.ISF.OpenFile(_completePathOnISF, FileMode.CreateNew))
+                        using (IsolatedStorageFileStream file = GlobalVariables.ISF.OpenFile(_completePathOnISF, FileMode.OpenOrCreate))
                         {
                             ioStream.CopyTo(file);
                             // also store version or timestamp to be able to identify if newer or not.....
