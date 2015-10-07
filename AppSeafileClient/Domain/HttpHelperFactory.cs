@@ -56,10 +56,18 @@ namespace PlasticWonderland.Domain
 
         public string CalculateHashForString(string repoId, string filePath, string fileName)
         {
-            string strConc = string.Format("{0};{1};{2}", repoId, filePath, fileName);
-            return this.CalculateHashForString(strConc, HttpHelperFactory.SHA_256);
+            string repoIdClean = repoId.Trim('/');
+            string filePathClean = filePath.Trim('/');
+            string fileNameClean = fileName.Trim('/');
+            string strConc = string.Format("{0};{1};{2}", repoIdClean, filePathClean, fileNameClean);
+            string hash =  this.CalculateHashForString(strConc, HttpHelperFactory.SHA_256);
+            return hash;
         }
-        public string CalculateHashForString(string DataString, string hashType)
+
+
+        #region Privee
+
+        private string CalculateHashForString(string DataString, string hashType)
         {
             string dataHash = string.Empty;
 
@@ -96,7 +104,9 @@ namespace PlasticWonderland.Domain
             }
 
             return null;
-        } 
+        }
+
+        #endregion
 
     }
 }

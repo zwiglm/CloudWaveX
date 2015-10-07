@@ -140,8 +140,6 @@ namespace PlasticWonderland.Pages
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            // save db
-            this.submitDatabase();
         }
 
 
@@ -249,7 +247,7 @@ namespace PlasticWonderland.Pages
                 if (libCntItem.type.Equals(GlobalVariables.FILE_AS_FILE))
                 {
                     string hash = 
-                        HttpHelperFactory.Instance.CalculateHashForString(GlobalVariables.currentLibrary, GlobalVariables.currentPWD, libCntItem.name);
+                        HttpHelperFactory.Instance.CalculateHashForString(GlobalVariables.currentLibrary, GlobalVariables.currentPath, libCntItem.name);
                     libCntItem.FileHash = hash;
 
                     if (this.isAlreadyDownloaded(hash))
@@ -490,16 +488,12 @@ namespace PlasticWonderland.Pages
                     //            "&url=" + address + 
                     //            "&idlibrary=" + GlobalVariables.currentLibrary + 
                     //            "&pathFolder=" + System.Net.HttpUtility.UrlEncode(GlobalVariables.currentPWD) + 
-                    //            "&fileName=" + lib.name +
-                    //
-                    //            "&timestamp=" + lib.mtime +
-                    //            "&fileSize=" + lib.size +
-                    //            "&sfUniqueId=" + lib.id, 
+                    //            "&fileName=" + lib.name, 
                     //            UriKind.Relative));
 
                     this.GetURLDataAsync(
                         authorization, address, 
-                        GlobalVariables.currentLibrary, GlobalVariables.FILE_AS_FILE, GlobalVariables.currentPWD, lib.name,
+                        GlobalVariables.currentLibrary, GlobalVariables.FILE_AS_FILE, GlobalVariables.currentPWD, GlobalVariables.currentPath, lib.name, lib.FileHash,
                         lib.mtime, lib.size, lib.id);
                 }
             }

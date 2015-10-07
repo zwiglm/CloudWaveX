@@ -31,7 +31,8 @@ namespace PlasticWonderland.Pages
         /// <summary>
         /// <see cref="StoreFileToISF(IHttpContent downloadContent)"/>
         /// </summary>
-        private string _filePath;
+        private string _filePathPWD;
+        private string _filePathRAW;
         private string _repoId;
         private string _fileName = "";
         /// <summary>
@@ -82,14 +83,6 @@ namespace PlasticWonderland.Pages
             }            
         }
 
-        private void submitDatabase()
-        {
-            using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
-            {
-                cfeDbContetxt.SubmitChanges();
-            }
-        }
-
         private void insertCacheFileEntry(string hashValue, 
                                           int mTime, long fileSize, string fileId,
                                           string fileName, string filePath, string library)
@@ -114,7 +107,7 @@ namespace PlasticWonderland.Pages
 
                 // Add a to-do item to the local database.
                 cfeDbContetxt.CacheFileEntries.InsertOnSubmit(newCacheFileEntry);
-                //cfeDbContetxt.SubmitChanges();
+                cfeDbContetxt.SubmitChanges();
             }
         }
 
@@ -128,11 +121,13 @@ namespace PlasticWonderland.Pages
                 found.Mtime = mTimeUpdate;
                 found.FileId = fileId;
 
-                CacheFileEntry fromOC = CacheFileEntriesDict[hashValue];
-                fromOC.FileSize = fileSize;
-                fromOC.Mtime = mTimeUpdate;
-                fromOC.FileId = fileId;
+                cfeDbContetxt.SubmitChanges();
             }
+
+            CacheFileEntry fromOC = CacheFileEntriesDict[hashValue];
+            fromOC.FileSize = fileSize;
+            fromOC.Mtime = mTimeUpdate;
+            fromOC.FileId = fileId;
         }
 
         /// <summary>
@@ -156,14 +151,15 @@ namespace PlasticWonderland.Pages
         #region Downloading Stuff
 
         private async void GetURLDataAsync(string token, string url, 
-                                           string idlib, string type, string path, string fileName,
+                                           string idlib, string type, string pathPWD, string pathRAW, string fileName, string hashValue,
                                            int mTime, long size, string fileId)
         {
             // other stuff that has been transported via Url-parms before
             _fileName = fileName;
-            _filePath = path;
+            _filePathPWD = pathPWD;
+            _filePathRAW = pathRAW.Trim('/');
             _repoId = idlib;
-            _hashValue = HttpHelperFactory.Instance.CalculateHashForString(_repoId, _filePath, _fileName);
+            _hashValue = hashValue;
             _mTime = mTime;
             _fSize = size;
             _fileId = fileId;
@@ -172,9 +168,9 @@ namespace PlasticWonderland.Pages
             Uri uristring = null;
             HttpClient webClientGetURLData = new HttpClient(filter);
 
-            if (!string.IsNullOrEmpty(path))
+            if (!string.IsNullOrEmpty(pathPWD))
             {
-                uristring = new Uri(url + "/api2/" + "repos/" + idlib + "/" + type + "/?p=/" + System.Net.HttpUtility.UrlEncode(path));
+                uristring = new Uri(url + "/api2/" + "repos/" + idlib + "/" + type + "/?p=/" + System.Net.HttpUtility.UrlEncode(pathPWD));
             }
             webClientGetURLData.DefaultRequestHeaders.Add("Accept", "application/json; charset=utf-8; indent=4");
             webClientGetURLData.DefaultRequestHeaders.Add("Authorization", "Token " + token);
@@ -214,16 +210,16 @@ namespace PlasticWonderland.Pages
                 _downloadUrl = tmp;
 
                 string pathInISF;
-                if (_filePath.StartsWith("/"))
+                if (_filePathPWD.StartsWith("/"))
                 {
-                    pathInISF = "cache" + "/" + id + _filePath;
+                    pathInISF = "cache" + "/" + id + _filePathPWD;
                 }
                 else
                 {
-                    pathInISF = "cache" + "/" + id + "/" + _filePath;
+                    pathInISF = "cache" + "/" + id + "/" + _filePathPWD;
                 }
 
-                if (GlobalVariables.ISF.FileExists(pathInISF))
+                if (GlobalVariables.ISF.FileExists(pathInISF) && !this.isNewerFile())
                 {
                     _completePathOnISF = pathInISF;
                     openFileFromISF();
@@ -316,7 +312,7 @@ namespace PlasticWonderland.Pages
         private async void StoreFileToISF(IHttpContent downloadContent)
         {
             //DownloadStatus fileDownloaded = await StoreFileSimle(downloadContent, _fileName, id, path);
-            DownloadStatus fileDownloaded = await StoreFileSimle(downloadContent, _fileName, _repoId, _filePath);
+            DownloadStatus fileDownloaded = await StoreFileSimle(downloadContent, _fileName, _repoId, _filePathPWD);
             switch (fileDownloaded)
             {
                 case DownloadStatus.Ok:
@@ -358,27 +354,50 @@ namespace PlasticWonderland.Pages
                 Stream ioStream = dwnldStream.AsStreamForRead();
 
 
-                if (GlobalVariables.ISF.FileExists(pathInISF + "/" + f)) 
-                    return DownloadStatus.SameName;
-
-                if (pathInISF.EndsWith("/"))
+                if (GlobalVariables.ISF.FileExists(pathInISF + "/" + f))
                 {
-                    _completePathOnISF = pathInISF + f;
+                    if (this.isAlreadyDownloaded(_hashValue))
+                    {
+                        if (!this.isNewerFile())
+                        {
+                            return DownloadStatus.SameName;
+                        }
+
+
+                        if (pathInISF.EndsWith("/"))
+                        {
+                            _completePathOnISF = pathInISF + f;
+                        }
+                        else
+                        {
+                            _completePathOnISF = pathInISF + "/" + f;
+                        }
+
+                        using (IsolatedStorageFileStream file = GlobalVariables.ISF.OpenFile(_completePathOnISF, FileMode.CreateNew))
+                        {
+                            ioStream.CopyTo(file);
+                            // also store version or timestamp to be able to identify if newer or not.....
+                            this.updateCachFileEntry(_hashValue, _fSize, _mTime, _fileId);
+                        }
+                    }
                 }
                 else
                 {
-                    _completePathOnISF = pathInISF + "/" + f;
+                    if (pathInISF.EndsWith("/"))
+                    {
+                        _completePathOnISF = pathInISF + f;
+                    }
+                    else
+                    {
+                        _completePathOnISF = pathInISF + "/" + f;
+                    }
+
+                    using (IsolatedStorageFileStream file = GlobalVariables.ISF.CreateFile(_completePathOnISF))
+                    {
+                        ioStream.CopyTo(file);
+                        this.insertCacheFileEntry(_hashValue, _mTime, _fSize, _fileId, _fileName, _filePathRAW, _repoId);
+                    }
                 }
-
-                using (IsolatedStorageFileStream file = GlobalVariables.ISF.CreateFile(_completePathOnISF))
-                {
-                    ioStream.CopyTo(file);
-
-                    // MaZ attn: also store version or timestamp to be able to identify if newer or not.....
-                    //           either insert or update
-                    this.updateDatabaseValue();
-                }
-
 
                 return DownloadStatus.Ok;
 
@@ -414,22 +433,13 @@ namespace PlasticWonderland.Pages
         }
 
         /// <summary>
-        /// either inserts or updatees the DB-Value of the Downloaded file
+        /// try to get along with comparing only with unique-Id
         /// </summary>
-        private void updateDatabaseValue()
+        /// <returns></returns>
+        private bool isNewerFile()
         {
-            if (this.isAlreadyDownloaded(_hashValue))
-            {
-                CacheFileEntry entry = this.getWithHash(_hashValue);
-
-                // try to get along with comparing only with unique-Id
-                if (!entry.FileId.Equals(_fileId))
-                    this.updateCachFileEntry(_hashValue, _fSize, _mTime, _fileId);
-            }
-            else
-            {
-                this.insertCacheFileEntry(_hashValue, _mTime, _fSize, _fileId, _fileName, _filePath, _repoId);
-            }
+            CacheFileEntry cfe = this.getWithHash(_hashValue);
+            return !cfe.FileId.Equals(_fileId);
         }
 
         #endregion
