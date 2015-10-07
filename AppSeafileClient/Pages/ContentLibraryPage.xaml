@@ -9,6 +9,7 @@
     xmlns:local="clr-namespace:PlasticWonderland"
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     xmlns:localClass="clr-namespace:PlasticWonderland.Class"
+    xmlns:plwDomain="clr-namespace:PlasticWonderland.Domain"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -23,6 +24,7 @@
     </phone:PhoneApplicationPage.DataContext>
     
     <phone:PhoneApplicationPage.Resources>
+        <plwDomain:BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
         <localClass:mtimeToDateConverter x:Key="mtimeToStringConverter"/>
         <localClass:sizeToStringConverter x:Key="sizeToStringConverter"/>
         
@@ -62,7 +64,9 @@
                                 </Grid.ColumnDefinitions>
                                 
                                 <Grid Grid.Row="0" Grid.Column="0">
-                                    <TextBlock Name="TickFileDownloaded" Text="&#x2705;" FontFamily="Segoe UI Symbol" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0" Visibility="Collapsed" />
+                                    <TextBlock Name="TickFileDownloaded" Text="&#x2705;" FontFamily="Segoe UI Symbol" 
+                                               FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0" 
+                                               Visibility="{Binding AlreadyDownloaded, Converter={StaticResource BoolToVisConverter}}" />
                                 </Grid>
                                 <Grid Grid.Row="0" Grid.Column="1">
                                     <TextBlock Grid.Column="1" Text="{Binding name}" TextWrapping="Wrap" FontSize="{StaticResource PhoneFontSizeMedium}" Foreground="Black" Margin="5,0,0,0" />

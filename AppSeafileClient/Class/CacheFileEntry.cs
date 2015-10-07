@@ -16,10 +16,11 @@ namespace PlasticWonderland.Class
     public class CacheFileEntry : INotifyPropertyChanged, INotifyPropertyChanging
     {
         private int _dummyId;
-
         private string _hashValue;
+
         private long _size;
-        private string _mtime;
+        private int _mtime;
+        private string _fileId;
 
         private string _fileName;
         private string _path;
@@ -62,8 +63,9 @@ namespace PlasticWonderland.Class
             }
         }
 
+
         [Column]
-        public string Mtime
+        public int Mtime
         {
             get
             {
@@ -97,6 +99,25 @@ namespace PlasticWonderland.Class
                 }
             }
         }
+
+        [Column]
+        public string FileId
+        {
+            get
+            {
+                return _fileId;
+            }
+            set
+            {
+                if (_fileId != value)
+                {
+                    NotifyPropertyChanging("FileId");
+                    _fileId = value;
+                    NotifyPropertyChanged("FileId");
+                }
+            }
+        }
+
 
         [Column]
         public string FileName
@@ -151,6 +172,7 @@ namespace PlasticWonderland.Class
                 }
             }
         }
+
 
         // Version column aids update performance.
         [Column(IsVersion = true)]

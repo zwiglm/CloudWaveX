@@ -13,9 +13,9 @@ namespace PlasticWonderland
             LibraryRootObject typeItem = item as LibraryRootObject;
             if (typeItem != null)
             {
-                if (typeItem.type == "file")
+                if (typeItem.type.Equals(GlobalVariables.FILE_AS_FILE))
                 {
-                    return GetDataTemplate("type_file", container);
+                    return GetDataTemplate(GlobalVariables.TYPEFILE_AS_TYPEFILE, container);
                 }
                 else if (typeItem.type == "dir")
                 {

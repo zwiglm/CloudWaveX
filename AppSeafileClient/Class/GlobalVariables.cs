@@ -4,6 +4,9 @@ using Windows.Storage;
 
 public static class GlobalVariables
 {
+    public static string FILE_AS_FILE = "file";
+    public static string TYPEFILE_AS_TYPEFILE = "type_file";
+
     public static string currentLibrary = "";
     public static string currentPath = "";
     public static string currentFile = "";

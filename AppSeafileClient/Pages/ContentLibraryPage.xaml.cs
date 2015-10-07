@@ -219,7 +219,11 @@ namespace PlasticWonderland.Pages
                 listContentLibrary.ItemsSource = null;
             }
 
+            // get objects from json
             var resultContentLibrary = JsonConvert.DeserializeObject<List<LibraryRootObject>>(p);
+            // enrich with Hash and see if already downloaded.....
+            this.enrichHashAndDownloadTick(resultContentLibrary);
+
             if (resultContentLibrary.Count == 0)
             {
                 if (GlobalVariables.IsDebugMode == true)
@@ -237,6 +241,25 @@ namespace PlasticWonderland.Pages
                 }
             }            
         }
+
+        private void enrichHashAndDownloadTick(List<LibraryRootObject> libraryContent)
+        {
+            foreach (var libCntItem in libraryContent)
+            {
+                if (libCntItem.type.Equals(GlobalVariables.FILE_AS_FILE))
+                {
+                    string hash = 
+                        HttpHelperFactory.Instance.CalculateHashForString(GlobalVariables.currentLibrary, GlobalVariables.currentPWD, libCntItem.name);
+                    libCntItem.FileHash = hash;
+
+                    if (this.isAlreadyDownloaded(hash))
+                    {
+                        libCntItem.AlreadyDownloaded = true;
+                    }
+                }
+            }
+        }
+
 
         #region | Upload file |
         
@@ -333,7 +356,7 @@ namespace PlasticWonderland.Pages
             requestUploadContent.Add(content4, "parent_dir");
 
             IHttpContent content5 = new HttpStreamContent(fileContent);
-            requestUploadContent.Add(content5,"file",fileName);
+            requestUploadContent.Add(content5,GlobalVariables.FILE_AS_FILE,fileName);
 
             string mimetype;
             try
@@ -444,7 +467,7 @@ namespace PlasticWonderland.Pages
 
                     requestContentLibrary(authorization, address, GlobalVariables.currentLibrary, "dir", System.Net.HttpUtility.UrlEncode(GlobalVariables.currentPath));
                 }
-                else if (lib.type == "file")
+                else if (lib.type.Equals(GlobalVariables.FILE_AS_FILE))
                 {
                     // MaZ attn: find stuff in DataTemplate via VisualTreeHelper
                     DependencyObject dummyCt = this.listContentLibrary.ItemContainerGenerator.ContainerFromItem(lib);
@@ -474,7 +497,10 @@ namespace PlasticWonderland.Pages
                     //            "&sfUniqueId=" + lib.id, 
                     //            UriKind.Relative));
 
-                    this.GetURLDataAsync(authorization, address, GlobalVariables.currentLibrary, "file", GlobalVariables.currentPWD, lib.name);
+                    this.GetURLDataAsync(
+                        authorization, address, 
+                        GlobalVariables.currentLibrary, GlobalVariables.FILE_AS_FILE, GlobalVariables.currentPWD, lib.name,
+                        lib.mtime, lib.size, lib.id);
                 }
             }
         }
@@ -724,11 +750,11 @@ namespace PlasticWonderland.Pages
 
             if (completePath == "")
             {
-                uristringDelete = new Uri(address + "/api2/" + "repos/" + id + "/" + "file" + "/?p=" + System.Net.HttpUtility.UrlEncode(fileToDelete));
+                uristringDelete = new Uri(address + "/api2/" + "repos/" + id + "/" + GlobalVariables.FILE_AS_FILE + "/?p=" + System.Net.HttpUtility.UrlEncode(fileToDelete));
             }
             else
             {
-                uristringDelete = new Uri(address + "/api2/" + "repos/" + id + "/" + "file" + "/?p=" + System.Net.HttpUtility.UrlEncode(completePath) + "/" + System.Net.HttpUtility.UrlEncode(fileToDelete));
+                uristringDelete = new Uri(address + "/api2/" + "repos/" + id + "/" + GlobalVariables.FILE_AS_FILE + "/?p=" + System.Net.HttpUtility.UrlEncode(completePath) + "/" + System.Net.HttpUtility.UrlEncode(fileToDelete));
             }
 
             HttpClientDeleteFile.DefaultRequestHeaders.Add("Accept", "application/json;charset=utf-8;indent=4");

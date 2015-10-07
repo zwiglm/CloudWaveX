@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.IO.IsolatedStorage;
@@ -21,9 +20,9 @@ using Windows.Web.Http;
 
 namespace PlasticWonderland.Pages
 {
-    public partial class ContentLibraryPage : INotifyPropertyChanged
+    public partial class ContentLibraryPage
     {
-        const string CACHE_FILE_ENTRIES_OC_PROP = "CacheFileEntriesOC";
+        const string CACHE_FILE_ENTRIES_PROP = "CacheFileEntriesDict";
 
         private string _downloadUrl = "";
         private string _completePathOnISF;
@@ -35,24 +34,20 @@ namespace PlasticWonderland.Pages
         private string _filePath;
         private string _repoId;
         private string _fileName = "";
+        /// <summary>
+        /// further on - to update DB....
+        /// </summary>
+        private int _mTime;
+        private long _fSize;
+        private string _fileId;
 
         private string _hashValue;
 
 
         #region DB Stuff
 
-        private ObservableCollection<CacheFileEntry> _cacheFileEntriesOC;
-        public event PropertyChangedEventHandler PropertyChanged;
-        
-        private void NotifyPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
-        public ObservableCollection<CacheFileEntry> CacheFileEntriesOC
+        private IDictionary<string, CacheFileEntry> _cacheFileEntriesOC;        
+        public IDictionary<string, CacheFileEntry> CacheFileEntriesDict
         {
             get
             {
@@ -60,11 +55,11 @@ namespace PlasticWonderland.Pages
             }
             set
             {
-                if (_cacheFileEntriesOC != value)
-                {
-                    _cacheFileEntriesOC = value;
-                    NotifyPropertyChanged(ContentLibraryPage.CACHE_FILE_ENTRIES_OC_PROP);
-                }
+                //if (_cacheFileEntriesOC != value)
+                //{
+                //    _cacheFileEntriesOC = value;
+                //}
+                _cacheFileEntriesOC = value;
             }
         }
 
@@ -74,11 +69,16 @@ namespace PlasticWonderland.Pages
             {
                 // Define the query to gather all of the to-do items.
                 var cacheFileEnties =
-                    from CacheFileEntry cfe in cfeDbContetxt.CacheFileEntries
-                    select cfe;
+                    from  cfe in cfeDbContetxt.CacheFileEntries select cfe;
 
                 // Execute the query and place the results into a collection.
-                this.CacheFileEntriesOC = new ObservableCollection<CacheFileEntry>(cacheFileEnties);
+                List<CacheFileEntry> tmpList = cacheFileEnties.ToList();
+                IDictionary<string, CacheFileEntry> dictEntries = new Dictionary<string, CacheFileEntry>();
+                foreach (var cfe in tmpList)
+                {
+                    dictEntries.Add(cfe.ZwstHashValue, cfe);
+                }
+                this.CacheFileEntriesDict = dictEntries;
             }            
         }
 
@@ -90,15 +90,19 @@ namespace PlasticWonderland.Pages
             }
         }
 
-        private void insertCacheFileEntry(string hashValue, string timeUpdated, long fileSize, string fileName, string filePath, string library)
+        private void insertCacheFileEntry(string hashValue, 
+                                          int mTime, long fileSize, string fileId,
+                                          string fileName, string filePath, string library)
         {
             using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
             {
                 CacheFileEntry newCacheFileEntry = new CacheFileEntry()
                 {
                     ZwstHashValue = hashValue,
-                    Mtime = timeUpdated,
+
+                    Mtime = mTime,
                     FileSize = fileSize,
+                    FileId = fileId,
 
                     FileName = fileName,
                     FilePath = filePath,
@@ -106,26 +110,44 @@ namespace PlasticWonderland.Pages
                 };
 
                 // Add a to-do item to the observable collection.
-                CacheFileEntriesOC.Add(newCacheFileEntry);
+                CacheFileEntriesDict.Add(hashValue, newCacheFileEntry);
 
                 // Add a to-do item to the local database.
                 cfeDbContetxt.CacheFileEntries.InsertOnSubmit(newCacheFileEntry);
+                //cfeDbContetxt.SubmitChanges();
             }
         }
 
-        private void updateCachFileEntry(string hashValue, long fileSize, string timeUpdated)
+        private void updateCachFileEntry(string hashValue, long fileSize, int mTimeUpdate, string fileId)
         {
             using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
             {
                 IQueryable<CacheFileEntry> cfeQuery = from cfe in cfeDbContetxt.CacheFileEntries where cfe.ZwstHashValue == hashValue select cfe;
                 CacheFileEntry found = cfeQuery.FirstOrDefault();
                 found.FileSize = fileSize;
-                found.Mtime = timeUpdated;
+                found.Mtime = mTimeUpdate;
+                found.FileId = fileId;
 
-                CacheFileEntry fromOC = CacheFileEntriesOC.First(q => q.DummyId == found.DummyId);
+                CacheFileEntry fromOC = CacheFileEntriesDict[hashValue];
                 fromOC.FileSize = fileSize;
-                fromOC.Mtime = timeUpdated;
+                fromOC.Mtime = mTimeUpdate;
+                fromOC.FileId = fileId;
             }
+        }
+
+        /// <summary>
+        ///  MaZ attn: going only to Dictionary are even to DB?
+        ///            atm: Dict.....
+        /// </summary>
+        /// <param name="libRootObj"></param>
+        /// <returns></returns>
+        private bool isAlreadyDownloaded(string hashValue)
+        {
+            return this.CacheFileEntriesDict.ContainsKey(hashValue);
+        }
+        private CacheFileEntry getWithHash(string hashValue)
+        {
+            return this.CacheFileEntriesDict[hashValue];
         }
 
         #endregion
@@ -133,16 +155,18 @@ namespace PlasticWonderland.Pages
 
         #region Downloading Stuff
 
-        private async void GetURLDataAsync(
-            string token, string url, string idlib, string type, string path,
-            string fileName)
+        private async void GetURLDataAsync(string token, string url, 
+                                           string idlib, string type, string path, string fileName,
+                                           int mTime, long size, string fileId)
         {
             // other stuff that has been transported via Url-parms before
             _fileName = fileName;
             _filePath = path;
             _repoId = idlib;
-            string strConc = string.Format("{0};{1};{2}", _repoId, _filePath, _fileName);
-            _hashValue = this.CalculateHashForString(strConc, "SHA-256");
+            _hashValue = HttpHelperFactory.Instance.CalculateHashForString(_repoId, _filePath, _fileName);
+            _mTime = mTime;
+            _fSize = size;
+            _fileId = fileId;
 
             var filter = HttpHelperFactory.Instance.getHttpFilter();
             Uri uristring = null;
@@ -352,8 +376,7 @@ namespace PlasticWonderland.Pages
 
                     // MaZ attn: also store version or timestamp to be able to identify if newer or not.....
                     //           either insert or update
-                    // MaZ todo: add found flag to differ
-                    //this.saveNewCacheFileEntry(f);
+                    this.updateDatabaseValue();
                 }
 
 
@@ -390,49 +413,24 @@ namespace PlasticWonderland.Pages
             }
         }
 
-        #endregion
-
-
-        #region Helper
-
-        private string CalculateHashForString(string DataString, string hashType)
+        /// <summary>
+        /// either inserts or updatees the DB-Value of the Downloaded file
+        /// </summary>
+        private void updateDatabaseValue()
         {
-            string dataHash = string.Empty;
-
-            if (string.IsNullOrWhiteSpace(DataString))
-                return null;
-
-            if (string.IsNullOrWhiteSpace(hashType))
-                hashType = "MD5";
-            try
+            if (this.isAlreadyDownloaded(_hashValue))
             {
-                ///Hash Algorithm Provider is Created 
-                HashAlgorithmProvider Algorithm = HashAlgorithmProvider.OpenAlgorithm(hashType);
-                ///Creating a Buffer Stream using the Cryptographic Buffer class and UTF8 encoding 
-                IBuffer vector = CryptographicBuffer.ConvertStringToBinary(DataString, BinaryStringEncoding.Utf8);
+                CacheFileEntry entry = this.getWithHash(_hashValue);
 
-
-                IBuffer digest = Algorithm.HashData(vector);////Hashing The Data 
-
-                if (digest.Length != Algorithm.HashLength)
-                {
-                    throw new System.InvalidOperationException(
-                      "HashAlgorithmProvider failed to generate a hash of proper length!");
-                }
-                else
-                {
-
-                    dataHash = CryptographicBuffer.EncodeToHexString(digest);//Encoding it to a Hex String 
-                    return dataHash;
-                }
+                // try to get along with comparing only with unique-Id
+                if (!entry.FileId.Equals(_fileId))
+                    this.updateCachFileEntry(_hashValue, _fSize, _mTime, _fileId);
             }
-            catch (Exception ex)
+            else
             {
-                ///
+                this.insertCacheFileEntry(_hashValue, _mTime, _fSize, _fileId, _fileName, _filePath, _repoId);
             }
-
-            return null;
-        } 
+        }
 
         #endregion
 

@@ -63,80 +63,6 @@ namespace PlasticWonderland.Pages
         }
 
 
-        #region DB Stuff
-
-        //public ObservableCollection<CacheFileEntry> CacheFileEntries
-        //{
-        //    get
-        //    {
-        //        return _cacheFileEntries;
-        //    }
-        //    set
-        //    {
-        //        if (_cacheFileEntries != value)
-        //        {
-        //            _cacheFileEntries = value;
-        //            //NotifyPropertyChanged("ToDoItems");
-        //        }
-        //    }
-        //}
-
-        private void loadCacheFileEntries()
-        {
-            // Define the query to gather all of the to-do items.
-            //var cacheFileEnties = 
-            //    from CacheFileEntry cfe in _cacheFileEntryDB.CacheFileEntries
-            //    select cfe;
-
-            // Execute the query and place the results into a collection.
-            //CacheFileEntries = new ObservableCollection<CacheFileEntry>(cacheFileEnties);
-        }
-
-        private void saveNewCacheFileEntry(string fileName)
-        {
-            using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
-            {
-                CacheFileEntry newCacheFileEntry = new CacheFileEntry()
-                {
-                    ZwstHashValue = sfUniqueId,
-                    Mtime = timeLastUpdate,
-                    FileSize = fileSize,
-                };
-
-                // Add a to-do item to the observable collection.
-                //CacheFileEntries.Add(newCacheFileEntry);
-
-                // Add a to-do item to the local database.
-                cfeDbContetxt.CacheFileEntries.InsertOnSubmit(newCacheFileEntry);
-
-                // Save changes to the database.
-                cfeDbContetxt.SubmitChanges();
-
-            }
-        }
-
-        private void updateCachFileEntry(CacheFileEntry cfe)
-        {
-            using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
-            {
-                cfe.FileSize = fileSize;
-                cfe.Mtime = timeLastUpdate;
-                cfeDbContetxt.SubmitChanges();
-            }
-        }
-
-        private CacheFileEntry findCfeByHash(string hashValue)
-        {
-            using (CacheFileEntryContext cfeDbContetxt = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
-            {
-                IQueryable<CacheFileEntry> cfeQuery = from cfe in cfeDbContetxt.CacheFileEntries where cfe.ZwstHashValue == hashValue select cfe;
-                return cfeQuery.FirstOrDefault();
-            }
-        }
-
-        #endregion
-
-
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -186,7 +112,7 @@ namespace PlasticWonderland.Pages
 
             if (backFromView == false)
             {
-                GetURLDataAsync(authorization, address, id, "file", path);
+                GetURLDataAsync(authorization, address, id, GlobalVariables.FILE_AS_FILE, path);
             }
             else
             {
@@ -404,10 +330,6 @@ namespace PlasticWonderland.Pages
                 using (IsolatedStorageFileStream file = GlobalVariables.ISF.CreateFile(completePathOnISF))
                 {
                     ioStream.CopyTo(file);
-                    // MaZ attn: also store version or timestamp to be able to identify if newer or not.....
-                    //           either insert or update
-                    // MaZ todo: add found flag to differ
-                    this.saveNewCacheFileEntry(f);
                 }
 
 

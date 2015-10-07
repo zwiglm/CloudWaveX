@@ -4,6 +4,7 @@
     /// Behavior from outside
     /// </summary>
     public bool AlreadyDownloaded { get; set; }
+    public string FileHash { get; set; }
 
     /// <summary>
     /// Common props
