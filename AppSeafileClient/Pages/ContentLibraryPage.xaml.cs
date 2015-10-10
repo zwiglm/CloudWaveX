@@ -50,8 +50,6 @@ namespace PlasticWonderland.Pages
 
         StorageFile fileChoosenFromFilePicker;
         CancellationTokenSource cts;
-        ProgressBar _selectedItemProgress;
-        TextBlock _tickedFileDownloaded;
 
 
         public ContentLibraryPage()
@@ -174,7 +172,7 @@ namespace PlasticWonderland.Pages
 
             HttpClientContentLibrary.DefaultRequestHeaders.Add("Accept", "application/json;indent=4");
             HttpClientContentLibrary.DefaultRequestHeaders.Add("Authorization", "token " + token);
-            HttpClientContentLibrary.DefaultRequestHeaders.Add("User-agent", "CloudWave for Seafile/" + nameHelper.Version);
+            HttpClientContentLibrary.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + nameHelper.Version);
 
             if (GlobalVariables.IsDebugMode == true)
             {
@@ -278,7 +276,7 @@ namespace PlasticWonderland.Pages
             var nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);    
           
             HttpClientGetUploadLink.DefaultRequestHeaders.Add("Authorization", "token " + authorization);
-            HttpClientGetUploadLink.DefaultRequestHeaders.Add("User-agent", "CloudWave for Seafile/" + nameHelper.Version);
+            HttpClientGetUploadLink.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + nameHelper.Version);
 
             try
             {
@@ -331,7 +329,7 @@ namespace PlasticWonderland.Pages
             var nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);
 
             HttpClientUpload.DefaultRequestHeaders.Add("Authorization", "token " + authorization);
-            HttpClientUpload.DefaultRequestHeaders.Add("User-agent", "CloudWave for Seafile/"+nameHelper.Version);
+            HttpClientUpload.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + nameHelper.Version);
             HttpClientUpload.DefaultRequestHeaders.Add("Accept", "*/*");
 
             FileInfo fi = new FileInfo(fileChoosenFromFilePicker.Path);
@@ -434,6 +432,7 @@ namespace PlasticWonderland.Pages
             if (lst.SelectedIndex != -1)
             {
                 LibraryRootObject lib = lst.SelectedItem as LibraryRootObject;
+                int selStartIdx = lst.SelectedIndex;
 
                 lst.SelectedIndex = -1;
 
@@ -467,11 +466,6 @@ namespace PlasticWonderland.Pages
                 }
                 else if (lib.type.Equals(GlobalVariables.FILE_AS_FILE))
                 {
-                    // MaZ attn: find stuff in DataTemplate via VisualTreeHelper
-                    DependencyObject dummyCt = this.listContentLibrary.ItemContainerGenerator.ContainerFromItem(lib);
-                    _selectedItemProgress = (ProgressBar) UIChildFinder.FindChild(dummyCt, "DownloadProgress", typeof(ProgressBar));
-                    _tickedFileDownloaded = (TextBlock)UIChildFinder.FindChild(dummyCt, "TickFileDownloaded", typeof(TextBlock));
-
                     if (GlobalVariables.currentPath.StartsWith("/") == true)
                     {
                         GlobalVariables.currentPath = GlobalVariables.currentPath.Substring(1, GlobalVariables.currentPath.Length - 1);
@@ -483,21 +477,41 @@ namespace PlasticWonderland.Pages
                         App.logger.log(LogLevel.debug, " GlobalVariables.currentPWD " + GlobalVariables.currentPWD);
                     }
 
-                    //NavigationService.Navigate(
-                    //    new Uri("/Pages/DownloadFile.xaml?token=" + authorization + 
-                    //            "&url=" + address + 
-                    //            "&idlibrary=" + GlobalVariables.currentLibrary + 
-                    //            "&pathFolder=" + System.Net.HttpUtility.UrlEncode(GlobalVariables.currentPWD) + 
-                    //            "&fileName=" + lib.name, 
-                    //            UriKind.Relative));
-
-                    this.GetURLDataAsync(
-                        authorization, address, 
-                        GlobalVariables.currentLibrary, GlobalVariables.FILE_AS_FILE, GlobalVariables.currentPWD, GlobalVariables.currentPath, lib.name, lib.FileHash,
-                        lib.mtime, lib.size, lib.id);
+                    // MaZ attn: Actual download the current item plus FIXED additional 2
+                    this.donwloadSelectedPlus(lst, lib, selStartIdx, 2);
+                    selStartIdx = -1;
                 }
             }
         }
+        /// <summary>
+        /// Download multiple files at once
+        /// </summary>
+        /// <param name="itemsLst"></param>
+        /// <param name="lib"></param>
+        /// <param name="startIdx"></param>
+        /// <param name="added"></param>
+        private async void donwloadSelectedPlus(ListBox itemsLst, LibraryRootObject selectedItem, int startIdx, int added)
+        {
+            await this.GetURLDataAsync(
+                authorization, address,
+                GlobalVariables.currentLibrary, GlobalVariables.FILE_AS_FILE, GlobalVariables.currentPWD, GlobalVariables.currentPath,
+                selectedItem, true);
+
+            int plusRunner = 0;
+            int selectRunner = startIdx + 1;
+            while (selectRunner < itemsLst.Items.Count && plusRunner < added)
+            {
+                LibraryRootObject lstNxt = (LibraryRootObject)itemsLst.Items[selectRunner];
+                if (lstNxt.type.Equals(GlobalVariables.FILE_AS_FILE) && !lstNxt.AlreadyDownloaded)
+                {
+                    // MaZ todo: also download.......
+                    plusRunner++;
+                }
+
+                selectRunner++;
+            }
+        }
+
 
         /// <summary>
         /// Occurs when back key is pressed, and change some variable
@@ -688,7 +702,7 @@ namespace PlasticWonderland.Pages
 
             HttpClientGetFileDetail.DefaultRequestHeaders.Add("Accept", "application/json;charset=utf-8;indent=4");
             HttpClientGetFileDetail.DefaultRequestHeaders.Add("Authorization", "token " + authorization);
-            HttpClientGetFileDetail.DefaultRequestHeaders.Add("User-agent", "CloudWave for Seafile/" + nameHelper.Version);
+            HttpClientGetFileDetail.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + nameHelper.Version);
 
             try
             {
@@ -753,7 +767,7 @@ namespace PlasticWonderland.Pages
 
             HttpClientDeleteFile.DefaultRequestHeaders.Add("Accept", "application/json;charset=utf-8;indent=4");
             HttpClientDeleteFile.DefaultRequestHeaders.Add("Authorization", "token " + authorization);
-            HttpClientDeleteFile.DefaultRequestHeaders.Add("User-agent", "CloudWave for Seafile/" + nameHelper.Version);
+            HttpClientDeleteFile.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + nameHelper.Version);
 
             try
             {

@@ -97,7 +97,7 @@ namespace PlasticWonderland.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to CloudWaveX.
+        ///   Looks up a localized string similar to Seashore.
         /// </summary>
         public static string AppTitle {
             get {

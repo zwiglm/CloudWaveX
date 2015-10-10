@@ -130,7 +130,7 @@
     <value>Enviar un archivo</value>
   </data>
   <data name="AppTitle" xml:space="preserve">
-    <value>CloudWaveX</value>
+    <value>Seashore</value>
   </data>
   <data name="Certificate_Error_CNMissmatch" xml:space="preserve">
     <value>El certificado no es válido para el uso requerido. Este error también ocurre si el certificado tiene un nombre inválido. </value>

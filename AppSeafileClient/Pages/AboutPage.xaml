@@ -27,7 +27,7 @@
                      FontWeight="Bold" FontStyle="Italic" FontSize="{StaticResource PhoneFontSizeLarge}" 
                      Foreground="#FFF39C03"
              >
-            	<Run Text="CloudWaveX"/>
+            	<Run Text="Seashore"/>
             </TextBlock>
             <TextBlock Text="About+Help" Margin="9,-7,0,0"   
                        FontSize="{StaticResource PivotHeaderFontSize}" 
@@ -43,8 +43,8 @@
             <StackPanel Grid.Row="0" Width="Auto">
                 <TextBlock Text="About" Foreground="Black" FontWeight="Bold" />
                 <TextBlock TextWrapping="Wrap" x:Name="about" FontSize="{StaticResource PhoneFontSizeNormal}" Foreground="Black" Margin="0,0,0,10" >
-                	<Run Text="Application made by "/>
-                	<Run Text="Martin Zwigl                                    " />
+                	<Run Text="Application made by Zwist.org"/><LineBreak/>
+                	<Run Text="(Martin Zwigl and Marco Stecher)" /><LineBreak/><LineBreak/>
                     <Run Text="This app uses Newtonsoft.Json, WPClogger and the Coding4Fun Toolkit."/>
                 </TextBlock>
                 <TextBlock Text="Help" Foreground="Black" FontWeight="Bold" />
@@ -69,12 +69,9 @@
                     <Image Grid.Row="3" Grid.Column="0" Source="/Assets/users_32.png" Stretch="None"></Image>
                     <TextBlock Grid.Row="3" Grid.Column="1" Text="The library is shared with people." FontSize="{StaticResource PhoneFontSizeNormal}" Foreground="Black"></TextBlock>
                     <TextBlock Grid.Row="4" Grid.Column="1" Text="Long press on an item will display a menu." FontSize="{StaticResource PhoneFontSizeNormal}" Foreground="Black"></TextBlock>
-
-
-
                 </Grid>
                 <TextBlock x:Name="ChangelogTitle" Text="Changelog" Foreground="Black" FontWeight="Bold" Margin="0,15,0,0" />
-                <TextBlock  TextWrapping="Wrap" x:Name="ChangelogContent" Text="Version 1.0.1 None - It's the first of its kind" Foreground="Black"/>
+                <TextBlock  TextWrapping="Wrap" x:Name="ChangelogContent" Text="Version 1.1.0 None - It's the first of its kind" Foreground="Black"/>
             </StackPanel>
         </Grid>
     </Grid>

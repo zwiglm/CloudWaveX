@@ -244,7 +244,7 @@ namespace PlasticWonderland
             var nameHelper = new AssemblyName(Assembly.GetExecutingAssembly().FullName);
 
             HttpClientLogin.DefaultRequestHeaders.Add("Accept", "application/json;indent=4");
-            HttpClientLogin.DefaultRequestHeaders.Add("User-agent", "CloudWaveX for Seafile/" + nameHelper.Version);
+            HttpClientLogin.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + nameHelper.Version);
 
             var values = new[]
                     {

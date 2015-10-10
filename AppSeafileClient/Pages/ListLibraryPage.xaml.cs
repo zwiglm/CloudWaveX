@@ -111,7 +111,7 @@ namespace PlasticWonderland.Pages
 
             HttpClientAccountInfos.DefaultRequestHeaders.Add("Accept", "application/json;indent=4");
             HttpClientAccountInfos.DefaultRequestHeaders.Add("Authorization", "token " + token);
-            HttpClientAccountInfos.DefaultRequestHeaders.Add("User-agent", "CloudWave for Seafile/" + nameHelper.Version);
+            HttpClientAccountInfos.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + nameHelper.Version);
 
             try
             {
@@ -191,7 +191,7 @@ namespace PlasticWonderland.Pages
 
             HttpClientGetLibrary.DefaultRequestHeaders.Add("Accept", "application/json;indent=4");
             HttpClientGetLibrary.DefaultRequestHeaders.Add("Authorization", "token " + token);
-            HttpClientGetLibrary.DefaultRequestHeaders.Add("User-agent", "CloudWave for Seafile/" + nameHelper.Version);
+            HttpClientGetLibrary.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + nameHelper.Version);
 
             HttpResponseMessage libsResponse = null;
             try

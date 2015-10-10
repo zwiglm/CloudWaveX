@@ -4,6 +4,8 @@ using Windows.Storage;
 
 public static class GlobalVariables
 {
+    public static string WEB_CLIENT_AGENT = "Seashore for Seafile/";
+
     public static string FILE_AS_FILE = "file";
     public static string TYPEFILE_AS_TYPEFILE = "type_file";
 

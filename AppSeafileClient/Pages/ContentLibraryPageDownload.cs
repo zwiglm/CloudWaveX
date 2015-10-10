@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using Microsoft.Phone.Controls;
 using PlasticWonderland.Class;
 using PlasticWonderland.Domain;
@@ -23,6 +24,10 @@ namespace PlasticWonderland.Pages
     public partial class ContentLibraryPage
     {
         const string CACHE_FILE_ENTRIES_PROP = "CacheFileEntriesDict";
+
+        // UI elements
+        ProgressBar _selectedItemProgress;
+        TextBlock _tickedFileDownloaded;
 
         private string _downloadUrl = "";
         private string _completePathOnISF;
@@ -150,19 +155,25 @@ namespace PlasticWonderland.Pages
 
         #region Downloading Stuff
 
-        private async void GetURLDataAsync(string token, string url, 
-                                           string idlib, string type, string pathPWD, string pathRAW, string fileName, string hashValue,
-                                           int mTime, long size, string fileId)
+        private async Task GetURLDataAsync(string token, string url, 
+                                           string idlib, string type, string pathPWD, string pathRAW, 
+                                           LibraryRootObject lib, bool showFile)
         {
             // other stuff that has been transported via Url-parms before
-            _fileName = fileName;
+            _fileName = lib.name;
             _filePathPWD = pathPWD;
             _filePathRAW = pathRAW.Trim('/');
             _repoId = idlib;
-            _hashValue = hashValue;
-            _mTime = mTime;
-            _fSize = size;
-            _fileId = fileId;
+            _hashValue = lib.FileHash;
+            _mTime = lib.mtime;
+            _fSize = lib.size;
+            _fileId = lib.id;
+
+            // MaZ attn: find stuff in DataTemplate via VisualTreeHelper
+            DependencyObject dummyCt = this.listContentLibrary.ItemContainerGenerator.ContainerFromItem(lib);
+            _selectedItemProgress = (ProgressBar)UIChildFinder.FindChild(dummyCt, "DownloadProgress", typeof(ProgressBar));
+            _tickedFileDownloaded = (TextBlock)UIChildFinder.FindChild(dummyCt, "TickFileDownloaded", typeof(TextBlock));
+
 
             var filter = HttpHelperFactory.Instance.getHttpFilter();
             Uri uristring = null;
@@ -222,7 +233,7 @@ namespace PlasticWonderland.Pages
                 if (GlobalVariables.ISF.FileExists(pathInISF) && !this.isNewerFile())
                 {
                     _completePathOnISF = pathInISF;
-                    openFileFromISF();
+                    this.openFileFromISF();
                 }
                 else
                 {
@@ -311,7 +322,6 @@ namespace PlasticWonderland.Pages
 
         private async void StoreFileToISF(IHttpContent downloadContent)
         {
-            //DownloadStatus fileDownloaded = await StoreFileSimle(downloadContent, _fileName, id, path);
             DownloadStatus fileDownloaded = await StoreFileSimle(downloadContent, _fileName, _repoId, _filePathPWD);
             switch (fileDownloaded)
             {
@@ -419,11 +429,9 @@ namespace PlasticWonderland.Pages
             string q;
 
             q = _completePathOnISF.Replace("/", "\\");
-
             t = "\\" + q;
 
             var file = await ApplicationData.Current.LocalFolder.GetFileAsync(q);
-
             if (file != null)
             {
                 var urlOptions = new Windows.System.LauncherOptions();

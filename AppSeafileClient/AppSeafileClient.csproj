@@ -126,9 +126,6 @@
     </Compile>
     <Compile Include="Pages\ContentLibraryPage.xaml.cs" />
     <Compile Include="Pages\ContentLibraryPageDownload.cs" />
-    <Compile Include="Pages\DownloadFile.xaml.cs">
-      <DependentUpon>DownloadFile.xaml</DependentUpon>
-    </Compile>
     <None Include="app.config" />
     <Compile Include="Pages\ListLibraryPage.xaml.cs" />
     <Compile Include="Pages\PhotoShare.xaml.cs">
@@ -165,10 +162,6 @@
     </Page>
     <Page Include="Pages\ContentLibraryPage.xaml">
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Pages\DownloadFile.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\ListLibraryPage.xaml">
       <SubType>Designer</SubType>

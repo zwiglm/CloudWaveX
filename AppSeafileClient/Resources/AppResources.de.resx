@@ -130,7 +130,7 @@
     <value>Senden einer Datei</value>
   </data>
   <data name="AppTitle" xml:space="preserve">
-    <value>CloudWaveX for Seafile</value>
+    <value>Seashore</value>
   </data>
   <data name="Certificate_Error_CNMissmatch" xml:space="preserve">
     <value>Das Zertifikat ist für die angeforderte Nutzung nicht gültig. Dieser Fehler wird auch zurückgegeben, wenn das Zertifikat eine ungültigen Namen hat.</value>
