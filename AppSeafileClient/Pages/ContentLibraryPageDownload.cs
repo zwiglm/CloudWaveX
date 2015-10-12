@@ -49,6 +49,8 @@ namespace PlasticWonderland.Pages
 
         private string _hashValue;
 
+        private bool _doShowFile;
+
 
         #region DB Stuff
 
@@ -169,6 +171,8 @@ namespace PlasticWonderland.Pages
             _fSize = lib.size;
             _fileId = lib.id;
 
+            _doShowFile = showFile;
+
             // MaZ attn: find stuff in DataTemplate via VisualTreeHelper
             DependencyObject dummyCt = this.listContentLibrary.ItemContainerGenerator.ContainerFromItem(lib);
             _selectedItemProgress = (ProgressBar)UIChildFinder.FindChild(dummyCt, "DownloadProgress", typeof(ProgressBar));
@@ -233,7 +237,8 @@ namespace PlasticWonderland.Pages
                 if (GlobalVariables.ISF.FileExists(pathInISF) && !this.isNewerFile())
                 {
                     _completePathOnISF = pathInISF;
-                    this.openFileFromISF();
+                    if (_doShowFile)
+                        this.openFileFromISF();
                 }
                 else
                 {
@@ -326,8 +331,8 @@ namespace PlasticWonderland.Pages
             switch (fileDownloaded)
             {
                 case DownloadStatus.Ok:
-                    //_tickedFileDownloaded......
-                    this.openFileFromISF();
+                    if (_doShowFile)
+                        this.openFileFromISF();
                     break;
                 case DownloadStatus.SameName:
                     MessageBox.Show(AppResources.Download_Error_StoreFile_Content_1);

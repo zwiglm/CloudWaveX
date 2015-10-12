@@ -492,23 +492,33 @@ namespace PlasticWonderland.Pages
         /// <param name="added"></param>
         private async void donwloadSelectedPlus(ListBox itemsLst, LibraryRootObject selectedItem, int startIdx, int added)
         {
+            //await this.GetURLDataAsync(
+            //    authorization, address,
+            //    GlobalVariables.currentLibrary, GlobalVariables.FILE_AS_FILE, GlobalVariables.currentPWD, GlobalVariables.currentPath,
+            //    selectedItem, true);
             await this.GetURLDataAsync(
                 authorization, address,
-                GlobalVariables.currentLibrary, GlobalVariables.FILE_AS_FILE, GlobalVariables.currentPWD, GlobalVariables.currentPath,
+                GlobalVariables.currentLibrary, GlobalVariables.FILE_AS_FILE, String.Format("{0}/{1}", GlobalVariables.currentPath, selectedItem.name), GlobalVariables.currentPath,
                 selectedItem, true);
 
-            int plusRunner = 0;
-            int selectRunner = startIdx + 1;
-            while (selectRunner < itemsLst.Items.Count && plusRunner < added)
+            if (!selectedItem.AlreadyDownloaded)
             {
-                LibraryRootObject lstNxt = (LibraryRootObject)itemsLst.Items[selectRunner];
-                if (lstNxt.type.Equals(GlobalVariables.FILE_AS_FILE) && !lstNxt.AlreadyDownloaded)
+                int plusRunner = 0;
+                int selectRunner = startIdx + 1;
+                while (selectRunner < itemsLst.Items.Count && plusRunner < added)
                 {
-                    // MaZ todo: also download.......
-                    plusRunner++;
-                }
+                    LibraryRootObject lstNxt = (LibraryRootObject)itemsLst.Items[selectRunner];
+                    if (lstNxt.type.Equals(GlobalVariables.FILE_AS_FILE) && !lstNxt.AlreadyDownloaded)
+                    {
+                        //await this.GetURLDataAsync(
+                        //    authorization, address,
+                        //    GlobalVariables.currentLibrary, GlobalVariables.FILE_AS_FILE, String.Format("{0}/{1}", GlobalVariables.currentPath, lstNxt.name), GlobalVariables.currentPath,
+                        //    lstNxt, false);
+                        plusRunner++;
+                    }
 
-                selectRunner++;
+                    selectRunner++;
+                }
             }
         }
 
