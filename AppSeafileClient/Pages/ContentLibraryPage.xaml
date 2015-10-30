@@ -90,7 +90,7 @@
                         </Grid>
                         <Grid Grid.Row="2" Grid.Column="1" Name="DwnldProgGrid">
                             <StackPanel Name="DwnldProgrStackP">
-                                <ProgressBar SmallChange="0.2" Minimum="0" Maximum="100" Name="DownloadProgress" Height="20" Background="#19ECA309" Visibility="Collapsed"/>
+                                <ProgressBar SmallChange="0.2" Minimum="0" Maximum="100" Name="DownloadProgress" Height="20" Margin="2,0,7,0" Background="#19ECA309" Visibility="Collapsed"/>
                             </StackPanel>
                         </Grid>
                         

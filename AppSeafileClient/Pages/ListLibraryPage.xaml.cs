@@ -255,6 +255,9 @@ namespace PlasticWonderland.Pages
         /// <param name="value">Value to display</param>
         public void SetProgressIndicator(bool value)
         {
+            if (SystemTray.ProgressIndicator == null)
+                SystemTray.ProgressIndicator = new ProgressIndicator();
+
             SystemTray.ProgressIndicator.IsIndeterminate = true;
             SystemTray.ProgressIndicator.IsVisible = value;
         }

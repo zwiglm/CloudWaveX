@@ -310,12 +310,6 @@ namespace PlasticWonderland.Pages
         {
             var bc = progressInfo.BytesReceived;
             var tb = progressInfo.TotalBytesToReceive;
-            var p = 0;
-            try
-            {
-                p = Convert.ToInt32(tb / bc);
-            }
-            catch { }
 
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
@@ -453,6 +447,17 @@ namespace PlasticWonderland.Pages
         {
             CacheFileEntry cfe = this.getWithHash(_hashValue);
             return !cfe.FileId.Equals(_fileId);
+        }
+
+        #endregion
+
+
+        #region SeaProgress
+
+        public class SeaProgress
+        {
+            public HttpProgress HttpProgress { get; set; }
+            public ProgressBar ProgressBar { get; set; }
         }
 
         #endregion
