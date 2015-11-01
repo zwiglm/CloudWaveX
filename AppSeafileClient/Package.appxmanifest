@@ -27,19 +27,6 @@
             <Task Type="systemEvent" />
           </BackgroundTasks>
         </Extension>
-        <Extension Category="windows.shareTarget">
-          <ShareTarget>
-            <SupportedFileTypes>
-              <FileType>.jpg</FileType>
-              <FileType>.png</FileType>
-              <FileType>.doc</FileType>
-              <FileType>.docx</FileType>
-              <FileType>.pdf</FileType>
-            </SupportedFileTypes>
-            <DataFormat>Text</DataFormat>
-            <DataFormat>Bitmap</DataFormat>
-          </ShareTarget>
-        </Extension>
       </Extensions>
     </Application>
   </Applications>

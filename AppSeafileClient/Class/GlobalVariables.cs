@@ -28,6 +28,8 @@ public static class GlobalVariables
     public static string TOKEN_SAVED_SET = "tokensaved";
     public static string URL_SAVED_SET = "urlsaved";
     public static string IGNORE_SELF_SIGNED_SET = "ignoreSelfSignedSet";
+    public static string SETTINGS_BACKUP_PHOTOS = "settingsBackupPhotos";
+    public static string SETTINGS_BACKUP_PHOTOS_WIFI_ONLY = "settingsBackupPhotosWifiOnly";
     public static string DOWNLOAD_THUMBNAILS = "downloadThumbs";
 
     // Seafile API request tokens

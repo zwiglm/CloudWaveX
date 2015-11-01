@@ -17,6 +17,7 @@ namespace PlasticWonderland.Pages
 {
     public partial class SettingsPage : PhoneApplicationPage
     {
+
         public SettingsPage()
         {
             InitializeComponent();
@@ -27,6 +28,23 @@ namespace PlasticWonderland.Pages
                 ButtonLogoff.IsEnabled = false;
             }
         }
+
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+
+            if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS))
+                this.CbBackupPhotos.IsChecked = true;
+            else
+                this.CbBackupPhotos.IsChecked = false;
+
+            if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY))
+                this.CbBackupPhotosWifiOnly.IsChecked = true;
+            else
+                this.CbBackupPhotosWifiOnly.IsChecked = false;
+        }
+
 
         /// <summary>
         /// Occurs when user click on the logoff button. Destroy settings and cache
@@ -111,6 +129,42 @@ namespace PlasticWonderland.Pages
         private void CbGetThumbs_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void CbBackupPhotos_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.CbBackupPhotos.IsChecked == true)
+            {
+                if (!GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS))
+                    GlobalVariables.IsolatedStorageUserInformations.Add(GlobalVariables.SETTINGS_BACKUP_PHOTOS, true);
+                else
+                    GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.SETTINGS_BACKUP_PHOTOS] = true;
+            }
+            else
+            {
+                if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS))
+                    GlobalVariables.IsolatedStorageUserInformations.Remove(GlobalVariables.SETTINGS_BACKUP_PHOTOS);
+            }
+            GlobalVariables.IsolatedStorageUserInformations.Save();
+        }
+
+        private void CbBackupPhotosOnlyOnWifi_Click(object sender, RoutedEventArgs e)
+        {
+            if (this.CbBackupPhotosWifiOnly.IsChecked == true)
+            {
+                if (!GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY))
+                    GlobalVariables.IsolatedStorageUserInformations.Add(GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY, true);
+                else
+                    GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY] = true;
+
+                this.CbBackupPhotos_Click(sender, e);
+            }
+            else
+            {
+                if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY))
+                    GlobalVariables.IsolatedStorageUserInformations.Remove(GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY);
+                GlobalVariables.IsolatedStorageUserInformations.Save();
+            }
         }
 
 

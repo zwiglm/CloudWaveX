@@ -342,6 +342,7 @@ namespace PlasticWonderland
         {
             if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.IGNORE_SELF_SIGNED_SET))
                 GlobalVariables.IsolatedStorageUserInformations.Remove(GlobalVariables.IGNORE_SELF_SIGNED_SET);
+            GlobalVariables.IsolatedStorageUserInformations.Save();
         } 
     }
 }

@@ -439,4 +439,10 @@
   <data name="Login_Checkbox_IgnoreSelfSigned" xml:space="preserve">
     <value>Ignore Self-Signed Certificate</value>
   </data>
+  <data name="Settings_Photo_Backup" xml:space="preserve">
+    <value>Backup Photos</value>
+  </data>
+  <data name="Settings_Photo_Backup_OnlyOnWifi" xml:space="preserve">
+    <value>Only with Wifi</value>
+  </data>
 </root>

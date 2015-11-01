@@ -997,6 +997,24 @@ namespace PlasticWonderland.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Backup Photos.
+        /// </summary>
+        public static string Settings_Photo_Backup {
+            get {
+                return ResourceManager.GetString("Settings_Photo_Backup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only with Wifi.
+        /// </summary>
+        public static string Settings_Photo_Backup_OnlyOnWifi {
+            get {
+                return ResourceManager.GetString("Settings_Photo_Backup_OnlyOnWifi", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete files downloaded in this app..
         /// </summary>
         public static string Settings_Text_DeleteCache {

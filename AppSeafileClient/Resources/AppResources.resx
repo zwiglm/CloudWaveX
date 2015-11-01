@@ -441,4 +441,10 @@
   <data name="Settings_Check_GetThumbs" xml:space="preserve">
     <value>Download Thumbnails</value>
   </data>
+  <data name="Settings_Photo_Backup" xml:space="preserve">
+    <value>Backup Photos</value>
+  </data>
+  <data name="Settings_Photo_Backup_OnlyOnWifi" xml:space="preserve">
+    <value>Only with Wifi</value>
+  </data>
 </root>

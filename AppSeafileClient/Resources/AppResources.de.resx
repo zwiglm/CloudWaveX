@@ -443,4 +443,10 @@
   <data name="Settings_Check_GetThumbs" xml:space="preserve">
     <value>Thumbnails herunterladen</value>
   </data>
+  <data name="Settings_Photo_Backup" xml:space="preserve">
+    <value>Photos sichern</value>
+  </data>
+  <data name="Settings_Photo_Backup_OnlyOnWifi" xml:space="preserve">
+    <value>Sichern nur über WLAN</value>
+  </data>
 </root>
