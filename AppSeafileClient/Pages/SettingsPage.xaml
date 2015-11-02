@@ -6,6 +6,7 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -28,8 +29,7 @@
                        Foreground="#FFF39C03"/>
             <TextBlock Text="{Binding Path=LocalizedResources.Settings_Title, Source={StaticResource LocalizedStrings}}"
                            FontSize="{StaticResource PivotHeaderFontSize}" 
-                       Foreground="{StaticResource PhoneAccentBrush}"
-                />
+                       Foreground="{StaticResource PhoneAccentBrush}" />
         </StackPanel>
 
         <!--ContentPanel - place additional content here-->
@@ -39,14 +39,13 @@
                 <Button x:Name="ButtonDeleteCache" Content="{Binding Path=LocalizedResources.Settings_Button_DeleteCache, Source={StaticResource LocalizedStrings}}" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="436" Click="ButtonDeleteCache_Click" BorderBrush="Black" Foreground="Black"/>
                 <Button x:Name="ButtonReview" Content="{Binding Path=LocalizedResources.Settings_Button_RateApp, Source={StaticResource LocalizedStrings}}" HorizontalAlignment="Left"  VerticalAlignment="Top" Width="436" Click="ButtonReview_Click" BorderBrush="Black" Foreground="Black" Background="Transparent"/>
 
-                <CheckBox FontSize="{StaticResource PhoneFontSizeNormal}" Name="CbBackupPhotos" 
-                          Content="{Binding Path=LocalizedResources.Settings_Photo_Backup, Source={StaticResource LocalizedStrings}}" 
-                          IsChecked="False" BorderBrush="Black" Foreground="Black" Background="Transparent" Click="CbBackupPhotos_Click" />
-                <CheckBox FontSize="{StaticResource PhoneFontSizeNormal}" Name="CbBackupPhotosWifiOnly" 
+                <toolkit:ToggleSwitch FontSize="{StaticResource PhoneFontSizeNormal}" x:Name="CbBackupPhotos" 
+                          Content="{Binding Path=LocalizedResources.Settings_Photo_Backup, Source={StaticResource LocalizedStrings}}" BorderBrush="Black" Foreground="Black" Background="Black" Click="CbBackupPhotos_Click" IsChecked="False" VerticalContentAlignment="Top" />
+                <toolkit:ToggleSwitch FontSize="{StaticResource PhoneFontSizeNormal}" x:Name="CbBackupPhotosWifiOnly" 
                           Content="{Binding Path=LocalizedResources.Settings_Photo_Backup_OnlyOnWifi, Source={StaticResource LocalizedStrings}}" 
-                          IsChecked="False" BorderBrush="Black" Foreground="Black" Background="Transparent" Margin="30,0,0,0" Click="CbBackupPhotosOnlyOnWifi_Click" />
+                          BorderBrush="Black" Foreground="Black" Background="Black" Margin="0" Click="CbBackupPhotosOnlyOnWifi_Click" IsChecked="False" HorizontalContentAlignment="Left" />
 
-                <CheckBox FontSize="{StaticResource PhoneFontSizeNormal}" Name="CbGetThumbs" 
+                <toolkit:ToggleSwitch FontSize="{StaticResource PhoneFontSizeNormal}" Name="CbGetThumbs" 
                           Content="{Binding Path=LocalizedResources.Settings_Check_GetThumbs, Source={StaticResource LocalizedStrings}}" 
                           IsChecked="False" BorderBrush="Black" Foreground="Black" Background="Transparent" Click="CbGetThumbs_Click" Visibility="Collapsed"/>
             </StackPanel>

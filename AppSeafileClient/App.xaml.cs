@@ -116,7 +116,6 @@ namespace PlasticWonderland
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
             Microsoft.Phone.Shell.PhoneApplicationService.Current.ContractActivated += Application_ContractActivated;
-
         }
 
         // Code to execute when the application is activated (brought to foreground)

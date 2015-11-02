@@ -133,19 +133,25 @@ namespace PlasticWonderland.Pages
 
         private void CbBackupPhotos_Click(object sender, RoutedEventArgs e)
         {
-            if (this.CbBackupPhotos.IsChecked == true)
+           if (this.CbBackupPhotos.IsChecked == true)
             {
                 if (!GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS))
                     GlobalVariables.IsolatedStorageUserInformations.Add(GlobalVariables.SETTINGS_BACKUP_PHOTOS, true);
                 else
                     GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.SETTINGS_BACKUP_PHOTOS] = true;
+
+                GlobalVariables.IsolatedStorageUserInformations.Save();
             }
             else
             {
                 if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS))
                     GlobalVariables.IsolatedStorageUserInformations.Remove(GlobalVariables.SETTINGS_BACKUP_PHOTOS);
+
+                GlobalVariables.IsolatedStorageUserInformations.Save();
+
+                this.CbBackupPhotosWifiOnly.IsChecked = false;
+                this.CbBackupPhotosOnlyOnWifi_Click(sender, e);
             }
-            GlobalVariables.IsolatedStorageUserInformations.Save();
         }
 
         private void CbBackupPhotosOnlyOnWifi_Click(object sender, RoutedEventArgs e)
@@ -157,6 +163,9 @@ namespace PlasticWonderland.Pages
                 else
                     GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY] = true;
 
+                GlobalVariables.IsolatedStorageUserInformations.Save();
+
+                this.CbBackupPhotos.IsChecked = true;
                 this.CbBackupPhotos_Click(sender, e);
             }
             else

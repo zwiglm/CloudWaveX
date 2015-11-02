@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Phone.Net.NetworkInformation;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Certificates;
 using Windows.Security.Cryptography.Core;
@@ -13,13 +15,14 @@ namespace PlasticWonderland.Domain
 {
     public class HttpHelperFactory
     {
-        public static string SHA_256 = "SHA256";
-
-        public static HttpHelperFactory _instance;
+        private static string SHA_256 = "SHA256";
+        private static HttpHelperFactory _instance;
 
 
         private  HttpHelperFactory()
         {
+            //NetworkInterfaces = new ObservableCollection<string>();
+            DeviceNetworkInformation.NetworkAvailabilityChanged += DeviceNetworkInformation_NetworkAvailabilityChanged;
         }
 
         public static HttpHelperFactory Instance
@@ -34,6 +37,8 @@ namespace PlasticWonderland.Domain
             }
         }
 
+        //public ObservableCollection<string> NetworkInterfaces { get; private set; }
+        public bool IsWifiEnabled { get; private set; }
 
         public HttpBaseProtocolFilter getHttpFilter()
         {
@@ -66,6 +71,11 @@ namespace PlasticWonderland.Domain
 
 
         #region Privee
+
+        private void DeviceNetworkInformation_NetworkAvailabilityChanged(object sender, NetworkNotificationEventArgs e)
+        {
+            this.IsWifiEnabled = DeviceNetworkInformation.IsWiFiEnabled;
+        }
 
         private string CalculateHashForString(string DataString, string hashType)
         {
