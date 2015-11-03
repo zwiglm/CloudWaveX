@@ -195,9 +195,10 @@
         <phone:Pivot.Title>
             <TextBlock Text="{Binding Path=LocalizedResources.AppTitle, Source={StaticResource LocalizedStrings}}"
                         FontWeight="Bold" FontStyle="Italic" FontSize="{StaticResource PhoneFontSizeLarge}" 
-                       Foreground="#FFF39C03"
-             />
+                       Foreground="#FFF39C03" />
         </phone:Pivot.Title>
+
+        <!--Pivot item ONE -->
         <phone:PivotItem HorizontalAlignment="Left" Margin="0,0,0,0" Width="auto">
             <phone:PivotItem.Header>
                 <TextBlock Text="{Binding Path=LocalizedResources.ListLibrary_PivotTitle_1, Source={StaticResource LocalizedStrings}}"
@@ -224,7 +225,34 @@
             </Grid>
         </phone:PivotItem>
 
-        <!--Pivot item two-->
+        <!--Pivot item TWO -->
+        <phone:PivotItem HorizontalAlignment="Left" Margin="0,0,0,0" Width="auto">
+            <phone:PivotItem.Header>
+                <TextBlock Text="{Binding Path=LocalizedResources.ListLibrary_PivotTitle_4, Source={StaticResource LocalizedStrings}}"
+                       FontSize="{StaticResource PivotHeaderFontSize}" 
+                       Foreground="{StaticResource PhoneAccentBrush}" TextTrimming="WordEllipsis" />
+            </phone:PivotItem.Header>
+            <Grid x:Name="BeSharedLayoutRoot" Background="Transparent"  HorizontalAlignment="Stretch" >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="1">
+                    <ListBox x:Name="listBoxBeSharedLibs" HorizontalContentAlignment="Stretch" 
+                             ItemsSource="{Binding Elements}" SelectionChanged="listAllLibraries_SelectionChanged">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <local:TypeTemplateSelector Content="{Binding}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Grid>
+        </phone:PivotItem>
+
+        <!--Pivot item three -->
         <phone:PivotItem>
             <phone:PivotItem.Header>
                 <TextBlock Text="{Binding Path=LocalizedResources.ListLibrary_PivotTitle_2, Source={StaticResource LocalizedStrings}}"
@@ -253,7 +281,7 @@
             </Grid>
         </phone:PivotItem>
 
-        <!--Pivot item three-->
+        <!--Pivot item four -->
         <phone:PivotItem>
             <phone:PivotItem.Header>
                 <TextBlock Text="{Binding Path=LocalizedResources.ListLibrary_PivotTitle_3, Source={StaticResource LocalizedStrings}}"

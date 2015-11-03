@@ -691,7 +691,7 @@ namespace PlasticWonderland.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to All libraries.
+        ///   Looks up a localized string similar to My Libraries.
         /// </summary>
         public static string ListLibrary_PivotTitle_1 {
             get {
@@ -714,6 +714,15 @@ namespace PlasticWonderland.Resources {
         public static string ListLibrary_PivotTitle_3 {
             get {
                 return ResourceManager.GetString("ListLibrary_PivotTitle_3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to BeShared Libraries.
+        /// </summary>
+        public static string ListLibrary_PivotTitle_4 {
+            get {
+                return ResourceManager.GetString("ListLibrary_PivotTitle_4", resourceCulture);
             }
         }
         

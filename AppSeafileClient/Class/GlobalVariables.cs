@@ -39,7 +39,8 @@ public static class GlobalVariables
 
     // Seafile API json respons
     public static string SF_RESP_REPOS = "repo";
-    public static string SF_RESP_GROUP_REPOS = "grepo";
+    public static string SF_RESP_SHARED_REPOS = "srepo";                // personally shared repo
+    public static string SF_RESP_GROUP_REPOS = "grepo";                 // group shared rep
 
     // Seafile API helper
     public static string SHARED_REPO_HELPER = "h_sRepo";

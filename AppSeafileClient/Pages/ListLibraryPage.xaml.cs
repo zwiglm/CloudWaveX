@@ -89,11 +89,11 @@ namespace PlasticWonderland.Pages
             var foundLibs = await requestLibrary(authorizationToken, address, GlobalVariables.SF_REQ_REPOS);
             List<LibraryRootObject> mainLibsSource = this.filterMainLibs(foundLibs.Content.ToString());
             // Get Be-Shared-Libraries
-            var beSharedLibs = await requestLibrary(authorizationToken, address, GlobalVariables.SF_REQ_BE_SHARED_REPOS);
-            List<LibraryRootObject> beSharedLibsSourece = this.filterBeSharedLibs(beSharedLibs.Content.ToString());
-            // add them up
-            mainLibsSource.AddRange(beSharedLibsSourece);
-            displayListLibrary(mainLibsSource);
+            //var beSharedLibs = await requestLibrary(authorizationToken, address, GlobalVariables.SF_REQ_BE_SHARED_REPOS);
+            //List<LibraryRootObject> beSharedLibsSourece = this.filterBeSharedLibs(beSharedLibs.Content.ToString());
+            List<LibraryRootObject> beSharedLibsSourece = this.filterBeSharedLibs(foundLibs.Content.ToString());
+            // put to list
+            displayListMyLibs(mainLibsSource, beSharedLibsSourece);
 
             // Get accounts infos
             requestAccountInfos(authorizationToken, address, "account/info");
@@ -218,18 +218,27 @@ namespace PlasticWonderland.Pages
         {
             List<LibraryRootObject> resultLibrary = JsonConvert.DeserializeObject<List<LibraryRootObject>>(httpResponse);
             resultLibrary.RemoveAll(q => q.@virtual);
+            resultLibrary.RemoveAll(q => (!string.IsNullOrEmpty(q.type) && q.type.Equals(GlobalVariables.SF_RESP_SHARED_REPOS)));
             resultLibrary.RemoveAll(q => (!string.IsNullOrEmpty(q.type) && q.type.Equals(GlobalVariables.SF_RESP_GROUP_REPOS)));
             return resultLibrary;
         }
+        //private List<LibraryRootObject> filterBeSharedLibs(string httpResponse)
+        //{
+        //    List<LibraryRootObject> resultLibrary = JsonConvert.DeserializeObject<List<LibraryRootObject>>(httpResponse);
+        //    foreach (var item in resultLibrary)
+        //        item.type = GlobalVariables.SHARED_REPO_HELPER;
+        //    return resultLibrary;
+        //}
         private List<LibraryRootObject> filterBeSharedLibs(string httpResponse)
         {
             List<LibraryRootObject> resultLibrary = JsonConvert.DeserializeObject<List<LibraryRootObject>>(httpResponse);
+            resultLibrary.RemoveAll(q => (!string.IsNullOrEmpty(q.type) && q.type.Equals(GlobalVariables.SF_RESP_REPOS)));
             foreach (var item in resultLibrary)
                 item.type = GlobalVariables.SHARED_REPO_HELPER;
             return resultLibrary;
         }
 
-        private void displayListLibrary(List<LibraryRootObject> mainLibsSource)
+        private void displayListMyLibs(List<LibraryRootObject> mainLibsSource, List<LibraryRootObject> beSharedLibsSource)
         {
             if (mainLibsSource.Count == 0)
             {
@@ -240,6 +249,7 @@ namespace PlasticWonderland.Pages
                 SetProgressIndicator(false);
 
                 listBoxAllLibraries.ItemsSource = mainLibsSource;
+                listBoxBeSharedLibs.ItemsSource = beSharedLibsSource;
                 if (GlobalVariables.IsDebugMode == true)
                 {
                     App.logger.log(LogLevel.debug, "List library OK");
@@ -301,7 +311,8 @@ namespace PlasticWonderland.Pages
                 else
                 {
                     //Go to ContentLibraryPage
-                    NavigationService.Navigate(new Uri("/Pages/ContentLibraryPage.xaml?token=" + authorizationToken + "&url=" + address + "&idlibrary=" + GlobalVariables.currentLibrary, UriKind.Relative));
+                    NavigationService.Navigate(
+                        new Uri("/Pages/ContentLibraryPage.xaml?token=" + authorizationToken + "&url=" + address + "&idlibrary=" + GlobalVariables.currentLibrary, UriKind.Relative));
                 }
             
             }
@@ -378,5 +389,6 @@ namespace PlasticWonderland.Pages
             }
     
         }
+
     }
 }

@@ -308,7 +308,7 @@
     <value>Gegenwärtige Nutzung in %</value>
   </data>
   <data name="ListLibrary_PivotTitle_1" xml:space="preserve">
-    <value>Alle Bibliotheken</value>
+    <value>Meine Bibliotheken</value>
   </data>
   <data name="ListLibrary_PivotTitle_2" xml:space="preserve">
     <value>Konto</value>
@@ -448,5 +448,8 @@
   </data>
   <data name="Settings_Photo_Backup_OnlyOnWifi" xml:space="preserve">
     <value>Sichern nur über WLAN</value>
+  </data>
+  <data name="ListLibrary_PivotTitle_4" xml:space="preserve">
+    <value>Für mich freigeben</value>
   </data>
 </root>

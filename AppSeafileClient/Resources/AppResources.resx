@@ -307,7 +307,7 @@
     <value>Current usage in %</value>
   </data>
   <data name="ListLibrary_PivotTitle_1" xml:space="preserve">
-    <value>All libraries</value>
+    <value>My Libraries</value>
   </data>
   <data name="ListLibrary_PivotTitle_2" xml:space="preserve">
     <value>Account</value>
@@ -446,5 +446,8 @@
   </data>
   <data name="Settings_Photo_Backup_OnlyOnWifi" xml:space="preserve">
     <value>Only with Wifi</value>
+  </data>
+  <data name="ListLibrary_PivotTitle_4" xml:space="preserve">
+    <value>BeShared Libraries</value>
   </data>
 </root>

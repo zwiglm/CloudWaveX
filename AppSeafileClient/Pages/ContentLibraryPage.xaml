@@ -137,6 +137,7 @@
                        FontWeight="Bold" FontStyle="Italic" FontSize="{StaticResource PhoneFontSizeLarge}" 
                        Foreground="#FFF39C03"/>
         </phone:Pivot.Title>
+        
         <phone:PivotItem x:Name="PivotItemLibContent" HorizontalAlignment="Left" Width="auto" Margin="0,0,0,0">
             <phone:PivotItem.Header>
                 <TextBlock Text="{Binding Path=LocalizedResources.ContentLibrary_PivotTitle_1, Source={StaticResource LocalizedStrings}}" 
