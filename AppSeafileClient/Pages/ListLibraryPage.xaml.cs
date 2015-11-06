@@ -24,6 +24,7 @@ using Coding4Fun.Toolkit.Controls.Common;
 using System.Reflection;
 using PlasticWonderland.Domain;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace PlasticWonderland.Pages
 {
@@ -235,7 +236,20 @@ namespace PlasticWonderland.Pages
             resultLibrary.RemoveAll(q => (!string.IsNullOrEmpty(q.type) && q.type.Equals(GlobalVariables.SF_RESP_REPOS)));
             foreach (var item in resultLibrary)
                 item.type = GlobalVariables.SHARED_REPO_HELPER;
-            return resultLibrary;
+
+            IEnumerable<IGrouping<string, LibraryRootObject>> bsLibGroups = resultLibrary.GroupBy(q => q.owner);
+            List<LibraryRootObject> grpdResult = new List<LibraryRootObject>();
+            foreach (var bsLibGrp in bsLibGroups)
+            {
+                LibraryRootObject grpSplitter = new LibraryRootObject()
+                {
+                    type = GlobalVariables.GROUP_SPLITTER,
+                    owner = bsLibGrp.Key,
+                };
+                grpdResult.Add(grpSplitter);
+                grpdResult.AddRange(bsLibGrp.ToList());
+            }
+            return grpdResult;
         }
 
         private void displayListMyLibs(List<LibraryRootObject> mainLibsSource, List<LibraryRootObject> beSharedLibsSource)

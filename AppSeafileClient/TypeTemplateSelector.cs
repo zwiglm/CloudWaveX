@@ -37,6 +37,10 @@ namespace PlasticWonderland
                 {
                     return GetDataTemplate("slib_crypt", container);
                 }
+                else if (typeItem.type == GlobalVariables.GROUP_SPLITTER)
+                {
+                    return GetDataTemplate(GlobalVariables.GROUP_SPLITTER, container);
+                }
                 else
                 {
                     return GetDataTemplate("NotDetermined", container);

@@ -44,4 +44,5 @@ public static class GlobalVariables
 
     // Seafile API helper
     public static string SHARED_REPO_HELPER = "h_sRepo";
+    public static string GROUP_SPLITTER = "group_splitter";
 }
