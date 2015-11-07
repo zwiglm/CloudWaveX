@@ -15,6 +15,7 @@ using Windows.Storage;
 using System.Xml;
 using Coding4Fun.Toolkit.Controls;
 using PlasticWonderland.Class;
+using Microsoft.Phone.Scheduler;
 
 namespace PlasticWonderland
 {
@@ -403,9 +404,8 @@ namespace PlasticWonderland
             GlobalVariables.currentPath = "";
             GlobalVariables.FolderNamePivotItem = AppResources.ContentLibrary_PivotTitle_1;
             (Application.Current.RootVisual as PhoneApplicationFrame).Navigate(new Uri("/Pages/ListLibraryPage.xaml?token=" + GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.TOKEN_SAVED_SET] as string + "&url=" + GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.URL_SAVED_SET] as string, UriKind.Relative));
-                   
-        }
 
+        }
 
     }
 }

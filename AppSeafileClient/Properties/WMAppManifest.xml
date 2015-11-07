@@ -21,6 +21,9 @@
     </Capabilities>
     <Tasks>
       <DefaultTask Name="_default" ActivationPolicy="Resume" />
+      <ExtendedTask Name="BackgroundTask">
+        <BackgroundServiceAgent Specifier="ScheduledTaskAgent" Name="SeashorePhotoUploader" Source="PhotoUploader" Type="PhotoUploader.ScheduledAgent" />
+      </ExtendedTask>
     </Tasks>
     <Tokens>
       <PrimaryToken TokenID="AppSeafileClientToken" TaskName="_default">

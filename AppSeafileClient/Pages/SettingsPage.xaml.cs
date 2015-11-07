@@ -12,11 +12,17 @@ using System.IO.IsolatedStorage;
 using System.IO;
 using Microsoft.Phone.Tasks;
 using PlasticWonderland.Class;
+using Microsoft.Phone.Scheduler;
+using System.Windows.Automation.Peers;
+using System.Windows.Automation.Provider;
+using PlasticWonderland.Domain;
 
 namespace PlasticWonderland.Pages
 {
     public partial class SettingsPage : PhoneApplicationPage
     {
+        bool _ignorePhotoBackupToggleEvents;
+
 
         public SettingsPage()
         {
@@ -32,17 +38,21 @@ namespace PlasticWonderland.Pages
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            this._ignorePhotoBackupToggleEvents = true;
+
             base.OnNavigatedTo(e);
 
-            if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS))
+            if (TaskHelperFactory.Instance.enabledBackupPhotos())
                 this.CbBackupPhotos.IsChecked = true;
             else
                 this.CbBackupPhotos.IsChecked = false;
 
-            if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY))
+            if (TaskHelperFactory.Instance.enabledBackupPhotosWifiOnly())
                 this.CbBackupPhotosWifiOnly.IsChecked = true;
             else
                 this.CbBackupPhotosWifiOnly.IsChecked = false;
+
+            this._ignorePhotoBackupToggleEvents = false;
         }
 
 
@@ -128,26 +138,20 @@ namespace PlasticWonderland.Pages
 
         private void CbGetThumbs_Click(object sender, RoutedEventArgs e)
         {
-
+            // MaZ todo:
         }
 
         private void CbBackupPhotos_Click(object sender, RoutedEventArgs e)
         {
-           if (this.CbBackupPhotos.IsChecked == true)
+            if (this.CbBackupPhotos.IsChecked == true)
             {
-                if (!GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS))
-                    GlobalVariables.IsolatedStorageUserInformations.Add(GlobalVariables.SETTINGS_BACKUP_PHOTOS, true);
-                else
-                    GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.SETTINGS_BACKUP_PHOTOS] = true;
-
-                GlobalVariables.IsolatedStorageUserInformations.Save();
+                TaskHelperFactory.Instance.addBackupPhotoSetting();
+                TaskHelperFactory.Instance.storeSettings();
             }
             else
             {
-                if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS))
-                    GlobalVariables.IsolatedStorageUserInformations.Remove(GlobalVariables.SETTINGS_BACKUP_PHOTOS);
-
-                GlobalVariables.IsolatedStorageUserInformations.Save();
+                TaskHelperFactory.Instance.removeBackupPhotoSetting();
+                TaskHelperFactory.Instance.storeSettings();
 
                 this.CbBackupPhotosWifiOnly.IsChecked = false;
                 this.CbBackupPhotosOnlyOnWifi_Click(sender, e);
@@ -158,21 +162,16 @@ namespace PlasticWonderland.Pages
         {
             if (this.CbBackupPhotosWifiOnly.IsChecked == true)
             {
-                if (!GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY))
-                    GlobalVariables.IsolatedStorageUserInformations.Add(GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY, true);
-                else
-                    GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY] = true;
-
-                GlobalVariables.IsolatedStorageUserInformations.Save();
+                TaskHelperFactory.Instance.addBackupPhotosWifiOnlySettings();
+                TaskHelperFactory.Instance.storeSettings();
 
                 this.CbBackupPhotos.IsChecked = true;
                 this.CbBackupPhotos_Click(sender, e);
             }
             else
             {
-                if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY))
-                    GlobalVariables.IsolatedStorageUserInformations.Remove(GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY);
-                GlobalVariables.IsolatedStorageUserInformations.Save();
+                TaskHelperFactory.Instance.removeBackupPhotosWifiOnlySettings();
+                TaskHelperFactory.Instance.storeSettings();
             }
         }
 
