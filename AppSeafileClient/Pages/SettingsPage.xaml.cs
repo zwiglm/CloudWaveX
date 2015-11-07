@@ -21,6 +21,7 @@ namespace PlasticWonderland.Pages
 {
     public partial class SettingsPage : PhoneApplicationPage
     {
+        // block too early clicking....
         bool _ignorePhotoBackupToggleEvents;
 
 
@@ -143,6 +144,9 @@ namespace PlasticWonderland.Pages
 
         private void CbBackupPhotos_Click(object sender, RoutedEventArgs e)
         {
+            if (_ignorePhotoBackupToggleEvents)
+                return;
+
             if (this.CbBackupPhotos.IsChecked == true)
             {
                 TaskHelperFactory.Instance.addBackupPhotoSetting();
@@ -160,6 +164,9 @@ namespace PlasticWonderland.Pages
 
         private void CbBackupPhotosOnlyOnWifi_Click(object sender, RoutedEventArgs e)
         {
+            if (_ignorePhotoBackupToggleEvents)
+                return;
+
             if (this.CbBackupPhotosWifiOnly.IsChecked == true)
             {
                 TaskHelperFactory.Instance.addBackupPhotosWifiOnlySettings();
