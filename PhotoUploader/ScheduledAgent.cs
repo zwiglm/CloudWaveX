@@ -1,7 +1,14 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using Microsoft.Phone.Scheduler;
 using Microsoft.Phone.Shell;
+using Windows.Storage;
+using System.Threading.Tasks;
+using System;
+using System.Linq;
+using SeaShoreShared;
+using SeaShoreShared.DataBase;
 
 namespace PhotoUploader
 {
@@ -49,6 +56,12 @@ namespace PhotoUploader
             {
                 // Execute periodic task actions here.
                 toastMessage = string.Format("Periodic Task: {0}", task.Description);
+
+                if (task.Name.Equals(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME))
+                {
+                    // MaZ todo: which known libraries - get from ApplicationSettings...
+                    this.iteratePictureLibary();
+                }
             }
             else
             {
@@ -72,5 +85,53 @@ namespace PhotoUploader
             // Call NotifyComplete to let the system know the agent is done working.
             NotifyComplete();
         }
+
+
+        #region Private own methods
+
+        private async void iteratePictureLibary()
+        {
+            List<StorageFile> pics = await this.getFilesFromPictureLib();
+        }
+
+        private async Task retriveFilesInFolder(List<StorageFile> list, StorageFolder parent)
+        {
+            foreach (var item in await parent.GetFilesAsync())
+            {
+                // MaZ todo: calculate MD5
+                string md5ForFile = SharedHelperFactory.Instance.CalculateMD5ForLibraryFile(item);
+                LibraryBaseEntry dbEntry = this.createDbEntry(md5ForFile, item);
+
+                list.Add(item);
+            }
+            foreach (var item in await parent.GetFoldersAsync())
+            {
+                await retriveFilesInFolder(list, item);
+            }
+        }
+
+        private async Task<List<StorageFile>> getFilesFromPictureLib()
+        {
+            StorageFolder folder = KnownFolders.PicturesLibrary;
+            List<StorageFile> listOfFiles = new List<StorageFile>();
+
+            await retriveFilesInFolder(listOfFiles, folder);
+
+            return listOfFiles;
+        }
+
+        private LibraryBaseEntry createDbEntry(string md5, StorageFile file)
+        {
+            LibraryBaseEntry result = new LibraryBaseEntry()
+            {
+                ShoreMD5Hash = md5,
+                FileName = file.Name,
+                Path = file.Path,
+            };
+            return result;
+        }
+
+        #endregion
+
     }
 }

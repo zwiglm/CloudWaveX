@@ -46,6 +46,4 @@ public static class GlobalVariables
     public static string SHARED_REPO_HELPER = "h_sRepo";
     public static string GROUP_SPLITTER = "group_splitter";
 
-    // Task helper
-    public static string CHECK_PHOTO_CHANGES_TASKNAME = "CheckPhotoChangesAgent";
 }

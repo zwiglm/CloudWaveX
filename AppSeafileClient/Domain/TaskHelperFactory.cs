@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Microsoft.Phone.Scheduler;
+using SeaShoreShared;
 
 namespace PlasticWonderland.Domain
 {
@@ -75,23 +76,23 @@ namespace PlasticWonderland.Domain
         #endregion 
 
 
-        public void StartPeriodicAgent()
+        public void startIteratingPicturesAgent()
         {
             // Variable for tracking enabled status of background agents for this app.
             //_agentsEnabled = true;
 
             // Obtain a reference to the period task, if one exists
-            PeriodicTask checkPhotoChangesTask = ScheduledActionService.Find(GlobalVariables.CHECK_PHOTO_CHANGES_TASKNAME) as PeriodicTask;
+            PeriodicTask checkPhotoChangesTask = ScheduledActionService.Find(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME) as PeriodicTask;
 
             // If the task already exists and background agents are enabled for the
             // application, you must remove the task and then add it again to update 
             // the schedule
             if (checkPhotoChangesTask != null)
             {
-                RemoveTaskAgent(GlobalVariables.CHECK_PHOTO_CHANGES_TASKNAME);
+                RemoveTaskAgent(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME);
             }
 
-            checkPhotoChangesTask = new PeriodicTask(GlobalVariables.CHECK_PHOTO_CHANGES_TASKNAME);
+            checkPhotoChangesTask = new PeriodicTask(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME);
 
             // The description is required for periodic agents. This is the string that the user
             // will see in the background services Settings page on the device.

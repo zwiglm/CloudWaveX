@@ -26,6 +26,7 @@ using System.Reflection;
 using System.Windows.Threading;
 using PlasticWonderland.Domain;
 using PlasticWonderland.Class;
+using SeaShoreShared;
 
 namespace PlasticWonderland.Pages
 {
@@ -245,7 +246,7 @@ namespace PlasticWonderland.Pages
                 if (libCntItem.type.Equals(GlobalVariables.FILE_AS_FILE))
                 {
                     string hash = 
-                        HttpHelperFactory.Instance.CalculateHashForString(GlobalVariables.currentLibrary, GlobalVariables.currentPath, libCntItem.name);
+                        SharedHelperFactory.Instance.CalculateHashForString(GlobalVariables.currentLibrary, GlobalVariables.currentPath, libCntItem.name);
                     libCntItem.FileHash = hash;
 
                     if (this.isAlreadyDownloaded(hash))

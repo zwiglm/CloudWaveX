@@ -116,7 +116,6 @@
     <Compile Include="Domain\BooleanToVisibilityConverter.cs" />
     <Compile Include="Domain\CloudHelper.cs" />
     <Compile Include="Domain\HttpHelperFactory.cs" />
-    <Compile Include="Domain\SeashoreHelperFactory.cs" />
     <Compile Include="Domain\TaskHelperFactory.cs" />
     <Compile Include="LocalizedStrings.cs" />
     <Compile Include="Login.xaml.cs">
@@ -293,7 +292,12 @@
       <HintPath>..\packages\Microsoft.Net.Http.2.2.28\lib\sl4-windowsphone71\System.Net.Http.Primitives.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\SeaShoreShared\SeaShoreShared.csproj">
+      <Project>{bfc3e5b1-2350-4bbd-9ecc-55a7d5ab3f2c}</Project>
+      <Name>SeaShoreShared</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

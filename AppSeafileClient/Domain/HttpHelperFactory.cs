@@ -59,61 +59,11 @@ namespace PlasticWonderland.Domain
         }
 
 
-        public string CalculateHashForString(string repoId, string filePath, string fileName)
-        {
-            string repoIdClean = repoId.Trim('/');
-            string filePathClean = filePath.Trim('/');
-            string fileNameClean = fileName.Trim('/');
-            string strConc = string.Format("{0};{1};{2}", repoIdClean, filePathClean, fileNameClean);
-            string hash =  this.CalculateHashForString(strConc, HttpHelperFactory.SHA_256);
-            return hash;
-        }
-
-
         #region Privee
 
         private void DeviceNetworkInformation_NetworkAvailabilityChanged(object sender, NetworkNotificationEventArgs e)
         {
             this.IsWifiEnabled = DeviceNetworkInformation.IsWiFiEnabled;
-        }
-
-        private string CalculateHashForString(string DataString, string hashType)
-        {
-            string dataHash = string.Empty;
-
-            if (string.IsNullOrWhiteSpace(DataString))
-                return null;
-
-            if (string.IsNullOrWhiteSpace(hashType))
-                hashType = "MD5";
-            try
-            {
-                ///Hash Algorithm Provider is Created 
-                HashAlgorithmProvider Algorithm = HashAlgorithmProvider.OpenAlgorithm(hashType);
-                ///Creating a Buffer Stream using the Cryptographic Buffer class and UTF8 encoding 
-                IBuffer vector = CryptographicBuffer.ConvertStringToBinary(DataString, BinaryStringEncoding.Utf8);
-
-
-                IBuffer digest = Algorithm.HashData(vector);////Hashing The Data 
-
-                if (digest.Length != Algorithm.HashLength)
-                {
-                    throw new System.InvalidOperationException(
-                      "HashAlgorithmProvider failed to generate a hash of proper length!");
-                }
-                else
-                {
-
-                    dataHash = CryptographicBuffer.EncodeToHexString(digest);//Encoding it to a Hex String 
-                    return dataHash;
-                }
-            }
-            catch (Exception ex)
-            {
-                ///
-            }
-
-            return null;
         }
 
         #endregion
