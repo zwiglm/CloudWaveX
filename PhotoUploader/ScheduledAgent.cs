@@ -99,8 +99,9 @@ namespace PhotoUploader
             foreach (var item in await parent.GetFilesAsync())
             {
                 // MaZ todo: calculate MD5
-                string md5ForFile = SharedHelperFactory.Instance.CalculateMD5ForLibraryFile(item);
-                LibraryBaseEntry dbEntry = this.createDbEntry(md5ForFile, item);
+                DateTimeOffset fileModified = (await item.GetBasicPropertiesAsync()).DateModified;
+                string md5ForFile = SharedHelperFactory.Instance.CalculateMD5ForLibraryFile(item, fileModified);
+                LibraryBaseEntry dbEntry = this.createDbEntry(md5ForFile, item, fileModified);
 
                 list.Add(item);
             }
@@ -120,13 +121,14 @@ namespace PhotoUploader
             return listOfFiles;
         }
 
-        private LibraryBaseEntry createDbEntry(string md5, StorageFile file)
+        private LibraryBaseEntry createDbEntry(string md5, StorageFile file, DateTimeOffset fileModified)
         {
             LibraryBaseEntry result = new LibraryBaseEntry()
             {
                 ShoreMD5Hash = md5,
                 FileName = file.Name,
                 Path = file.Path,
+                DateModified = fileModified,
             };
             return result;
         }

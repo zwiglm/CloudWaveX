@@ -51,9 +51,9 @@ namespace SeaShoreShared
             return hash;
         }
 
-        public string CalculateMD5ForLibraryFile(StorageFile file)
+        public string CalculateMD5ForLibraryFile(StorageFile file, DateTimeOffset modifiedOffset)
         {
-            string forEncoding = String.Format("{0};{1};{2};{3}", file.DisplayName, file.Name, file.Path, file.DateCreated.ToString());
+            string forEncoding = String.Format("{0};{1};{2};{3}", file.DisplayName, file.Name, file.Path, modifiedOffset.ToString());
             string md5Hash = this.CalculateHashForString(forEncoding, SharedHelperFactory.MD5);
             return md5Hash;
         }
