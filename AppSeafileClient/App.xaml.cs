@@ -16,6 +16,7 @@ using System.Xml;
 using Coding4Fun.Toolkit.Controls;
 using PlasticWonderland.Class;
 using Microsoft.Phone.Scheduler;
+using PlasticWonderland.Domain;
 
 namespace PlasticWonderland
 {
@@ -117,13 +118,14 @@ namespace PlasticWonderland
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
             Microsoft.Phone.Shell.PhoneApplicationService.Current.ContractActivated += Application_ContractActivated;
+            TaskHelperFactory.Instance.triggerScheduleAgent();
         }
 
         // Code to execute when the application is activated (brought to foreground)
         // This code will not execute when the application is first launched
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
-
+            TaskHelperFactory.Instance.triggerScheduleAgent();
         }
 
         // Code to execute when the application is deactivated (sent to background)

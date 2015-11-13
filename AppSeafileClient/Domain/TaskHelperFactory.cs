@@ -1,9 +1,12 @@
-﻿using System;
+﻿#define DEBUG_AGENT
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.Phone.Net.NetworkInformation;
 using Microsoft.Phone.Scheduler;
 using SeaShoreShared;
 
@@ -16,6 +19,8 @@ namespace PlasticWonderland.Domain
 
         private TaskHelperFactory()
         {
+            //NetworkInterfaces = new ObservableCollection<string>();
+            DeviceNetworkInformation.NetworkAvailabilityChanged += DeviceNetworkInformation_NetworkAvailabilityChanged;
         }
 
         public static TaskHelperFactory Instance
@@ -29,6 +34,10 @@ namespace PlasticWonderland.Domain
                 return _instance;
             }
         }
+
+
+        //public ObservableCollection<string> NetworkInterfaces { get; private set; }
+        public bool IsWifiEnabled { get; private set; }
 
 
         #region Settings in regard to tasks
@@ -48,6 +57,7 @@ namespace PlasticWonderland.Domain
         {
             GlobalVariables.IsolatedStorageUserInformations.Save();
         }
+
         public void addBackupPhotoSetting()
         {
             if (!GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS))
@@ -71,6 +81,30 @@ namespace PlasticWonderland.Domain
         {
             if (GlobalVariables.IsolatedStorageUserInformations.Contains(GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY))
                 GlobalVariables.IsolatedStorageUserInformations.Remove(GlobalVariables.SETTINGS_BACKUP_PHOTOS_WIFI_ONLY);
+        }
+
+        public void triggerScheduleAgent()
+        {
+            if (this.enabledBackupPhotos() && !this.enabledBackupPhotosWifiOnly())
+            {
+                this.startIteratingPicturesAgent();
+                return;
+            }
+
+            if (this.enabledBackupPhotos() && this.enabledBackupPhotosWifiOnly() && this.IsWifiEnabled)
+            {
+                this.startIteratingPicturesAgent();
+                return;
+            }
+
+            if (!this.enabledBackupPhotos())
+            {
+                this.RemoveTaskAgent(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME);
+                return;
+            }
+
+            // just in case...
+            this.RemoveTaskAgent(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME);
         }
 
         #endregion 
@@ -104,9 +138,9 @@ namespace PlasticWonderland.Domain
                 ScheduledActionService.Add(checkPhotoChangesTask);
 
                 // If debugging is enabled, use LaunchForTest to launch the agent in one minute.
-                //#if(DEBUG_AGENT)
-                //    ScheduledActionService.LaunchForTest(periodicTaskName, TimeSpan.FromSeconds(60));
-                //#endif
+#if(DEBUG_AGENT)
+                ScheduledActionService.LaunchForTest(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME, TimeSpan.FromSeconds(30));
+#endif
             }
             catch (InvalidOperationException exception)
             {
@@ -146,6 +180,15 @@ namespace PlasticWonderland.Domain
             }
         }
 
+
+        #region Private
+
+        private void DeviceNetworkInformation_NetworkAvailabilityChanged(object sender, NetworkNotificationEventArgs e)
+        {
+            this.IsWifiEnabled = DeviceNetworkInformation.IsWiFiEnabled;
+        }
+
+        #endregion
 
     }
 }

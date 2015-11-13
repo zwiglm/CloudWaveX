@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#define DEBUG_AGENT
+
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using Microsoft.Phone.Scheduler;
@@ -9,6 +11,7 @@ using System;
 using System.Linq;
 using SeaShoreShared;
 using SeaShoreShared.DataBase;
+
 
 namespace PhotoUploader
 {
@@ -78,12 +81,17 @@ namespace PhotoUploader
             toast.Show();
 
             // If debugging is enabled, launch the agent again in one minute.
-//#if DEBUG_AGENT
-//  ScheduledActionService.LaunchForTest(task.Name, TimeSpan.FromSeconds(60));
-//#endif
+#if DEBUG_AGENT
+            ScheduledActionService.LaunchForTest(task.Name, TimeSpan.FromSeconds(30));
+#endif
 
             // Call NotifyComplete to let the system know the agent is done working.
             NotifyComplete();
+        }
+
+        protected override void OnCancel()
+        {
+            base.OnCancel();
         }
 
 
@@ -96,7 +104,8 @@ namespace PhotoUploader
 
         private async Task retriveFilesInFolder(List<StorageFile> list, StorageFolder parent)
         {
-            foreach (var item in await parent.GetFilesAsync())
+            IReadOnlyList<StorageFile> allFiles = await parent.GetFilesAsync();
+            foreach (var item in allFiles)
             {
                 // MaZ todo: calculate MD5
                 DateTimeOffset fileModified = (await item.GetBasicPropertiesAsync()).DateModified;
@@ -105,7 +114,9 @@ namespace PhotoUploader
 
                 list.Add(item);
             }
-            foreach (var item in await parent.GetFoldersAsync())
+
+            IReadOnlyList<StorageFolder> allFolders = await parent.GetFoldersAsync();
+            foreach (var item in allFolders)
             {
                 await retriveFilesInFolder(list, item);
             }

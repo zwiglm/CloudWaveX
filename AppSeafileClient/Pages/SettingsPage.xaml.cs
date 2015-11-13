@@ -56,6 +56,13 @@ namespace PlasticWonderland.Pages
             this._ignorePhotoBackupToggleEvents = false;
         }
 
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            base.OnNavigatedFrom(e);
+
+            TaskHelperFactory.Instance.triggerScheduleAgent();
+        }
+
 
         /// <summary>
         /// Occurs when user click on the logoff button. Destroy settings and cache

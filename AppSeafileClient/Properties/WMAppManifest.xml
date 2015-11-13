@@ -21,8 +21,8 @@
     </Capabilities>
     <Tasks>
       <DefaultTask Name="_default" ActivationPolicy="Resume" />
-      <ExtendedTask Name="BackgroundTask">
-        <BackgroundServiceAgent Specifier="ScheduledTaskAgent" Name="SeashorePhotoUploader" Source="PhotoUploader" Type="PhotoUploader.ScheduledAgent" />
+      <ExtendedTask Name="SeashorePhotoUploader">
+        <BackgroundServiceAgent Specifier="ScheduledTaskAgent" Name="PhotoUploader" Source="PhotoUploader" Type="PhotoUploader.ScheduledAgent" />
       </ExtendedTask>
     </Tasks>
     <Tokens>

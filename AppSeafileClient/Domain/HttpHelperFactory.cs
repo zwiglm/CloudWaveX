@@ -21,8 +21,6 @@ namespace PlasticWonderland.Domain
 
         private  HttpHelperFactory()
         {
-            //NetworkInterfaces = new ObservableCollection<string>();
-            DeviceNetworkInformation.NetworkAvailabilityChanged += DeviceNetworkInformation_NetworkAvailabilityChanged;
         }
 
         public static HttpHelperFactory Instance
@@ -37,8 +35,6 @@ namespace PlasticWonderland.Domain
             }
         }
 
-        //public ObservableCollection<string> NetworkInterfaces { get; private set; }
-        public bool IsWifiEnabled { get; private set; }
 
         public HttpBaseProtocolFilter getHttpFilter()
         {
@@ -57,16 +53,6 @@ namespace PlasticWonderland.Domain
             } 
             return filter;
         }
-
-
-        #region Privee
-
-        private void DeviceNetworkInformation_NetworkAvailabilityChanged(object sender, NetworkNotificationEventArgs e)
-        {
-            this.IsWifiEnabled = DeviceNetworkInformation.IsWiFiEnabled;
-        }
-
-        #endregion
 
     }
 }

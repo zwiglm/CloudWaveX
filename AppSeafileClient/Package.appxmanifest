@@ -21,6 +21,14 @@
         </m3:DefaultTile>
         <m3:SplashScreen Image="Assets\SplashScreen.png" />
       </m3:VisualElements>
+      <Extensions>
+        <Extension Category="windows.backgroundTasks" EntryPoint="AgHost.BackgroundTask">
+          <BackgroundTasks>
+            <Task Type="systemEvent" />
+            <Task Type="timer" />
+          </BackgroundTasks>
+        </Extension>
+      </Extensions>
     </Application>
   </Applications>
   <Capabilities>
@@ -37,11 +45,5 @@
         <ActivatableClass ActivatableClassId="AgHost.BackgroundTask" ThreadingModel="both" />
       </InProcessServer>
     </Extension>
-    <!--<Extension Category="windows.certificates">
-      <Certificates>
-        <Certificate StoreName="Root" Content="zwigl_cert_cert.cer" />
-        <SelectionCriteria AutoSelect="true" />
-      </Certificates>
-    </Extension>-->
   </Extensions>
 </Package>
