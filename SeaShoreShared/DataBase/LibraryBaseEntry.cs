@@ -26,7 +26,7 @@ namespace SeaShoreShared.DataBase
         public string Path { get; set; }
 
         [Column]
-        public DateTimeOffset DateModified { get; set; }
+        public string DateModified { get; set; }
 
         [Column(IsVersion = true)]
         private Binary _version { get; set; }

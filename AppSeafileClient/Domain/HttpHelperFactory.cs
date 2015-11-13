@@ -15,9 +15,7 @@ namespace PlasticWonderland.Domain
 {
     public class HttpHelperFactory
     {
-        private static string SHA_256 = "SHA256";
         private static HttpHelperFactory _instance;
-
 
         private  HttpHelperFactory()
         {

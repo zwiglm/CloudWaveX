@@ -11,6 +11,8 @@ using System;
 using System.Linq;
 using SeaShoreShared;
 using SeaShoreShared.DataBase;
+using Windows.Storage.FileProperties;
+using SeaShoreShared.Resources;
 
 
 namespace PhotoUploader
@@ -50,6 +52,8 @@ namespace PhotoUploader
         /// </remarks>
         protected override void OnInvoke(ScheduledTask task)
         {
+            Debug.WriteLine("Seashore Background Invocation started:");
+
             //TODO: Add code to perform your task in background
             string toastMessage = "";
 
@@ -62,8 +66,15 @@ namespace PhotoUploader
 
                 if (task.Name.Equals(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME))
                 {
-                    // MaZ todo: which known libraries - get from ApplicationSettings...
-                    this.iteratePictureLibary();
+                    List<LibraryBaseEntry> notUploaded = this.iteratePictureLibary();
+
+                    if (notUploaded.Count > 0)
+                    {
+                        this.showToast(
+                            PhotoUploadResource.Background_Agent_Title,
+                            String.Format(PhotoUploadResource.Backgroun_Agent_FilesForUpload, notUploaded.Count),
+                            "");
+                    }
                 }
             }
             else
@@ -73,13 +84,6 @@ namespace PhotoUploader
                 toastMessage = string.Format("Task: {0}", task.Description);
             }
 
-            // Launch a toast to show that the agent is running.
-            // The toast will not be shown if the foreground application is running.
-            ShellToast toast = new ShellToast();
-            toast.Title = "Seashore Background Agent";
-            toast.Content = toastMessage;
-            toast.Show();
-
             // If debugging is enabled, launch the agent again in one minute.
 #if DEBUG_AGENT
             ScheduledActionService.LaunchForTest(task.Name, TimeSpan.FromSeconds(30));
@@ -87,52 +91,70 @@ namespace PhotoUploader
 
             // Call NotifyComplete to let the system know the agent is done working.
             NotifyComplete();
-        }
 
-        protected override void OnCancel()
-        {
-            base.OnCancel();
-        }
+            // Launch a toast to show that the agent has been running.
+            // The toast will not be shown if the foreground application is running.
 
+            //ShellToast toast = new ShellToast();
+            //toast.Title = "Seashore Background Agent";
+            //toast.Content = toastMessage;
+            //// Make toast silent
+            //SetProperty(toast, "Sound", new Uri("", UriKind.RelativeOrAbsolute));
+            //toast.Show();
+        }
 
         #region Private own methods
 
-        private async void iteratePictureLibary()
-        {
-            List<StorageFile> pics = await this.getFilesFromPictureLib();
-        }
-
-        private async Task retriveFilesInFolder(List<StorageFile> list, StorageFolder parent)
-        {
-            IReadOnlyList<StorageFile> allFiles = await parent.GetFilesAsync();
-            foreach (var item in allFiles)
-            {
-                // MaZ todo: calculate MD5
-                DateTimeOffset fileModified = (await item.GetBasicPropertiesAsync()).DateModified;
-                string md5ForFile = SharedHelperFactory.Instance.CalculateMD5ForLibraryFile(item, fileModified);
-                LibraryBaseEntry dbEntry = this.createDbEntry(md5ForFile, item, fileModified);
-
-                list.Add(item);
-            }
-
-            IReadOnlyList<StorageFolder> allFolders = await parent.GetFoldersAsync();
-            foreach (var item in allFolders)
-            {
-                await retriveFilesInFolder(list, item);
-            }
-        }
-
-        private async Task<List<StorageFile>> getFilesFromPictureLib()
+        private List<LibraryBaseEntry> iteratePictureLibary()
         {
             StorageFolder folder = KnownFolders.PicturesLibrary;
-            List<StorageFile> listOfFiles = new List<StorageFile>();
-
-            await retriveFilesInFolder(listOfFiles, folder);
-
-            return listOfFiles;
+            Task<List<LibraryBaseEntry>> picturesTask = retriveFilesInFolder(folder);
+            return picturesTask.Result;
         }
 
-        private LibraryBaseEntry createDbEntry(string md5, StorageFile file, DateTimeOffset fileModified)
+
+        private async Task<List<LibraryBaseEntry>> retriveFilesInFolder(StorageFolder parent)
+        {
+            List<LibraryBaseEntry> result = new List<LibraryBaseEntry>();
+
+            IReadOnlyList<StorageFile> allFiles = await this.getFileList(parent);
+            foreach (var item in allFiles)
+            {
+                BasicProperties basicProps = await this.getBasicProps(item);
+                string fileModified = basicProps.DateModified.ToString();
+                string md5ForFile = SharedHelperFactory.Instance.CalculateMD5ForLibraryFile(item, fileModified);
+                
+                // MaZ todo: check if already in DB
+                LibraryBaseEntry dbEntry = this.createDbEntry(md5ForFile, item, fileModified);
+                result.Add(dbEntry);
+            }
+
+            IReadOnlyList<StorageFolder> allFolders = await this.getFolderList(parent);
+            foreach (var item in allFolders)
+	        {
+                List<LibraryBaseEntry> inSubFolder = await this.retriveFilesInFolder(item);
+                result.AddRange(inSubFolder);
+	        }
+
+            return result;
+        }
+
+
+        private async Task<IReadOnlyList<StorageFile>> getFileList(StorageFolder parent)
+        {
+            return await parent.GetFilesAsync();
+        }
+        private async Task<IReadOnlyList<StorageFolder>> getFolderList(StorageFolder parent)
+        {
+            return await parent.GetFoldersAsync();
+        }
+        private async Task<BasicProperties> getBasicProps(StorageFile item)
+        {
+            return await item.GetBasicPropertiesAsync();
+        }
+
+
+        private LibraryBaseEntry createDbEntry(string md5, StorageFile file, string fileModified)
         {
             LibraryBaseEntry result = new LibraryBaseEntry()
             {
@@ -142,6 +164,26 @@ namespace PhotoUploader
                 DateModified = fileModified,
             };
             return result;
+        }
+
+        private static void SetProperty(object instance, string name, object value)
+        {
+            var setMethod = instance.GetType().GetProperty(name).GetSetMethod();
+            setMethod.Invoke(instance, new object[] { value });
+        }
+
+        #endregion
+
+
+        #region Private UI
+
+        private void showToast(string title, string message, string sound)
+        {
+            ShellToast toast = new ShellToast();
+            toast.Title = title;
+            toast.Content = message;
+            SetProperty(toast, "Sound", new Uri(sound, UriKind.RelativeOrAbsolute));
+            toast.Show();
         }
 
         #endregion

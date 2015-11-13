@@ -84,9 +84,21 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DataBase\LibraryBaseEntry.cs" />
+    <Compile Include="Resources\PhotoUploadResource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PhotoUploadResource.resx</DependentUpon>
+    </Compile>
     <Compile Include="SharedGlobalVars.cs" />
     <Compile Include="SharedHelperFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\PhotoUploadResource.de.resx" />
+    <EmbeddedResource Include="Resources\PhotoUploadResource.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>PhotoUploadResource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).$(TargetFrameworkVersion).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\$(TargetFrameworkIdentifier)\$(TargetFrameworkVersion)\Microsoft.$(TargetFrameworkIdentifier).CSharp.targets" />
