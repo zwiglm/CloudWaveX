@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Diagnostics;
 using System.Resources;
 using System.Windows;
@@ -17,6 +18,8 @@ using Coding4Fun.Toolkit.Controls;
 using PlasticWonderland.Class;
 using Microsoft.Phone.Scheduler;
 using PlasticWonderland.Domain;
+using Windows.ApplicationModel.Background;
+using SeaShoreShared.DataBase;
 
 namespace PlasticWonderland
 {
@@ -72,6 +75,8 @@ namespace PlasticWonderland
 
             // Create the database if it does not exist.
             this.createLocalDatabase();
+
+            //
         }
 
 
@@ -79,12 +84,32 @@ namespace PlasticWonderland
 
         private void createLocalDatabase()
         {
+            // Download Cache
             using (CacheFileEntryContext db = new CacheFileEntryContext(CacheFileEntryContext.DBConnectionString))
             {
                 bool DEBUG = false;
                 if (!db.DatabaseExists() || DEBUG)
                 {
                     //Create the database
+                    try
+                    {
+                        if (DEBUG)
+                            db.DeleteDatabase();
+
+                        db.CreateDatabase();
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }
+            }
+
+            // Files for upload
+            using (PhotoUploadContext db = new PhotoUploadContext(PhotoUploadContext.DBConnectionString))
+            {
+                bool DEBUG = false;
+                if (!db.DatabaseExists() || DEBUG)
+                {
                     try
                     {
                         if (DEBUG)
@@ -407,6 +432,43 @@ namespace PlasticWonderland
             GlobalVariables.FolderNamePivotItem = AppResources.ContentLibrary_PivotTitle_1;
             (Application.Current.RootVisual as PhoneApplicationFrame).Navigate(new Uri("/Pages/ListLibraryPage.xaml?token=" + GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.TOKEN_SAVED_SET] as string + "&url=" + GlobalVariables.IsolatedStorageUserInformations[GlobalVariables.URL_SAVED_SET] as string, UriKind.Relative));
 
+        }
+
+
+
+        /// <summary>
+        /// MaZ attn:
+        /// </summary>
+        private async void registerRtcUpload()
+        {
+            try
+            {
+                BackgroundAccessStatus status = await BackgroundExecutionManager.RequestAccessAsync();
+                if (status == BackgroundAccessStatus.AllowedWithAlwaysOnRealTimeConnectivity || status == BackgroundAccessStatus.AllowedMayUseActiveRealTimeConnectivity)
+                {
+                    bool isRegistered = BackgroundTaskRegistration.AllTasks.Any(x => x.Value.Name == "RTC-Uploader task");
+                    if (!isRegistered)
+                    {
+                        BackgroundTaskBuilder builder = new BackgroundTaskBuilder
+                        {
+                            Name = "RTC-Uploader task",
+                            TaskEntryPoint = "PhotoUploaderUpload.ActualUploader"
+                        };
+                        builder.SetTrigger(new TimeTrigger(15, false));
+                        builder.AddCondition(new SystemCondition(SystemConditionType.InternetAvailable));
+                        BackgroundTaskRegistration task = builder.Register();
+                        //task.Completed += taskRegistration_Completed;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                //Debug.WriteLine("The access has already been granted");
+            }
+        }
+        void taskRegistration_Completed(BackgroundTaskRegistration sender, BackgroundTaskCompletedEventArgs args)
+        {
+            // MaZ todo:
         }
 
     }

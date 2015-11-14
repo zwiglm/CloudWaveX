@@ -34,7 +34,12 @@ namespace SeaShoreShared.DataBase
         public string DateModified { get; set; }
 
         [Column]
+        public ulong Size { get; set; }
+
+
+        [Column]
         public bool AlreadyUploaded { get; set; }
+
 
         [Column(IsVersion = true)]
         private Binary _version { get; set; }

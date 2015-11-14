@@ -106,9 +106,12 @@ namespace PhotoUploader
                 string fileModified = basicProps.DateModified.ToString();
                 string md5ForFile = SharedHelperFactory.Instance.CalculateMD5ForLibraryFile(item, fileModified);
                 
-                // MaZ todo: check if already in DB
-                LibraryBaseEntry dbEntry = this.createDbEntry(md5ForFile, item, fileModified);
-                result.Add(dbEntry);
+                // check if already in DB
+                if (SharedDbFactory.Instance.entryQualifiesAdding(md5ForFile, item, basicProps.Size, fileModified))
+                {
+                    LibraryBaseEntry dbEntry = this.createDbEntry(md5ForFile, item, fileModified, basicProps.Size);
+                    result.Add(dbEntry);
+                }
             }
 
             IReadOnlyList<StorageFolder> allFolders = await this.getFolderList(parent);
@@ -136,7 +139,7 @@ namespace PhotoUploader
         }
 
 
-        private LibraryBaseEntry createDbEntry(string md5, StorageFile file, string fileModified)
+        private LibraryBaseEntry createDbEntry(string md5, StorageFile file, string fileModified, ulong size)
         {
             LibraryBaseEntry result = new LibraryBaseEntry()
             {
@@ -144,6 +147,7 @@ namespace PhotoUploader
                 FileName = file.Name,
                 Path = file.Path,
                 DateModified = fileModified,
+                Size = size,
             };
             return result;
         }
