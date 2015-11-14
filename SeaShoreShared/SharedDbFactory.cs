@@ -8,6 +8,13 @@ using Windows.Storage;
 
 namespace SeaShoreShared
 {
+    public enum QualifiesAdding
+    {
+        No,
+        ForInsert,
+        ForUpdate,
+    }
+
     public class SharedDbFactory
     {
         private static SharedDbFactory _instance;
@@ -33,21 +40,21 @@ namespace SeaShoreShared
 
         #region Convenience to find out if have to add, or alread in Dict
 
-        public bool entryQualifiesAdding(string md5Hash, StorageFile file, ulong size, string dateOffset)
+        public QualifiesAdding entryQualifiesAdding(string md5Hash, StorageFile file, ulong size, string dateOffset)
         {
             // if not there qualifies anyway
             if (!this.inDictionary(md5Hash))
-                return true;
+                return QualifiesAdding.ForInsert;
 
 
             if (this.inDictionary(md5Hash))
             {
                 LibraryBaseEntry dbEntry = this._allUploadEntries[md5Hash];
                 if (dbEntry.Size != size || !dbEntry.DateModified.Equals(dateOffset))
-                    return true;
+                    return QualifiesAdding.ForUpdate;
             }
 
-            return false;
+            return QualifiesAdding.No;
         }
 
         #endregion
@@ -82,6 +89,16 @@ namespace SeaShoreShared
         public bool inDictionary(string md5Hash)
         {
             return this._allUploadEntries.ContainsKey(md5Hash);
+        }
+
+        public void convenienceInsert(List<LibraryBaseEntry> foundEntries)
+        {
+            this.insertLibraryBase(foundEntries.Where(q => !q.AlreadyUploaded).ToList());
+
+            foreach (var entry in foundEntries.Where(q => q.AlreadyUploaded))
+            {
+                this.updateCachFileEntry(entry.ShoreMD5Hash, false);
+            }
         }
 
         public void insertLibraryBase(List<LibraryBaseEntry> foundEntries)

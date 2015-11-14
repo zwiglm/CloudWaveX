@@ -13,6 +13,7 @@ using SeaShoreShared;
 using SeaShoreShared.DataBase;
 using Windows.Storage.FileProperties;
 using SeaShoreShared.Resources;
+using System.IO;
 
 
 namespace PhotoUploader
@@ -61,6 +62,7 @@ namespace PhotoUploader
                 if (task.Name.Equals(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME))
                 {
                     List<LibraryBaseEntry> notUploaded = this.iteratePictureLibary();
+                    SharedDbFactory.Instance.convenienceInsert(notUploaded);
 
                     if (notUploaded.Count > 0)
                     {
@@ -104,13 +106,26 @@ namespace PhotoUploader
             {
                 BasicProperties basicProps = await this.getBasicProps(item);
                 string fileModified = basicProps.DateModified.ToString();
-                string md5ForFile = SharedHelperFactory.Instance.CalculateMD5ForLibraryFile(item, fileModified);
+                string md5ForFile = SharedHelperFactory.Instance.CalculateMD5ForLibraryFile(item);
+                string cutPath = SharedHelperFactory.Instance.cutSystemPathFromPath(item.Path, KnownFolders.PicturesLibrary.Name);
                 
                 // check if already in DB
-                if (SharedDbFactory.Instance.entryQualifiesAdding(md5ForFile, item, basicProps.Size, fileModified))
+                LibraryBaseEntry dbEntry = null;
+                switch (SharedDbFactory.Instance.entryQualifiesAdding(md5ForFile, item, basicProps.Size, fileModified))
                 {
-                    LibraryBaseEntry dbEntry = this.createDbEntry(md5ForFile, item, fileModified, basicProps.Size);
-                    result.Add(dbEntry);
+                    case QualifiesAdding.No:
+                        break;
+
+                    case QualifiesAdding.ForInsert:
+                        dbEntry = this.createDbEntry(md5ForFile, item, cutPath, fileModified, basicProps.Size);
+                        result.Add(dbEntry);
+                        break;
+
+                    case QualifiesAdding.ForUpdate:
+                        dbEntry = this.createDbEntry(md5ForFile, item, cutPath, fileModified, basicProps.Size);
+                        dbEntry.AlreadyUploaded = true;
+                        result.Add(dbEntry);
+                        break;
                 }
             }
 
@@ -139,15 +154,16 @@ namespace PhotoUploader
         }
 
 
-        private LibraryBaseEntry createDbEntry(string md5, StorageFile file, string fileModified, ulong size)
+        private LibraryBaseEntry createDbEntry(string md5, StorageFile file, string cutPath, string fileModified, ulong size)
         {
             LibraryBaseEntry result = new LibraryBaseEntry()
             {
                 ShoreMD5Hash = md5,
                 FileName = file.Name,
-                Path = file.Path,
+                Path = cutPath,
                 DateModified = fileModified,
                 Size = size,
+                FolderRelativeId = file.FolderRelativeId,
             };
             return result;
         }

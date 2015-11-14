@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -51,11 +52,22 @@ namespace SeaShoreShared
             return hash;
         }
 
-        public string CalculateMD5ForLibraryFile(StorageFile file, string modifiedOffset)
+        public string CalculateMD5ForLibraryFile(StorageFile file)
         {
-            string forEncoding = String.Format("{0};{1};{2};{3}", file.DisplayName, file.Name, file.Path, modifiedOffset);
+            string forEncoding = String.Format("{0};{1};{2}", file.Name, file.Path, file.FolderRelativeId);
             string md5Hash = this.CalculateHashForString(forEncoding, SharedHelperFactory.MD5);
             return md5Hash;
+        }
+
+        public string cutSystemPathFromPath(string fileNamePath, string knownFolderName)
+        {
+            StringBuilder result = new StringBuilder();
+            int nPos = fileNamePath.IndexOf(knownFolderName);
+            if (nPos >= 0)
+            {
+                result.Append(fileNamePath.Substring(nPos + knownFolderName.Length));
+            }
+            return result.ToString();
         }
 
 

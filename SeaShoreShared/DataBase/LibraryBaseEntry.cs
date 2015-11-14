@@ -30,6 +30,10 @@ namespace SeaShoreShared.DataBase
         [Column]
         public string Path { get; set; }
 
+
+        [Column]
+        public string FolderRelativeId { get; set; }
+
         [Column]
         public string DateModified { get; set; }
 
