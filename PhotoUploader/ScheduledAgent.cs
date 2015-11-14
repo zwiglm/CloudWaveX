@@ -52,18 +52,12 @@ namespace PhotoUploader
         /// </remarks>
         protected override void OnInvoke(ScheduledTask task)
         {
-            Debug.WriteLine("Seashore Background Invocation started:");
-
-            //TODO: Add code to perform your task in background
-            string toastMessage = "";
 
             // If your application uses both PeriodicTask and ResourceIntensiveTask
             // you can branch your application code here. Otherwise, you don't need to.
             if (task is PeriodicTask)
             {
                 // Execute periodic task actions here.
-                toastMessage = string.Format("Periodic Task: {0}", task.Description);
-
                 if (task.Name.Equals(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME))
                 {
                     List<LibraryBaseEntry> notUploaded = this.iteratePictureLibary();
@@ -80,8 +74,6 @@ namespace PhotoUploader
             else
             {
                 // Execute resource-intensive task actions here.
-                //toastMessage = "Resource-intensive task running.";
-                toastMessage = string.Format("Task: {0}", task.Description);
             }
 
             // If debugging is enabled, launch the agent again in one minute.
@@ -91,16 +83,6 @@ namespace PhotoUploader
 
             // Call NotifyComplete to let the system know the agent is done working.
             NotifyComplete();
-
-            // Launch a toast to show that the agent has been running.
-            // The toast will not be shown if the foreground application is running.
-
-            //ShellToast toast = new ShellToast();
-            //toast.Title = "Seashore Background Agent";
-            //toast.Content = toastMessage;
-            //// Make toast silent
-            //SetProperty(toast, "Sound", new Uri("", UriKind.RelativeOrAbsolute));
-            //toast.Show();
         }
 
         #region Private own methods
@@ -166,12 +148,6 @@ namespace PhotoUploader
             return result;
         }
 
-        private static void SetProperty(object instance, string name, object value)
-        {
-            var setMethod = instance.GetType().GetProperty(name).GetSetMethod();
-            setMethod.Invoke(instance, new object[] { value });
-        }
-
         #endregion
 
 
@@ -182,7 +158,7 @@ namespace PhotoUploader
             ShellToast toast = new ShellToast();
             toast.Title = title;
             toast.Content = message;
-            SetProperty(toast, "Sound", new Uri(sound, UriKind.RelativeOrAbsolute));
+            toast.Sound = new Uri(sound, UriKind.RelativeOrAbsolute);
             toast.Show();
         }
 

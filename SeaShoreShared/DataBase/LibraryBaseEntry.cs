@@ -13,6 +13,11 @@ namespace SeaShoreShared.DataBase
     [Index(Columns = "ShoreMD5Hash", IsUnique = true)]
     public class LibraryBaseEntry
     {
+        public LibraryBaseEntry()
+        {
+            this.AlreadyUploaded = false;
+        }
+
         [Column(IsPrimaryKey = true, IsDbGenerated = true, DbType = "INT NOT NULL Identity", CanBeNull = false, AutoSync = AutoSync.OnInsert)]
         public int DummyId { get; set; }
 
@@ -27,6 +32,9 @@ namespace SeaShoreShared.DataBase
 
         [Column]
         public string DateModified { get; set; }
+
+        [Column]
+        public bool AlreadyUploaded { get; set; }
 
         [Column(IsVersion = true)]
         private Binary _version { get; set; }

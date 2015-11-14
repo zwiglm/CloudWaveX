@@ -84,11 +84,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DataBase\LibraryBaseEntry.cs" />
+    <Compile Include="DataBase\PhotoUploadContext.cs" />
     <Compile Include="Resources\PhotoUploadResource.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>PhotoUploadResource.resx</DependentUpon>
     </Compile>
+    <Compile Include="SharedDbFactory.cs" />
     <Compile Include="SharedGlobalVars.cs" />
     <Compile Include="SharedHelperFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
