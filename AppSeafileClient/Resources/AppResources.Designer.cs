@@ -898,6 +898,24 @@ namespace PlasticWonderland.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This Library is created by the Seashore Photo Backup. The strange string at the end is your device name as supplied by the Windows Phone SDK.
+        /// </summary>
+        public static string Photo_Backup_Library_Description {
+            get {
+                return ResourceManager.GetString("Photo_Backup_Library_Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Windows Phone Pictures.
+        /// </summary>
+        public static string Photo_Backup_Library_Prefix {
+            get {
+                return ResourceManager.GetString("Photo_Backup_Library_Prefix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Send log.
         /// </summary>
         public static string PivotHelpControl_Button {

@@ -98,6 +98,10 @@ namespace PlasticWonderland.Pages
 
             // Get accounts infos
             requestAccountInfos(authorizationToken, address, "account/info");
+
+            // if photo-backup is enabled.... then....
+            // pre-check for background-task photo-backup --- also set progressIndicator.....
+            LibraryRootObject photoBackupLibrary = HttpHelperFactory.Instance.photoBackupLibraryExists(mainLibsSource);
         }
 
 

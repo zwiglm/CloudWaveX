@@ -450,4 +450,10 @@
   <data name="ListLibrary_PivotTitle_4" xml:space="preserve">
     <value>BeShared Libraries</value>
   </data>
+  <data name="Photo_Backup_Library_Description" xml:space="preserve">
+    <value>This Library is created by the Seashore Photo Backup. The strange string at the end is your device name as supplied by the Windows Phone SDK</value>
+  </data>
+  <data name="Photo_Backup_Library_Prefix" xml:space="preserve">
+    <value>Windows Phone Pictures</value>
+  </data>
 </root>

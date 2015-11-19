@@ -452,4 +452,10 @@
   <data name="ListLibrary_PivotTitle_4" xml:space="preserve">
     <value>Für mich freigeben</value>
   </data>
+  <data name="Photo_Backup_Library_Description" xml:space="preserve">
+    <value>Diese Bibliothek wurde erzeugt vom Seashore Photo Backup. Die seltsame Bezeichnung am  Ende ist der Gerätename aus dem Windows Phone SDK.</value>
+  </data>
+  <data name="Photo_Backup_Library_Prefix" xml:space="preserve">
+    <value>Windows Phone Bilder</value>
+  </data>
 </root>

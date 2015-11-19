@@ -2,13 +2,19 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Phone.Info;
 using Microsoft.Phone.Net.NetworkInformation;
+using Newtonsoft.Json;
+using PlasticWonderland.Resources;
+using Windows.Devices.Enumeration;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Certificates;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage.Streams;
+using Windows.Web.Http;
 using Windows.Web.Http.Filters;
 
 namespace PlasticWonderland.Domain
@@ -19,6 +25,8 @@ namespace PlasticWonderland.Domain
 
         private  HttpHelperFactory()
         {
+            this.PhotoBackupLibraryName = this.photoBackupLibraryName();
+            this.GetAgentVersion = new AssemblyName(Assembly.GetExecutingAssembly().FullName).Version;
         }
 
         public static HttpHelperFactory Instance
@@ -33,6 +41,9 @@ namespace PlasticWonderland.Domain
             }
         }
 
+
+        public string PhotoBackupLibraryName { get; private set; }
+        public Version GetAgentVersion { get; private set; }
 
         public HttpBaseProtocolFilter getHttpFilter()
         {
@@ -50,6 +61,62 @@ namespace PlasticWonderland.Domain
                 filter.IgnorableServerCertificateErrors.Add(ChainValidationResult.InvalidName);
             } 
             return filter;
+        }
+
+        public LibraryRootObject photoBackupLibraryExists(List<LibraryRootObject> mainLibs)
+        {
+            LibraryRootObject result = null;
+            List<LibraryRootObject> selected = mainLibs.Where(q => q.name.Equals(this.PhotoBackupLibraryName)).ToList();
+            if (selected.Count > 0)
+                result = selected.First();
+            return result;
+        }
+
+        public async Task<LibraryRootObject> createPhotoBackupLibary(string token, string url)
+        {
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
+            Uri currentRequestUri = new Uri(url + "/api2/" + GlobalVariables.SF_REQ_REPOS + "/");
+            var HttpClientGetLibrary = new HttpClient(filter);
+
+            HttpClientGetLibrary.DefaultRequestHeaders.Add("Accept", "application/json;indent=4");
+            HttpClientGetLibrary.DefaultRequestHeaders.Add("Authorization", "token " + token);
+            HttpClientGetLibrary.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + this.GetAgentVersion);
+
+            HttpStringContent msgParms = 
+                new HttpStringContent(
+                    String.Format("name={0}&desc={1}", this.PhotoBackupLibraryName, AppResources.Photo_Backup_Library_Description), 
+                    Windows.Storage.Streams.UnicodeEncoding.Utf8);
+
+            LibraryRootObject result = null;
+            try
+            {
+                HttpResponseMessage libsResponse = await HttpClientGetLibrary.PostAsync(currentRequestUri, msgParms);
+                result = JsonConvert.DeserializeObject<LibraryRootObject>(libsResponse.Content.ToString());
+                HttpClientGetLibrary.Dispose();
+            }
+            catch (Exception ex)
+            {
+                if (GlobalVariables.IsDebugMode == true)
+                {
+                    App.logger.log(LogLevel.critical, "Download list library Exception err" + ex);
+                    App.logger.log(LogLevel.critical, "Download list library uristringRequestLibrary : " + currentRequestUri.ToString());
+                    App.logger.log(LogLevel.critical, "Download list library informations address : " + url);
+
+                }
+            }
+
+            return result;
+        }
+
+
+        private string photoBackupLibraryName()
+        {
+            //byte[] devIdBytes = (byte[])DeviceExtendedProperties.GetValue("DeviceUniqueId");
+            //string deviceId = Convert.ToBase64String(devIdBytes);
+
+            string device = DeviceStatus.DeviceName;
+            string result = String.Format("{0} - {1}", AppResources.Photo_Backup_Library_Prefix, device);
+            return result;
         }
 
     }
