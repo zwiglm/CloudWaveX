@@ -99,10 +99,42 @@ namespace PlasticWonderland.Pages
             // Get accounts infos
             requestAccountInfos(authorizationToken, address, "account/info");
 
-            // if photo-backup is enabled.... then....
-            // pre-check for background-task photo-backup --- also set progressIndicator.....
-            LibraryRootObject photoBackupLibrary = HttpHelperFactory.Instance.photoBackupLibraryExists(mainLibsSource);
+            // MaZ todo: handle pseudo-auto-backup....
         }
+
+
+        #region Take care about Photo-Upload
+
+        private void handePhotoBackup(List<LibraryRootObject> mainLibsSource, string authToken, string url)
+        {
+            if (TaskHelperFactory.Instance.isAgentEnabled())
+            {
+                LibraryRootObject photoBackupLibrary = HttpHelperFactory.Instance.photoBackupLibraryExists(mainLibsSource);
+                if (photoBackupLibrary == null)
+                {
+                    Task<LibraryRootObject> lroTask = HttpHelperFactory.Instance.createPhotoBackupLibary(authToken, url);
+                    photoBackupLibrary = lroTask.Result;
+                }
+
+                // MaZ todo: get Upload-Link
+                // MaZ toto: get Update-Link
+            }
+        }
+
+        /// <summary>
+        /// 440 Invalid filename --> cant upload
+        /// 
+        /// 441 File already exists --> try again
+        /// 500 Internal server error --> try again
+        /// 
+        /// </summary>
+        /// <param name="uploadUrl"></param>
+        private void putPhotosToQueue(string uploadUrl)
+        {
+
+        }
+
+        #endregion
 
 
         private async void requestAccountInfos(string token, string url, string type)
