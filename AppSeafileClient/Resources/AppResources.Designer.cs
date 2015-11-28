@@ -106,6 +106,24 @@ namespace PlasticWonderland.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disc quota not big enough for  upload.
+        /// </summary>
+        public static string Background_Upload_QuotaError {
+            get {
+                return ResourceManager.GetString("Background_Upload_QuotaError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Background Upload.
+        /// </summary>
+        public static string Background_Upload_Task {
+            get {
+                return ResourceManager.GetString("Background_Upload_Task", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The certificate is not valid for the requested usage. This error is also returned if the certificate has an invalid name..
         /// </summary>
         public static string Certificate_Error_CNMissmatch {

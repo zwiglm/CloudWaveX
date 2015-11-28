@@ -66,7 +66,7 @@ namespace PhotoUploader
 
                     if (notUploaded.Count > 0)
                     {
-                        this.showToast(
+                        SharedHelperFactory.Instance.showToast(
                             PhotoUploadResource.Background_Agent_Title,
                             String.Format(PhotoUploadResource.Backgroun_Agent_FilesForUpload, notUploaded.Count),
                             "");
@@ -169,20 +169,6 @@ namespace PhotoUploader
                 FolderRelativeId = file.FolderRelativeId,
             };
             return result;
-        }
-
-        #endregion
-
-
-        #region Private UI
-
-        private void showToast(string title, string message, string sound)
-        {
-            ShellToast toast = new ShellToast();
-            toast.Title = title;
-            toast.Content = message;
-            toast.Sound = new Uri(sound, UriKind.RelativeOrAbsolute);
-            toast.Show();
         }
 
         #endregion

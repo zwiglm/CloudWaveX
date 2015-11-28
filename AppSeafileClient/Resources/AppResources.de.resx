@@ -458,4 +458,10 @@
   <data name="Photo_Backup_Library_Prefix" xml:space="preserve">
     <value>Windows Phone Bilder</value>
   </data>
+  <data name="Background_Upload_QuotaError" xml:space="preserve">
+    <value>Nicht genügend Speicherplatz für Upload</value>
+  </data>
+  <data name="Background_Upload_Task" xml:space="preserve">
+    <value>Background Upload</value>
+  </data>
 </root>

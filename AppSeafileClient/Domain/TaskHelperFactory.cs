@@ -88,16 +88,19 @@ namespace PlasticWonderland.Domain
             if (this.enabledBackupPhotos() && !this.enabledBackupPhotosWifiOnly())
             {
                 this.startIteratingPicturesAgent();
+                return;
             }
 
             if (this.enabledBackupPhotos() && this.enabledBackupPhotosWifiOnly() && this.IsWifiEnabled)
             {
                 this.startIteratingPicturesAgent();
+                return;
             }
 
             if (!this.enabledBackupPhotos())
             {
                 this.RemoveTaskAgent(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME);
+                return;
             }
 
             // just in case...

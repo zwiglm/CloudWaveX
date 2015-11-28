@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Net.NetworkInformation;
+using Microsoft.Phone.Shell;
 using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage;
@@ -69,6 +70,16 @@ namespace SeaShoreShared
             }
             return result.ToString();
         }
+
+        public void showToast(string title, string message, string sound)
+        {
+            ShellToast toast = new ShellToast();
+            toast.Title = title;
+            toast.Content = message;
+            toast.Sound = new Uri(sound, UriKind.RelativeOrAbsolute);
+            toast.Show();
+        }
+
 
 
         #region Privat

@@ -79,10 +79,17 @@ namespace SeaShoreShared
             }
         }
 
-        public Dictionary<string, LibraryBaseEntry> getNotUploaded()
+        public Dictionary<string, LibraryBaseEntry> getForUpload()
         {
             Dictionary<string, LibraryBaseEntry> dummy = 
                 this._allUploadEntries.Where(q => !q.Value.AlreadyUploaded).ToDictionary(q2 => q2.Key, q2 => q2.Value);
+            return dummy;
+        }
+
+        public Dictionary<string, LibraryBaseEntry> getForUpdate()
+        {
+            Dictionary<string, LibraryBaseEntry> dummy =
+                this._allUploadEntries.Where(q => q.Value.AlreadyUploaded && q.Value.NeedsUpdate).ToDictionary(q2 => q2.Key, q2 => q2.Value);
             return dummy;
         }
 

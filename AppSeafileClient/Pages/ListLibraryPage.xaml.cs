@@ -26,6 +26,8 @@ using PlasticWonderland.Domain;
 using System.Threading.Tasks;
 using System.Collections;
 using SeaShoreShared;
+using SeaShoreShared.DataBase;
+using Windows.Networking.BackgroundTransfer;
 
 namespace PlasticWonderland.Pages
 {
@@ -39,6 +41,8 @@ namespace PlasticWonderland.Pages
         PasswordInputPrompt passwordInputLibrary;
 
         private static readonly Guid _cacheInvalidator = Guid.NewGuid();
+
+        private CancellationTokenSource _photoUploadCts;
 
 
         public ListLibraryPage()
@@ -130,12 +134,20 @@ namespace PlasticWonderland.Pages
                 if (photoBackupLibrary != null)
                 {
                     // get Upload-Link
-                    PhotoUploadWrapper uplLinkTsk = 
+                    PhotoUploadWrapper uploadLink = 
                         await HttpHelperFactory.Instance.getUplUpdLink(authToken, url, repoId, SharedGlobalVars.UPLOAD_LINK_QUALI);
 
                     // get Update-Link
-                    PhotoUploadWrapper updLinkTsk =
+                    PhotoUploadWrapper updateLink =
                         await HttpHelperFactory.Instance.getUplUpdLink(authToken, url, repoId, SharedGlobalVars.UPDATE_LINK_QUALI);
+
+                    if (updateLink.HttpResponseState == HttpStatusCode.InternalServerError || updateLink.HttpResponseState == HttpStatusCode.InternalServerError)
+                        SharedHelperFactory.Instance.showToast(
+                            AppResources.Background_Upload_Task,
+                            AppResources.Background_Upload_QuotaError,
+                            "");
+                    else
+                        this.putPhotosToQueue(uploadLink, updateLink);
                 }
             }
         }
@@ -148,9 +160,81 @@ namespace PlasticWonderland.Pages
         /// 
         /// </summary>
         /// <param name="uploadUrl"></param>
-        private void putPhotosToQueue(string uploadUrl)
+        private void putPhotosToQueue(PhotoUploadWrapper uploadUrl, PhotoUploadWrapper updateUrl)
         {
+            IList<LibraryBaseEntry> libBaseForUpload = SharedDbFactory.Instance.getForUpload().Values.ToList();
+            this.putUploadsToQueue(uploadUrl, libBaseForUpload);
+            IList<LibraryBaseEntry> libBaseForUpdate = SharedDbFactory.Instance.getForUpdate().Values.ToList();
+            this.putUpdatesToQueue(updateUrl, libBaseForUpdate);
+        }
+        private async void putUploadsToQueue(PhotoUploadWrapper upload, IList<LibraryBaseEntry> entsForUpload)
+        {
+            int testRunner = 0;
+            foreach (var item in entsForUpload)
+            {
+                StorageFile sFile = await StorageFile.GetFileFromPathAsync(item.FullPath);
+                testRunner++;
 
+                if (testRunner == 4)
+                    break;
+            }
+        }
+        private async void putUpdatesToQueue(PhotoUploadWrapper update, IList<LibraryBaseEntry> entsForUpload)
+        {
+            foreach (var item in entsForUpload)
+            {
+                StorageFile sFile = await StorageFile.GetFileFromPathAsync(item.FullPath);
+            }
+        }
+
+        private async Task handlePhotoUploadAsync(UploadOperation upload, bool start)
+        {
+            try
+            {
+                Progress<UploadOperation> progressCallback = new Progress<UploadOperation>(photoUploadAsyncProgress);
+                if (start)
+                {
+                    // Start the upload and attach a progress handler.
+                    await upload.StartAsync().AsTask(_photoUploadCts.Token, progressCallback);
+                }
+                else
+                {
+                    // The upload was already running when the application started, re-attach the progress handler.
+                    await upload.AttachAsync().AsTask(_photoUploadCts.Token, progressCallback);
+                }
+
+                ResponseInformation response = upload.GetResponseInformation();
+
+            }
+            catch (TaskCanceledException cncEx)
+            {
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        private void photoUploadAsyncProgress(UploadOperation upload)
+        {
+            BackgroundUploadProgress progress = upload.Progress;
+
+            double percentSent = 100;
+            if (progress.TotalBytesToSend > 0)
+            {
+                percentSent = progress.BytesSent * 100 / progress.TotalBytesToSend;
+            }
+
+            if (progress.HasRestarted)
+            {
+            }
+
+            if (progress.HasResponseChanged)
+            {
+                // We've received new response headers from the server.
+
+                // If you want to stream the response data this is a good time to start.
+                // upload.GetResultStreamAt(0);
+            }
         }
 
         #endregion

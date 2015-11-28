@@ -456,4 +456,10 @@
   <data name="Photo_Backup_Library_Prefix" xml:space="preserve">
     <value>Windows Phone Pictures</value>
   </data>
+  <data name="Background_Upload_QuotaError" xml:space="preserve">
+    <value>Disc quota not big enough for  upload</value>
+  </data>
+  <data name="Background_Upload_Task" xml:space="preserve">
+    <value>Background Upload</value>
+  </data>
 </root>
