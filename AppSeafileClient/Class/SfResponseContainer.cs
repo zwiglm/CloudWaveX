@@ -10,7 +10,7 @@
     /// Common props
     /// </summary>
     public string permission { get; set; }
-    public bool encrypted { get; set; }
+    public bool? encrypted { get; set; }
     
     /// <summary>
     /// Response from List Libraries

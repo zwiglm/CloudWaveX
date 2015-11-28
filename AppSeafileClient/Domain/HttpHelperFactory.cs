@@ -82,10 +82,14 @@ namespace PlasticWonderland.Domain
             HttpClientGetLibrary.DefaultRequestHeaders.Add("Authorization", "token " + token);
             HttpClientGetLibrary.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + this.GetAgentVersion);
 
-            HttpStringContent msgParms = 
-                new HttpStringContent(
-                    String.Format("name={0}&desc={1}", this.PhotoBackupLibraryName, AppResources.Photo_Backup_Library_Description), 
-                    Windows.Storage.Streams.UnicodeEncoding.Utf8);
+            //HttpStringContent msgParms = 
+            //    new HttpStringContent(
+            //        String.Format("name={0}&desc={1}", this.PhotoBackupLibraryName, AppResources.Photo_Backup_Library_Description), 
+            //        Windows.Storage.Streams.UnicodeEncoding.Utf8);
+            HttpFormUrlEncodedContent msgParms = new HttpFormUrlEncodedContent(new[] {
+               new KeyValuePair<string, string>("name", this.PhotoBackupLibraryName),
+               new KeyValuePair<string, string>("desc", AppResources.Photo_Backup_Library_Description)
+            });
 
             LibraryRootObject result = null;
             try
@@ -101,6 +105,37 @@ namespace PlasticWonderland.Domain
                     App.logger.log(LogLevel.critical, "Download list library Exception err" + ex);
                     App.logger.log(LogLevel.critical, "Download list library uristringRequestLibrary : " + currentRequestUri.ToString());
                     App.logger.log(LogLevel.critical, "Download list library informations address : " + url);
+
+                }
+            }
+
+            return result;
+        }
+
+        public async Task<PhotoUploadWrapper> getUplUpdLink(string token, string url, string repoId, string sfQualifier)
+        {
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
+            Uri currentRequestUri = new Uri(url + "/api2/repos/" + repoId + "/" + sfQualifier + "/");
+            var HttpClientGetLibrary = new HttpClient(filter);
+
+            HttpClientGetLibrary.DefaultRequestHeaders.Add("Authorization", "token " + token);
+            HttpClientGetLibrary.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + this.GetAgentVersion);
+
+            PhotoUploadWrapper result = new PhotoUploadWrapper();
+            try
+            {
+                HttpResponseMessage libsResponse = await HttpClientGetLibrary.GetAsync(currentRequestUri);
+                result.HttpResponseState = libsResponse.StatusCode;
+                if (result.HttpResponseState == HttpStatusCode.Ok)
+                    result.UplUpdLink = libsResponse.Content.ToString().Trim('"');
+
+                HttpClientGetLibrary.Dispose();
+            }
+            catch (Exception ex)
+            {
+                if (GlobalVariables.IsDebugMode == true)
+                {
+                    App.logger.log(LogLevel.critical, ex, String.Format("get {0} failed", sfQualifier));
 
                 }
             }

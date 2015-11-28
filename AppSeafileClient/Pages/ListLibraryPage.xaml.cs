@@ -25,6 +25,7 @@ using System.Reflection;
 using PlasticWonderland.Domain;
 using System.Threading.Tasks;
 using System.Collections;
+using SeaShoreShared;
 
 namespace PlasticWonderland.Pages
 {
@@ -99,25 +100,43 @@ namespace PlasticWonderland.Pages
             // Get accounts infos
             requestAccountInfos(authorizationToken, address, "account/info");
 
-            // MaZ todo: handle pseudo-auto-backup....
+            // handle pseudo-auto-backup....
+            this.handePhotoBackup(mainLibsSource, authorizationToken, address);
         }
 
 
         #region Take care about Photo-Upload
 
-        private void handePhotoBackup(List<LibraryRootObject> mainLibsSource, string authToken, string url)
+        private async void handePhotoBackup(List<LibraryRootObject> mainLibsSource, string authToken, string url)
         {
+            // anyway: only when upload is enabled....
             if (TaskHelperFactory.Instance.isAgentEnabled())
             {
                 LibraryRootObject photoBackupLibrary = HttpHelperFactory.Instance.photoBackupLibraryExists(mainLibsSource);
+                string repoId = null;
                 if (photoBackupLibrary == null)
                 {
-                    Task<LibraryRootObject> lroTask = HttpHelperFactory.Instance.createPhotoBackupLibary(authToken, url);
-                    photoBackupLibrary = lroTask.Result;
+                    photoBackupLibrary = await HttpHelperFactory.Instance.createPhotoBackupLibary(authToken, url);
+                    if (photoBackupLibrary != null)
+                    {
+                        repoId = photoBackupLibrary.repo_id;
+                    }
+                }
+                else
+                {
+                    repoId = photoBackupLibrary.id;
                 }
 
-                // MaZ todo: get Upload-Link
-                // MaZ toto: get Update-Link
+                if (photoBackupLibrary != null)
+                {
+                    // get Upload-Link
+                    PhotoUploadWrapper uplLinkTsk = 
+                        await HttpHelperFactory.Instance.getUplUpdLink(authToken, url, repoId, SharedGlobalVars.UPLOAD_LINK_QUALI);
+
+                    // get Update-Link
+                    PhotoUploadWrapper updLinkTsk =
+                        await HttpHelperFactory.Instance.getUplUpdLink(authToken, url, repoId, SharedGlobalVars.UPDATE_LINK_QUALI);
+                }
             }
         }
 

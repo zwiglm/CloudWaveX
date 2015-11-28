@@ -116,6 +116,7 @@
     <Compile Include="Domain\BooleanToVisibilityConverter.cs" />
     <Compile Include="Domain\CloudHelper.cs" />
     <Compile Include="Domain\HttpHelperFactory.cs" />
+    <Compile Include="Domain\PhotoUploadWrapper.cs" />
     <Compile Include="Domain\TaskHelperFactory.cs" />
     <Compile Include="LocalizedStrings.cs" />
     <Compile Include="Login.xaml.cs">
