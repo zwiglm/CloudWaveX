@@ -117,13 +117,15 @@ namespace PhotoUploader
                         break;
 
                     case QualifiesAdding.ForInsert:
-                        dbEntry = this.createDbEntry(md5ForFile, item, cutPath, fileModified, basicProps.Size);
+                        dbEntry = this.createDbEntry(md5ForFile, item, item.Path, cutPath, fileModified, basicProps.Size);
+                        dbEntry.NeedsUpdate = false;
                         result.Add(dbEntry);
                         break;
 
                     case QualifiesAdding.ForUpdate:
-                        dbEntry = this.createDbEntry(md5ForFile, item, cutPath, fileModified, basicProps.Size);
+                        dbEntry = this.createDbEntry(md5ForFile, item, item.Path, cutPath, fileModified, basicProps.Size);
                         dbEntry.AlreadyUploaded = true;
+                        dbEntry.NeedsUpdate = true;
                         result.Add(dbEntry);
                         break;
                 }
@@ -154,13 +156,14 @@ namespace PhotoUploader
         }
 
 
-        private LibraryBaseEntry createDbEntry(string md5, StorageFile file, string cutPath, string fileModified, ulong size)
+        private LibraryBaseEntry createDbEntry(string md5, StorageFile file, string fullPath, string cutPath, string fileModified, ulong size)
         {
             LibraryBaseEntry result = new LibraryBaseEntry()
             {
                 ShoreMD5Hash = md5,
                 FileName = file.Name,
-                Path = cutPath,
+                FullPath = fullPath,
+                CutPath = cutPath,
                 DateModified = fileModified,
                 Size = size,
                 FolderRelativeId = file.FolderRelativeId,

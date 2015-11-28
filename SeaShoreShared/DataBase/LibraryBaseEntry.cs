@@ -16,6 +16,7 @@ namespace SeaShoreShared.DataBase
         public LibraryBaseEntry()
         {
             this.AlreadyUploaded = false;
+            this.NeedsUpdate = false;
         }
 
         [Column(IsPrimaryKey = true, IsDbGenerated = true, DbType = "INT NOT NULL Identity", CanBeNull = false, AutoSync = AutoSync.OnInsert)]
@@ -28,7 +29,9 @@ namespace SeaShoreShared.DataBase
         public string FileName { get; set; }
 
         [Column]
-        public string Path { get; set; }
+        public string CutPath { get; set; }
+        [Column]
+        public string FullPath { get; set; }
 
 
         [Column]
@@ -43,6 +46,8 @@ namespace SeaShoreShared.DataBase
 
         [Column]
         public bool AlreadyUploaded { get; set; }
+        [Column]
+        public bool NeedsUpdate { get; set; }
 
 
         [Column(IsVersion = true)]
