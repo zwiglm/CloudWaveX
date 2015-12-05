@@ -47,9 +47,18 @@ namespace PlasticWonderland.Pages
 
         public ListLibraryPage()
         {
+            _bgPhotoUploadCTS = new CancellationTokenSource();
             InitializeComponent();
         }
-     
+
+        public void Dispose()
+        {
+            if (_bgPhotoUploadCTS != null)
+            {
+                _bgPhotoUploadCTS.Dispose();
+                _bgPhotoUploadCTS = null;
+            }
+        }
 
         #region Pie-Chart
         public class PData 
@@ -148,7 +157,7 @@ namespace PlasticWonderland.Pages
                             AppResources.Background_Upload_QuotaError,
                             "");
                     else
-                        this.putPhotosToQueue(uploadLink, updateLink, authToken);
+                        this.putPhotosToQueue(uploadLink, updateLink, authToken, false);
                 }
             }
         }
@@ -165,10 +174,14 @@ namespace PlasticWonderland.Pages
         /// 
         /// </summary>
         /// <param name="uploadUrl"></param>
-        private void putPhotosToQueue(PhotoUploadWrapper uploadUrl, PhotoUploadWrapper updateUrl, string authToken)
+        private void putPhotosToQueue(PhotoUploadWrapper uploadUrl, PhotoUploadWrapper updateUrl, string authToken, bool bgUpload)
         {
             IList<LibraryBaseEntry> libBaseForUpload = SharedDbFactory.Instance.getForUpload().Values.ToList();
-            //this.putUploadsToQueue(uploadUrl, libBaseForUpload, authToken);
+            //if (bgUpload)
+            //    this.putUploadsToBackgroundQueue(uploadUrl, libBaseForUpload, authToken);
+            //else
+            //    this.putUploadsToQueue(uploadUrl, libBaseForUpload, authToken);
+
             IList<LibraryBaseEntry> libBaseForUpdate = SharedDbFactory.Instance.getForUpdate().Values.ToList();
             //this.putUpdatesToQueue(updateUrl, libBaseForUpdate, authToken);
         }
@@ -178,32 +191,69 @@ namespace PlasticWonderland.Pages
             foreach (LibraryBaseEntry item in entsForUpload)
             {
                 testRunner++;
+
                 StorageFile sFile = await StorageFile.GetFileFromPathAsync(item.FullPath);
+                var fileContent = await sFile.OpenReadAsync();
 
+                var filter = HttpHelperFactory.Instance.getHttpFilter();
+                var uploadHttpClient = new HttpClient(filter);
+                uploadHttpClient.DefaultRequestHeaders.Add("Authorization", "token " + authToken);
+                uploadHttpClient.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + HttpHelperFactory.Instance.GetAgentVersion);
+                uploadHttpClient.DefaultRequestHeaders.Add("Accept", "*/*");
 
+                string boundary = "s---------" + DateTime.Today.Ticks.ToString("x");
+                HttpMultipartFormDataContent requestUploadContent = new HttpMultipartFormDataContent(boundary);
+                //
+                string parent_dir = this.makeSeashoreParentDir(item);
+                IHttpContent content4 = new HttpStringContent(parent_dir);
+                requestUploadContent.Add(content4, "parent_dir");
+                //
+                IHttpContent content5 = new HttpStreamContent(fileContent);
+                requestUploadContent.Add(content5, GlobalVariables.FILE_AS_FILE, item.FileName);
+                content5.Headers.Add("Content-Type", "application/octet-stream");
+
+                Uri upldUri = new Uri(upload.UplUpdLink);
+                await this.handlePhotoUploadAsync(uploadHttpClient, upldUri, requestUploadContent);
+
+                if (testRunner == 2)
+                    break;
+            }
+        }
+        private async void putUploadsToBackgroundQueue(PhotoUploadWrapper upload, IList<LibraryBaseEntry> entsForUpload, string authToken)
+        {
+            int testRunner = 0;
+            foreach (LibraryBaseEntry item in entsForUpload)
+            {
+                testRunner++;
+
+                StorageFile sFile = await StorageFile.GetFileFromPathAsync(item.FullPath);
                 List<BackgroundTransferContentPart> parts = new List<BackgroundTransferContentPart>();
+
+                BackgroundTransferContentPart partParentDir = new BackgroundTransferContentPart();
+                string parent_dir = this.makeSeashoreParentDir(item);
+                partParentDir.SetHeader("Content-Disposition", "form-data; name=\"parent_dir\"");
+                partParentDir.SetText(parent_dir);
+                parts.Add(partParentDir);
                 BackgroundTransferContentPart partFile = new BackgroundTransferContentPart(item.FileName, item.FullPath);
+                //BackgroundTransferContentPart partFile = new BackgroundTransferContentPart();
+                partFile.SetHeader("Content-Disposition", "form-data; name=\"file\"; filename=\"" + item.FileName + "\"");
+                partFile.SetHeader("Content-Type", "application/octet-stream");
                 partFile.SetFile(sFile);
                 parts.Add(partFile);
-                BackgroundTransferContentPart partFileName = new BackgroundTransferContentPart(item.FileName, item.FullPath);
-                partFileName.SetText(String.Format("filename={0}", item.FileName));
-                parts.Add(partFileName);
-                BackgroundTransferContentPart partParentDir = new BackgroundTransferContentPart(item.FileName, item.FullPath);
-                string parent_dir = this.makeSeashoreParentDir(item);
-                partParentDir.SetText(String.Format("parent_dir={0}", parent_dir));
-                parts.Add(partParentDir);
 
                 BackgroundUploader uploader = new BackgroundUploader();
-                uploader.SetRequestHeader("Authorization", String.Format("Token {0}", authToken));
+                uploader.SetRequestHeader("Authorization", String.Format("token {0}", authToken));
+                uploader.SetRequestHeader("User-agent", GlobalVariables.WEB_CLIENT_AGENT + HttpHelperFactory.Instance.GetAgentVersion);
+                uploader.SetRequestHeader("Accept", "*/*");
                 uploader.Method = "POST";
                 Uri upldUri = new Uri(upload.UplUpdLink);
-                UploadOperation uploadOp = await uploader.CreateUploadAsync(upldUri, parts);
+                string boundary = "s---------" + DateTime.Today.Ticks.ToString("x");
+                UploadOperation uploadOp = await uploader.CreateUploadAsync(upldUri, parts, "form-data", boundary);
 
                 // Attach progress and completion handlers.
                 await handleBgPhotoUploadAsync(uploadOp, true);
 
-
-                if (testRunner == 4)
+                if (testRunner == 2)
                     break;
             }
         }
@@ -216,11 +266,41 @@ namespace PlasticWonderland.Pages
         }
 
 
+        private async Task handlePhotoUploadAsync(HttpClient uploadClient, Uri upldUri, HttpMultipartFormDataContent requestUploadContent)
+        {
+            try
+            {
+                var upldProgrHandler = new Progress<HttpProgress>(photoUploadAsyncProgress);
+                var responseUpload = 
+                    await uploadClient.PostAsync(upldUri, requestUploadContent).AsTask(_bgPhotoUploadCTS.Token, upldProgrHandler);
+
+                HttpResponseMessage errors = responseUpload.EnsureSuccessStatusCode();
+                switch (errors.StatusCode)
+                {
+                    case HttpStatusCode.Ok:
+                        break;
+                    case HttpStatusCode.BadRequest:
+                        break;
+                    case HttpStatusCode.InternalServerError:
+                        break;
+                    default:
+                        break;
+                }
+                uploadClient.Dispose();
+            }
+            catch (TaskCanceledException tcEx)
+            {
+            }
+            catch (Exception ex)
+            {
+            }
+        }
         private async Task handleBgPhotoUploadAsync(UploadOperation upload, bool start)
         {
             try
             {
-                Progress<UploadOperation> progressCallback = new Progress<UploadOperation>(photoUploadAsyncProgress);
+                Progress<UploadOperation> progressCallback = new Progress<UploadOperation>(photoUploadBgAsyncProgress);
+                
                 if (start)
                 {
                     // Start the upload and attach a progress handler.
@@ -236,6 +316,9 @@ namespace PlasticWonderland.Pages
                 string dummy = "here";
                 switch (response.StatusCode)
                 {
+                    case 200:
+                        dummy = "here";
+                        break;
                     case 400:
                         dummy = "here";
                         break;
@@ -260,7 +343,11 @@ namespace PlasticWonderland.Pages
             }
         }
 
-        private void photoUploadAsyncProgress(UploadOperation upload)
+        private void photoUploadAsyncProgress(HttpProgress progress)
+        {
+            string dummmy = "here";
+        }
+        private void photoUploadBgAsyncProgress(UploadOperation upload)
         {
             BackgroundUploadProgress progress = upload.Progress;
 
