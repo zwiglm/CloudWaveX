@@ -28,6 +28,7 @@ using System.Collections;
 using SeaShoreShared;
 using SeaShoreShared.DataBase;
 using Windows.Networking.BackgroundTransfer;
+using Windows.Web;
 
 namespace PlasticWonderland.Pages
 {
@@ -42,8 +43,7 @@ namespace PlasticWonderland.Pages
 
         private static readonly Guid _cacheInvalidator = Guid.NewGuid();
 
-        private CancellationTokenSource _photoUploadCts;
-
+        private CancellationTokenSource _bgPhotoUploadCTS;
 
         public ListLibraryPage()
         {
@@ -105,13 +105,14 @@ namespace PlasticWonderland.Pages
             requestAccountInfos(authorizationToken, address, "account/info");
 
             // handle pseudo-auto-backup....
-            this.handePhotoBackup(mainLibsSource, authorizationToken, address);
+            this.handlePhotoBackup(mainLibsSource, authorizationToken, address);
         }
 
 
         #region Take care about Photo-Upload
+        // -------------------------------------------------------------------------------
 
-        private async void handePhotoBackup(List<LibraryRootObject> mainLibsSource, string authToken, string url)
+        private async void handlePhotoBackup(List<LibraryRootObject> mainLibsSource, string authToken, string url)
         {
             // anyway: only when upload is enabled....
             if (TaskHelperFactory.Instance.isAgentEnabled())
@@ -147,11 +148,15 @@ namespace PlasticWonderland.Pages
                             AppResources.Background_Upload_QuotaError,
                             "");
                     else
-                        this.putPhotosToQueue(uploadLink, updateLink);
+                        this.putPhotosToQueue(uploadLink, updateLink, authToken);
                 }
             }
         }
 
+        private string makeSeashoreParentDir(LibraryBaseEntry item)
+        {
+            return item.CutPath.Replace(item.FileName, "").Replace(@"\\", @"\").Replace(@"\", "/");
+        }
         /// <summary>
         /// 440 Invalid filename --> cant upload
         /// 
@@ -160,26 +165,49 @@ namespace PlasticWonderland.Pages
         /// 
         /// </summary>
         /// <param name="uploadUrl"></param>
-        private void putPhotosToQueue(PhotoUploadWrapper uploadUrl, PhotoUploadWrapper updateUrl)
+        private void putPhotosToQueue(PhotoUploadWrapper uploadUrl, PhotoUploadWrapper updateUrl, string authToken)
         {
             IList<LibraryBaseEntry> libBaseForUpload = SharedDbFactory.Instance.getForUpload().Values.ToList();
-            this.putUploadsToQueue(uploadUrl, libBaseForUpload);
+            //this.putUploadsToQueue(uploadUrl, libBaseForUpload, authToken);
             IList<LibraryBaseEntry> libBaseForUpdate = SharedDbFactory.Instance.getForUpdate().Values.ToList();
-            this.putUpdatesToQueue(updateUrl, libBaseForUpdate);
+            //this.putUpdatesToQueue(updateUrl, libBaseForUpdate, authToken);
         }
-        private async void putUploadsToQueue(PhotoUploadWrapper upload, IList<LibraryBaseEntry> entsForUpload)
+        private async void putUploadsToQueue(PhotoUploadWrapper upload, IList<LibraryBaseEntry> entsForUpload, string authToken)
         {
             int testRunner = 0;
-            foreach (var item in entsForUpload)
+            foreach (LibraryBaseEntry item in entsForUpload)
             {
-                StorageFile sFile = await StorageFile.GetFileFromPathAsync(item.FullPath);
                 testRunner++;
+                StorageFile sFile = await StorageFile.GetFileFromPathAsync(item.FullPath);
+
+
+                List<BackgroundTransferContentPart> parts = new List<BackgroundTransferContentPart>();
+                BackgroundTransferContentPart partFile = new BackgroundTransferContentPart(item.FileName, item.FullPath);
+                partFile.SetFile(sFile);
+                parts.Add(partFile);
+                BackgroundTransferContentPart partFileName = new BackgroundTransferContentPart(item.FileName, item.FullPath);
+                partFileName.SetText(String.Format("filename={0}", item.FileName));
+                parts.Add(partFileName);
+                BackgroundTransferContentPart partParentDir = new BackgroundTransferContentPart(item.FileName, item.FullPath);
+                string parent_dir = this.makeSeashoreParentDir(item);
+                partParentDir.SetText(String.Format("parent_dir={0}", parent_dir));
+                parts.Add(partParentDir);
+
+                BackgroundUploader uploader = new BackgroundUploader();
+                uploader.SetRequestHeader("Authorization", String.Format("Token {0}", authToken));
+                uploader.Method = "POST";
+                Uri upldUri = new Uri(upload.UplUpdLink);
+                UploadOperation uploadOp = await uploader.CreateUploadAsync(upldUri, parts);
+
+                // Attach progress and completion handlers.
+                await handleBgPhotoUploadAsync(uploadOp, true);
+
 
                 if (testRunner == 4)
                     break;
             }
         }
-        private async void putUpdatesToQueue(PhotoUploadWrapper update, IList<LibraryBaseEntry> entsForUpload)
+        private async void putUpdatesToQueue(PhotoUploadWrapper update, IList<LibraryBaseEntry> entsForUpload, string authToken)
         {
             foreach (var item in entsForUpload)
             {
@@ -187,7 +215,8 @@ namespace PlasticWonderland.Pages
             }
         }
 
-        private async Task handlePhotoUploadAsync(UploadOperation upload, bool start)
+
+        private async Task handleBgPhotoUploadAsync(UploadOperation upload, bool start)
         {
             try
             {
@@ -195,16 +224,33 @@ namespace PlasticWonderland.Pages
                 if (start)
                 {
                     // Start the upload and attach a progress handler.
-                    await upload.StartAsync().AsTask(_photoUploadCts.Token, progressCallback);
+                    await upload.StartAsync().AsTask(_bgPhotoUploadCTS.Token, progressCallback);
                 }
                 else
                 {
                     // The upload was already running when the application started, re-attach the progress handler.
-                    await upload.AttachAsync().AsTask(_photoUploadCts.Token, progressCallback);
+                    await upload.AttachAsync().AsTask(_bgPhotoUploadCTS.Token, progressCallback);
                 }
 
                 ResponseInformation response = upload.GetResponseInformation();
-
+                string dummy = "here";
+                switch (response.StatusCode)
+                {
+                    case 400:
+                        dummy = "here";
+                        break;
+                    case 440:
+                        dummy = "here";
+                        break;
+                    case 441:
+                        dummy = "here";
+                        break;
+                    case 500:
+                        dummy = "here";
+                        break;
+                    default:
+                        break;
+                }
             }
             catch (TaskCanceledException cncEx)
             {
@@ -217,6 +263,17 @@ namespace PlasticWonderland.Pages
         private void photoUploadAsyncProgress(UploadOperation upload)
         {
             BackgroundUploadProgress progress = upload.Progress;
+
+            if (progress.Status == BackgroundTransferStatus.Completed)
+            {
+                // MaZ todo: write DB...
+                string dummy = "here";
+            }
+            if (progress.Status == BackgroundTransferStatus.Error)
+            {
+                // MaZ todo: write DB...
+                string dummy = "here";
+            }
 
             double percentSent = 100;
             if (progress.TotalBytesToSend > 0)
@@ -237,6 +294,66 @@ namespace PlasticWonderland.Pages
             }
         }
 
+        private async Task DiscoverActiveUploadsAsync()
+        {
+            IReadOnlyList<UploadOperation> uploads = null;
+            try
+            {
+                uploads = await BackgroundUploader.GetCurrentUploadsAsync();
+            }
+            catch (Exception ex)
+            {
+                if (!isBgPhotoUploadExceptionHandled("Discovery error", ex))
+                {
+                    throw;
+                }
+                return;
+            }
+
+            if (uploads.Count > 0)
+            {
+                List<Task> tasks = new List<Task>();
+                foreach (UploadOperation upload in uploads)
+                {
+                    //Log(String.Format(CultureInfo.CurrentCulture, "Discovered background upload: {0}, Status: {1}",
+                    //    upload.Guid, upload.Progress.Status));
+
+                    // Attach progress and completion handlers.
+                    tasks.Add(handleBgPhotoUploadAsync(upload, false));
+                }
+
+                // Don't await HandleUploadAsync() in the foreach loop since we would attach to the second
+                // upload only when the first one completed; attach to the third upload when the second one
+                // completes etc. We want to attach to all uploads immediately.
+                // If there are actions that need to be taken once uploads complete, await tasks here, outside
+                // the loop.
+                await Task.WhenAll(tasks);
+            }
+        }
+
+        private bool isBgPhotoUploadExceptionHandled(string title, Exception ex, UploadOperation upload = null)
+        {
+            WebErrorStatus error = BackgroundTransferError.GetStatus(ex.HResult);
+            if (error == WebErrorStatus.Unknown)
+            {
+                return false;
+            }
+
+            if (upload == null)
+            {
+                //LogStatus(String.Format(CultureInfo.CurrentCulture, "Error: {0}: {1}", title, error),
+                //    NotifyType.ErrorMessage);
+            }
+            else
+            {
+                //LogStatus(String.Format(CultureInfo.CurrentCulture, "Error: {0} - {1}: {2}", upload.Guid, title,
+                //    error), NotifyType.ErrorMessage);
+            }
+
+            return true;
+        }
+
+        // -------------------------------------------------------------------------------
         #endregion
 
 
