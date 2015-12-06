@@ -82,10 +82,6 @@ namespace PlasticWonderland.Domain
             HttpClientGetLibrary.DefaultRequestHeaders.Add("Authorization", "token " + token);
             HttpClientGetLibrary.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + this.GetAgentVersion);
 
-            //HttpStringContent msgParms = 
-            //    new HttpStringContent(
-            //        String.Format("name={0}&desc={1}", this.PhotoBackupLibraryName, AppResources.Photo_Backup_Library_Description), 
-            //        Windows.Storage.Streams.UnicodeEncoding.Utf8);
             HttpFormUrlEncodedContent msgParms = new HttpFormUrlEncodedContent(new[] {
                new KeyValuePair<string, string>("name", this.PhotoBackupLibraryName),
                new KeyValuePair<string, string>("desc", AppResources.Photo_Backup_Library_Description)
@@ -143,6 +139,60 @@ namespace PlasticWonderland.Domain
             return result;
         }
 
+        public async Task<HttpStatusCode> directoryExists(PhotoUploadWrapper wrp, string directory)
+        {
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
+            Uri currentRequestUri = new Uri(wrp.RawUrl + "/api2/" + GlobalVariables.SF_REQ_REPOS + "/" + wrp.RepoId +"/dir/?p=" + directory);
+            var HttpClientGetLibrary = new HttpClient(filter);
+
+            HttpClientGetLibrary.DefaultRequestHeaders.Add("Accept", "application/json;charset=utf-8;indent=4");
+            HttpClientGetLibrary.DefaultRequestHeaders.Add("Authorization", "token " + wrp.AuthToken);
+            HttpClientGetLibrary.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + this.GetAgentVersion);
+
+            HttpStatusCode result = HttpStatusCode.NotImplemented;
+            try
+            {
+                HttpResponseMessage libsResponse = await HttpClientGetLibrary.GetAsync(currentRequestUri);
+                result = libsResponse.StatusCode;
+                HttpClientGetLibrary.Dispose();
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return result;
+        }
+
+        public async Task<HttpStatusCode> createDirectory(PhotoUploadWrapper wrp, string directory)
+        {
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
+            Uri currentRequestUri = new Uri(wrp.RawUrl + "/api2/" + GlobalVariables.SF_REQ_REPOS + "/" + wrp.RepoId + "/dir/?p=" + directory);
+            var HttpClientGetLibrary = new HttpClient(filter);
+
+            HttpClientGetLibrary.DefaultRequestHeaders.Add("Accept", "application/json;charset=utf-8;indent=4");
+            HttpClientGetLibrary.DefaultRequestHeaders.Add("Authorization", "token " + wrp.AuthToken);
+            HttpClientGetLibrary.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + this.GetAgentVersion);
+
+            HttpFormUrlEncodedContent msgParms = new HttpFormUrlEncodedContent(new[] {
+               new KeyValuePair<string, string>("operation", "mkdir"),
+            });
+
+            HttpStatusCode result = HttpStatusCode.NotImplemented;
+            try
+            {
+                HttpResponseMessage libsResponse = await HttpClientGetLibrary.PostAsync(currentRequestUri, msgParms);
+                result = libsResponse.StatusCode;
+                HttpClientGetLibrary.Dispose();
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return result;
+        }
+
+
+        #region Private
 
         private string photoBackupLibraryName()
         {
@@ -153,6 +203,8 @@ namespace PlasticWonderland.Domain
             string result = String.Format("{0} - {1}", AppResources.Photo_Backup_Library_Prefix, device);
             return result;
         }
+
+        #endregion
 
     }
 }

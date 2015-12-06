@@ -14,6 +14,10 @@ namespace PlasticWonderland.Domain
         }
 
         public HttpStatusCode HttpResponseState { get; set; }
+
         public String UplUpdLink { get; set; }
+        public string RawUrl { get; set; }
+        public string RepoId { get; set; }
+        public string AuthToken { get; set; }
     }
 }

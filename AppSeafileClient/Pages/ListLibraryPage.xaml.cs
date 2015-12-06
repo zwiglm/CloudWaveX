@@ -146,10 +146,16 @@ namespace PlasticWonderland.Pages
                     // get Upload-Link
                     PhotoUploadWrapper uploadLink = 
                         await HttpHelperFactory.Instance.getUplUpdLink(authToken, url, repoId, SharedGlobalVars.UPLOAD_LINK_QUALI);
+                    uploadLink.AuthToken = authToken;
+                    uploadLink.RawUrl = url;
+                    uploadLink.RepoId = repoId;
 
                     // get Update-Link
                     PhotoUploadWrapper updateLink =
                         await HttpHelperFactory.Instance.getUplUpdLink(authToken, url, repoId, SharedGlobalVars.UPDATE_LINK_QUALI);
+                    updateLink.AuthToken = authToken;
+                    updateLink.RawUrl = url;
+                    updateLink.RepoId = repoId;
 
                     if (updateLink.HttpResponseState == HttpStatusCode.InternalServerError || updateLink.HttpResponseState == HttpStatusCode.InternalServerError)
                         SharedHelperFactory.Instance.showToast(
@@ -213,7 +219,22 @@ namespace PlasticWonderland.Pages
                 content5.Headers.Add("Content-Type", "application/octet-stream");
 
                 Uri upldUri = new Uri(upload.UplUpdLink);
-                await this.handlePhotoUploadAsync(uploadHttpClient, upldUri, requestUploadContent);
+                HttpResponseMessage upldResponse = await this.handlePhotoUploadAsync(uploadHttpClient, upldUri, requestUploadContent);
+                if (upldResponse != null)
+                {
+                    switch (upldResponse.StatusCode)
+                    {
+                        case HttpStatusCode.Ok:
+                            break;
+                        case HttpStatusCode.BadRequest:
+                            break;
+                        case HttpStatusCode.InternalServerError:
+                            this.handlePossibleDirectoryIssues(upload, parent_dir);
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
                 if (testRunner == 2)
                     break;
@@ -266,26 +287,16 @@ namespace PlasticWonderland.Pages
         }
 
 
-        private async Task handlePhotoUploadAsync(HttpClient uploadClient, Uri upldUri, HttpMultipartFormDataContent requestUploadContent)
+        private async Task<HttpResponseMessage> handlePhotoUploadAsync(HttpClient uploadClient, Uri upldUri, HttpMultipartFormDataContent requestUploadContent)
         {
+            HttpResponseMessage result = null;
             try
             {
                 var upldProgrHandler = new Progress<HttpProgress>(photoUploadAsyncProgress);
                 var responseUpload = 
                     await uploadClient.PostAsync(upldUri, requestUploadContent).AsTask(_bgPhotoUploadCTS.Token, upldProgrHandler);
 
-                HttpResponseMessage errors = responseUpload.EnsureSuccessStatusCode();
-                switch (errors.StatusCode)
-                {
-                    case HttpStatusCode.Ok:
-                        break;
-                    case HttpStatusCode.BadRequest:
-                        break;
-                    case HttpStatusCode.InternalServerError:
-                        break;
-                    default:
-                        break;
-                }
+                result = responseUpload;
                 uploadClient.Dispose();
             }
             catch (TaskCanceledException tcEx)
@@ -294,6 +305,7 @@ namespace PlasticWonderland.Pages
             catch (Exception ex)
             {
             }
+            return result;
         }
         private async Task handleBgPhotoUploadAsync(UploadOperation upload, bool start)
         {
@@ -438,6 +450,15 @@ namespace PlasticWonderland.Pages
             }
 
             return true;
+        }
+
+        private async void handlePossibleDirectoryIssues(PhotoUploadWrapper upldWraper, string directory) 
+        {
+            HttpStatusCode dirExists = await HttpHelperFactory.Instance.directoryExists(upldWraper, directory);
+            if (dirExists == HttpStatusCode.NotFound)
+            {
+                HttpStatusCode dirCreated = await HttpHelperFactory.Instance.createDirectory(upldWraper, directory);
+            }
         }
 
         // -------------------------------------------------------------------------------
