@@ -172,6 +172,10 @@ namespace PlasticWonderland.Pages
         {
             return item.CutPath.Replace(item.FileName, "").Replace(@"\\", @"\").Replace(@"\", "/");
         }
+        private string makeSeashoreTargetFile(LibraryBaseEntry item)
+        {
+            return item.CutPath.Replace(@"\\", @"\").Replace(@"\", "/");
+        }
         /// <summary>
         /// 440 Invalid filename --> cant upload
         /// 
@@ -186,12 +190,12 @@ namespace PlasticWonderland.Pages
             //if (bgUpload)
             //    this.putUploadsToBackgroundQueue(uploadUrl, libBaseForUpload, authToken);
             //else
-            //    this.putUploadsToQueue(uploadUrl, libBaseForUpload, authToken);
+            //    this.putUploadsToQueue(uploadUrl, libBaseForUpload, authToken, false);
 
             IList<LibraryBaseEntry> libBaseForUpdate = SharedDbFactory.Instance.getForUpdate().Values.ToList();
-            //this.putUpdatesToQueue(updateUrl, libBaseForUpdate, authToken);
+            //this.putUpdatesToQueue(updateUrl, libBaseForUpdate, authToken, true);
         }
-        private async void putUploadsToQueue(PhotoUploadWrapper upload, IList<LibraryBaseEntry> entsForUpload, string authToken)
+        private async void putUploadsToQueue(PhotoUploadWrapper upload, IList<LibraryBaseEntry> entsForUpload, string authToken, bool isUpdate)
         {
             int testRunner = 0;
             foreach (LibraryBaseEntry item in entsForUpload)
@@ -211,8 +215,17 @@ namespace PlasticWonderland.Pages
                 HttpMultipartFormDataContent requestUploadContent = new HttpMultipartFormDataContent(boundary);
                 //
                 string parent_dir = this.makeSeashoreParentDir(item);
-                IHttpContent content4 = new HttpStringContent(parent_dir);
-                requestUploadContent.Add(content4, "parent_dir");
+                if (!isUpdate) 
+                {
+                    IHttpContent content4 = new HttpStringContent(parent_dir);
+                    requestUploadContent.Add(content4, "parent_dir");
+                }
+                else
+                {
+                    string target_file = this.makeSeashoreTargetFile(item);
+                    IHttpContent content4 = new HttpStringContent(target_file);
+                    requestUploadContent.Add(content4, "target_file");
+                }
                 //
                 IHttpContent content5 = new HttpStreamContent(fileContent);
                 requestUploadContent.Add(content5, GlobalVariables.FILE_AS_FILE, item.FileName);
@@ -225,11 +238,13 @@ namespace PlasticWonderland.Pages
                     switch (upldResponse.StatusCode)
                     {
                         case HttpStatusCode.Ok:
+                            SharedDbFactory.Instance.resetToUploaded(item.ShoreMD5Hash);
                             break;
                         case HttpStatusCode.BadRequest:
                             break;
                         case HttpStatusCode.InternalServerError:
-                            this.handlePossibleDirectoryIssues(upload, parent_dir);
+                            if (!isUpdate)
+                                this.handlePossibleDirectoryIssues(upload, parent_dir);
                             break;
                         default:
                             break;
@@ -276,13 +291,6 @@ namespace PlasticWonderland.Pages
 
                 if (testRunner == 2)
                     break;
-            }
-        }
-        private async void putUpdatesToQueue(PhotoUploadWrapper update, IList<LibraryBaseEntry> entsForUpload, string authToken)
-        {
-            foreach (var item in entsForUpload)
-            {
-                StorageFile sFile = await StorageFile.GetFileFromPathAsync(item.FullPath);
             }
         }
 

@@ -60,6 +60,8 @@ namespace SeaShoreShared
         #endregion
 
 
+        #region Private Methods
+
         private void loadDatabase()
         {
             using (PhotoUploadContext uploadContext = new PhotoUploadContext(PhotoUploadContext.DBConnectionString))
@@ -78,6 +80,34 @@ namespace SeaShoreShared
                 this._allUploadEntries = result;
             }
         }
+
+        private void insertLibraryBase(List<LibraryBaseEntry> foundEntries)
+        {
+            using (PhotoUploadContext uploadContext = new PhotoUploadContext(PhotoUploadContext.DBConnectionString))
+            {
+                uploadContext.PhotoUploadEntries.InsertAllOnSubmit(foundEntries);
+                uploadContext.SubmitChanges();
+            }
+        }
+
+        private void updateCacheFileEntry(string hashValue, bool uploaded)
+        {
+            using (PhotoUploadContext uploadContext = new PhotoUploadContext(PhotoUploadContext.DBConnectionString))
+            {
+                IQueryable<LibraryBaseEntry> query = from uplEnt in uploadContext.PhotoUploadEntries where uplEnt.ShoreMD5Hash == hashValue select uplEnt;
+                LibraryBaseEntry found = query.FirstOrDefault();
+
+                found.AlreadyUploaded = uploaded;
+
+                uploadContext.SubmitChanges();
+            }
+
+            LibraryBaseEntry fromOC = this._allUploadEntries[hashValue];
+            fromOC.AlreadyUploaded = uploaded;
+        }
+
+        #endregion
+
 
         public Dictionary<string, LibraryBaseEntry> getForUpload()
         {
@@ -104,33 +134,28 @@ namespace SeaShoreShared
 
             foreach (var entry in foundEntries.Where(q => q.AlreadyUploaded))
             {
-                this.updateCachFileEntry(entry.ShoreMD5Hash, false);
+                this.updateCacheFileEntry(entry.ShoreMD5Hash, false);
             }
         }
 
-        public void insertLibraryBase(List<LibraryBaseEntry> foundEntries)
-        {
-            using (PhotoUploadContext uploadContext = new PhotoUploadContext(PhotoUploadContext.DBConnectionString))
-            {
-                uploadContext.PhotoUploadEntries.InsertAllOnSubmit(foundEntries);
-                uploadContext.SubmitChanges();
-            }
-        }
-
-        public void updateCachFileEntry(string hashValue, bool uploaded)
+        public void resetToUploaded(string hashValue)
         {
             using (PhotoUploadContext uploadContext = new PhotoUploadContext(PhotoUploadContext.DBConnectionString))
             {
                 IQueryable<LibraryBaseEntry> query = from uplEnt in uploadContext.PhotoUploadEntries where uplEnt.ShoreMD5Hash == hashValue select uplEnt;
                 LibraryBaseEntry found = query.FirstOrDefault();
-                found.AlreadyUploaded = uploaded;
+
+                found.AlreadyUploaded = true;
+                found.NeedsUpdate = false;
 
                 uploadContext.SubmitChanges();
             }
 
             LibraryBaseEntry fromOC = this._allUploadEntries[hashValue];
-            fromOC.AlreadyUploaded = uploaded;
+            fromOC.AlreadyUploaded = true;
+            fromOC.NeedsUpdate = false;
         }
+
 
     }
 }
