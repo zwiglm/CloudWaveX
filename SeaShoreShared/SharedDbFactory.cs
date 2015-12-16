@@ -109,18 +109,18 @@ namespace SeaShoreShared
         #endregion
 
 
-        public Dictionary<string, LibraryBaseEntry> getForUpload()
+        public ForUploadWrapper getForUpload()
         {
             Dictionary<string, LibraryBaseEntry> dummy = 
                 this._allUploadEntries.Where(q => !q.Value.AlreadyUploaded).ToDictionary(q2 => q2.Key, q2 => q2.Value);
-            return dummy;
+            return new ForUploadWrapper(dummy.Count, dummy);
         }
 
-        public Dictionary<string, LibraryBaseEntry> getForUpdate()
+        public ForUploadWrapper getForUpdate()
         {
             Dictionary<string, LibraryBaseEntry> dummy =
                 this._allUploadEntries.Where(q => q.Value.AlreadyUploaded && q.Value.NeedsUpdate).ToDictionary(q2 => q2.Key, q2 => q2.Value);
-            return dummy;
+            return new ForUploadWrapper(dummy.Count, dummy);
         }
 
         public bool inDictionary(string md5Hash)
@@ -156,6 +156,22 @@ namespace SeaShoreShared
             fromOC.NeedsUpdate = false;
         }
 
+    }
 
+
+    public class ForUploadWrapper
+    {
+        public ForUploadWrapper(int count, Dictionary<string, LibraryBaseEntry> entries)
+        {
+            this.Count = count;
+            this.Entries = entries;
+
+            this.ValuesList = entries.Values.ToList();
+        }
+
+        public int Count { get; private set; }
+        public Dictionary<string, LibraryBaseEntry> Entries { get; private set; }
+
+        public List<LibraryBaseEntry> ValuesList { get; private set; }
     }
 }

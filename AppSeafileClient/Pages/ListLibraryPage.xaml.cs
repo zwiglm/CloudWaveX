@@ -186,82 +186,82 @@ namespace PlasticWonderland.Pages
         /// <param name="uploadUrl"></param>
         private void putPhotosToQueue(PhotoUploadWrapper uploadUrl, PhotoUploadWrapper updateUrl, string authToken, bool bgUpload)
         {
-            IList<LibraryBaseEntry> libBaseForUpload = SharedDbFactory.Instance.getForUpload().Values.ToList();
-            //if (bgUpload)
-            //    this.putUploadsToBackgroundQueue(uploadUrl, libBaseForUpload, authToken);
-            //else
-            //    this.putUploadsToQueue(uploadUrl, libBaseForUpload, authToken, false);
+            //for (ForUploadWrapper uplWrapper; (uplWrapper = SharedDbFactory.Instance.getForUpload()).Count > 0; )
+            //{
+            //    IList<LibraryBaseEntry> libBaseForUpload = uplWrapper.ValuesList;
+            //    foreach (var item in libBaseForUpload)
+            //    {
+            //        if (bgUpload)
+            //            this.putUploadsToBackgroundQueue(uploadUrl, libBaseForUpload, authToken);
+            //        else
+            //            this.putUploadsToQueue(uploadUrl, item, authToken, false);
+            //    }
+            //}
 
-            IList<LibraryBaseEntry> libBaseForUpdate = SharedDbFactory.Instance.getForUpdate().Values.ToList();
-            //this.putUpdatesToQueue(updateUrl, libBaseForUpdate, authToken, true);
+            //for (ForUploadWrapper uplWrapper; (uplWrapper = SharedDbFactory.Instance.getForUpdate()).Count > 0; )
+            //{
+            //    IList<LibraryBaseEntry> libBaseForUpload = uplWrapper.ValuesList;
+            //    foreach (var item in libBaseForUpload)
+            //    {
+            //        this.putUploadsToQueue(updateUrl, item, authToken, true);
+            //    }
+            //}
         }
-        private async void putUploadsToQueue(PhotoUploadWrapper upload, IList<LibraryBaseEntry> entsForUpload, string authToken, bool isUpdate)
+        private async void putUploadsToQueue(PhotoUploadWrapper upload, LibraryBaseEntry uploadEntry, string authToken, bool isUpdate)
         {
-            int testRunner = 0;
-            foreach (LibraryBaseEntry item in entsForUpload)
+            StorageFile sFile = await StorageFile.GetFileFromPathAsync(uploadEntry.FullPath);
+            var fileContent = await sFile.OpenReadAsync();
+
+            var filter = HttpHelperFactory.Instance.getHttpFilter();
+            var uploadHttpClient = new HttpClient(filter);
+            uploadHttpClient.DefaultRequestHeaders.Add("Authorization", "token " + authToken);
+            uploadHttpClient.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + HttpHelperFactory.Instance.GetAgentVersion);
+            uploadHttpClient.DefaultRequestHeaders.Add("Accept", "*/*");
+
+            string boundary = "s---------" + DateTime.Today.Ticks.ToString("x");
+            HttpMultipartFormDataContent requestUploadContent = new HttpMultipartFormDataContent(boundary);
+            //
+            string parent_dir = this.makeSeashoreParentDir(uploadEntry);
+            if (!isUpdate)
             {
-                testRunner++;
+                IHttpContent content4 = new HttpStringContent(parent_dir);
+                requestUploadContent.Add(content4, "parent_dir");
+            }
+            else
+            {
+                string target_file = this.makeSeashoreTargetFile(uploadEntry);
+                IHttpContent content4 = new HttpStringContent(target_file);
+                requestUploadContent.Add(content4, "target_file");
+            }
+            //
+            IHttpContent content5 = new HttpStreamContent(fileContent);
+            requestUploadContent.Add(content5, GlobalVariables.FILE_AS_FILE, uploadEntry.FileName);
+            content5.Headers.Add("Content-Type", "application/octet-stream");
 
-                StorageFile sFile = await StorageFile.GetFileFromPathAsync(item.FullPath);
-                var fileContent = await sFile.OpenReadAsync();
-
-                var filter = HttpHelperFactory.Instance.getHttpFilter();
-                var uploadHttpClient = new HttpClient(filter);
-                uploadHttpClient.DefaultRequestHeaders.Add("Authorization", "token " + authToken);
-                uploadHttpClient.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + HttpHelperFactory.Instance.GetAgentVersion);
-                uploadHttpClient.DefaultRequestHeaders.Add("Accept", "*/*");
-
-                string boundary = "s---------" + DateTime.Today.Ticks.ToString("x");
-                HttpMultipartFormDataContent requestUploadContent = new HttpMultipartFormDataContent(boundary);
-                //
-                string parent_dir = this.makeSeashoreParentDir(item);
-                if (!isUpdate) 
+            Uri upldUri = new Uri(upload.UplUpdLink);
+            HttpResponseMessage upldResponse = await this.handlePhotoUploadAsync(uploadHttpClient, upldUri, requestUploadContent);
+            if (upldResponse != null)
+            {
+                switch (upldResponse.StatusCode)
                 {
-                    IHttpContent content4 = new HttpStringContent(parent_dir);
-                    requestUploadContent.Add(content4, "parent_dir");
+                    case HttpStatusCode.Ok:
+                        SharedDbFactory.Instance.resetToUploaded(uploadEntry.ShoreMD5Hash);
+                        break;
+                    case HttpStatusCode.BadRequest:
+                        break;
+                    case HttpStatusCode.InternalServerError:
+                        if (!isUpdate)
+                            await this.handlePossibleDirectoryIssues(upload, parent_dir);
+                        break;
+                    default:
+                        break;
                 }
-                else
-                {
-                    string target_file = this.makeSeashoreTargetFile(item);
-                    IHttpContent content4 = new HttpStringContent(target_file);
-                    requestUploadContent.Add(content4, "target_file");
-                }
-                //
-                IHttpContent content5 = new HttpStreamContent(fileContent);
-                requestUploadContent.Add(content5, GlobalVariables.FILE_AS_FILE, item.FileName);
-                content5.Headers.Add("Content-Type", "application/octet-stream");
-
-                Uri upldUri = new Uri(upload.UplUpdLink);
-                HttpResponseMessage upldResponse = await this.handlePhotoUploadAsync(uploadHttpClient, upldUri, requestUploadContent);
-                if (upldResponse != null)
-                {
-                    switch (upldResponse.StatusCode)
-                    {
-                        case HttpStatusCode.Ok:
-                            SharedDbFactory.Instance.resetToUploaded(item.ShoreMD5Hash);
-                            break;
-                        case HttpStatusCode.BadRequest:
-                            break;
-                        case HttpStatusCode.InternalServerError:
-                            if (!isUpdate)
-                                this.handlePossibleDirectoryIssues(upload, parent_dir);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-
-                if (testRunner == 2)
-                    break;
             }
         }
         private async void putUploadsToBackgroundQueue(PhotoUploadWrapper upload, IList<LibraryBaseEntry> entsForUpload, string authToken)
         {
-            int testRunner = 0;
             foreach (LibraryBaseEntry item in entsForUpload)
             {
-                testRunner++;
-
                 StorageFile sFile = await StorageFile.GetFileFromPathAsync(item.FullPath);
                 List<BackgroundTransferContentPart> parts = new List<BackgroundTransferContentPart>();
 
@@ -288,9 +288,6 @@ namespace PlasticWonderland.Pages
 
                 // Attach progress and completion handlers.
                 await handleBgPhotoUploadAsync(uploadOp, true);
-
-                if (testRunner == 2)
-                    break;
             }
         }
 
@@ -460,13 +457,14 @@ namespace PlasticWonderland.Pages
             return true;
         }
 
-        private async void handlePossibleDirectoryIssues(PhotoUploadWrapper upldWraper, string directory) 
+        private async Task<HttpStatusCode> handlePossibleDirectoryIssues(PhotoUploadWrapper upldWraper, string directory) 
         {
             HttpStatusCode dirExists = await HttpHelperFactory.Instance.directoryExists(upldWraper, directory);
             if (dirExists == HttpStatusCode.NotFound)
             {
-                HttpStatusCode dirCreated = await HttpHelperFactory.Instance.createDirectory(upldWraper, directory);
+                return await HttpHelperFactory.Instance.createDirectory(upldWraper, directory);
             }
+            return dirExists;
         }
 
         // -------------------------------------------------------------------------------
