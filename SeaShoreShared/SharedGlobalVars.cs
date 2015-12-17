@@ -14,5 +14,8 @@ namespace SeaShoreShared
         // Seafile API
         public static string UPLOAD_LINK_QUALI = "upload-link";
         public static string UPDATE_LINK_QUALI = "update-link";
+
+        // Misc
+        public static int MAX_DOWNLOAD_PAGE = 5;
     }
 }

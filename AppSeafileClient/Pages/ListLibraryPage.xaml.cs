@@ -188,23 +188,28 @@ namespace PlasticWonderland.Pages
         {
             //for (ForUploadWrapper uplWrapper; (uplWrapper = SharedDbFactory.Instance.getForUpload()).Count > 0; )
             //{
-            //    IList<LibraryBaseEntry> libBaseForUpload = uplWrapper.ValuesList;
-            //    foreach (var item in libBaseForUpload)
-            //    {
-            //        if (bgUpload)
-            //            this.putUploadsToBackgroundQueue(uploadUrl, libBaseForUpload, authToken);
-            //        else
-            //            this.putUploadsToQueue(uploadUrl, item, authToken, false);
-            //    }
+            //}
+            IList<LibraryBaseEntry> libBaseForUpload = SharedDbFactory.Instance.getForUpload().ValuesList;
+            //int runner = 0;
+            //foreach (var item in libBaseForUpload)
+            //{
+            //    if (bgUpload)
+            //        this.putUploadsToBackgroundQueue(uploadUrl, libBaseForUpload, authToken);
+            //    else
+            //        this.putUploadsToQueue(uploadUrl, item, authToken, false);
+
+            //    runner++;
+            //    if (runner >= SharedGlobalVars.MAX_DOWNLOAD_PAGE)
+            //        break;
             //}
 
             //for (ForUploadWrapper uplWrapper; (uplWrapper = SharedDbFactory.Instance.getForUpdate()).Count > 0; )
             //{
-            //    IList<LibraryBaseEntry> libBaseForUpload = uplWrapper.ValuesList;
-            //    foreach (var item in libBaseForUpload)
-            //    {
-            //        this.putUploadsToQueue(updateUrl, item, authToken, true);
-            //    }
+            //}
+            libBaseForUpload = SharedDbFactory.Instance.getForUpdate().ValuesList;
+            //foreach (var item in libBaseForUpload)
+            //{
+            //    this.putUploadsToQueue(updateUrl, item, authToken, true);
             //}
         }
         private async void putUploadsToQueue(PhotoUploadWrapper upload, LibraryBaseEntry uploadEntry, string authToken, bool isUpdate)
@@ -246,12 +251,13 @@ namespace PlasticWonderland.Pages
                 {
                     case HttpStatusCode.Ok:
                         SharedDbFactory.Instance.resetToUploaded(uploadEntry.ShoreMD5Hash);
+                        //HttpStatusCode dummy = HttpHelperFactory.Instance.directoryExists(upload, parent_dir);
                         break;
                     case HttpStatusCode.BadRequest:
                         break;
                     case HttpStatusCode.InternalServerError:
                         if (!isUpdate)
-                            await this.handlePossibleDirectoryIssues(upload, parent_dir);
+                            this.handlePossibleDirectoryIssues(upload, parent_dir);
                         break;
                     default:
                         break;
@@ -457,12 +463,12 @@ namespace PlasticWonderland.Pages
             return true;
         }
 
-        private async Task<HttpStatusCode> handlePossibleDirectoryIssues(PhotoUploadWrapper upldWraper, string directory) 
+        private HttpStatusCode handlePossibleDirectoryIssues(PhotoUploadWrapper upldWraper, string directory) 
         {
-            HttpStatusCode dirExists = await HttpHelperFactory.Instance.directoryExists(upldWraper, directory);
-            if (dirExists == HttpStatusCode.NotFound)
+            HttpStatusCode dirExists = HttpHelperFactory.Instance.directoryExists(upldWraper, directory);
+            if (dirExists == HttpStatusCode.NotImplemented)
             {
-                return await HttpHelperFactory.Instance.createDirectory(upldWraper, directory);
+                return HttpHelperFactory.Instance.createDirectory(upldWraper, directory);
             }
             return dirExists;
         }

@@ -139,7 +139,7 @@ namespace PlasticWonderland.Domain
             return result;
         }
 
-        public async Task<HttpStatusCode> directoryExists(PhotoUploadWrapper wrp, string directory)
+        public HttpStatusCode directoryExists(PhotoUploadWrapper wrp, string directory)
         {
             var filter = HttpHelperFactory.Instance.getHttpFilter();
             Uri currentRequestUri = new Uri(wrp.RawUrl + "/api2/" + GlobalVariables.SF_REQ_REPOS + "/" + wrp.RepoId +"/dir/?p=" + directory);
@@ -152,7 +152,7 @@ namespace PlasticWonderland.Domain
             HttpStatusCode result = HttpStatusCode.NotImplemented;
             try
             {
-                HttpResponseMessage libsResponse = await HttpClientGetLibrary.GetAsync(currentRequestUri);
+                HttpResponseMessage libsResponse = HttpClientGetLibrary.GetAsync(currentRequestUri).GetResults();
                 result = libsResponse.StatusCode;
                 HttpClientGetLibrary.Dispose();
             }
@@ -163,7 +163,7 @@ namespace PlasticWonderland.Domain
             return result;
         }
 
-        public async Task<HttpStatusCode> createDirectory(PhotoUploadWrapper wrp, string directory)
+        public HttpStatusCode createDirectory(PhotoUploadWrapper wrp, string directory)
         {
             var filter = HttpHelperFactory.Instance.getHttpFilter();
             Uri currentRequestUri = new Uri(wrp.RawUrl + "/api2/" + GlobalVariables.SF_REQ_REPOS + "/" + wrp.RepoId + "/dir/?p=" + directory);
@@ -180,7 +180,7 @@ namespace PlasticWonderland.Domain
             HttpStatusCode result = HttpStatusCode.NotImplemented;
             try
             {
-                HttpResponseMessage libsResponse = await HttpClientGetLibrary.PostAsync(currentRequestUri, msgParms);
+                HttpResponseMessage libsResponse = HttpClientGetLibrary.PostAsync(currentRequestUri, msgParms).GetResults();
                 result = libsResponse.StatusCode;
                 HttpClientGetLibrary.Dispose();
             }
