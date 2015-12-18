@@ -114,7 +114,7 @@ namespace PlasticWonderland.Pages
             requestAccountInfos(authorizationToken, address, "account/info");
 
             // handle pseudo-auto-backup....
-            this.handlePhotoBackup(mainLibsSource, authorizationToken, address);
+            var dkny = Task.Run(() => this.handlePhotoBackup(mainLibsSource, authorizationToken, address));
         }
 
 
@@ -244,6 +244,7 @@ namespace PlasticWonderland.Pages
             content5.Headers.Add("Content-Type", "application/octet-stream");
 
             Uri upldUri = new Uri(upload.UplUpdLink);
+            //HttpResponseMessage upldResponse = null;
             HttpResponseMessage upldResponse = await this.handlePhotoUploadAsync(uploadHttpClient, upldUri, requestUploadContent);
             if (upldResponse != null)
             {
@@ -251,7 +252,6 @@ namespace PlasticWonderland.Pages
                 {
                     case HttpStatusCode.Ok:
                         SharedDbFactory.Instance.resetToUploaded(uploadEntry.ShoreMD5Hash);
-                        //HttpStatusCode dummy = HttpHelperFactory.Instance.directoryExists(upload, parent_dir);
                         break;
                     case HttpStatusCode.BadRequest:
                         break;
@@ -274,29 +274,29 @@ namespace PlasticWonderland.Pages
                 BackgroundTransferContentPart partParentDir = new BackgroundTransferContentPart();
                 string parent_dir = this.makeSeashoreParentDir(item);
                 partParentDir.SetHeader("Content-Disposition", "form-data; name=\"parent_dir\"");
+                partParentDir.SetHeader("Content-Type", "text/plain");
                 partParentDir.SetText(parent_dir);
                 parts.Add(partParentDir);
-                BackgroundTransferContentPart partFile = new BackgroundTransferContentPart(item.FileName, item.FullPath);
-                //BackgroundTransferContentPart partFile = new BackgroundTransferContentPart();
+                //BackgroundTransferContentPart partFile = new BackgroundTransferContentPart(item.FileName, item.FullPath);
+                BackgroundTransferContentPart partFile = new BackgroundTransferContentPart();
                 partFile.SetHeader("Content-Disposition", "form-data; name=\"file\"; filename=\"" + item.FileName + "\"");
                 partFile.SetHeader("Content-Type", "application/octet-stream");
                 partFile.SetFile(sFile);
                 parts.Add(partFile);
 
                 BackgroundUploader uploader = new BackgroundUploader();
-                uploader.SetRequestHeader("Authorization", String.Format("token {0}", authToken));
+                uploader.SetRequestHeader("Authorization", "token " + authToken);
                 uploader.SetRequestHeader("User-agent", GlobalVariables.WEB_CLIENT_AGENT + HttpHelperFactory.Instance.GetAgentVersion);
                 uploader.SetRequestHeader("Accept", "*/*");
                 uploader.Method = "POST";
                 Uri upldUri = new Uri(upload.UplUpdLink);
                 string boundary = "s---------" + DateTime.Today.Ticks.ToString("x");
-                UploadOperation uploadOp = await uploader.CreateUploadAsync(upldUri, parts, "form-data", boundary);
+                UploadOperation uploadOp = await uploader.CreateUploadAsync(upldUri, parts, "multipart/form-data", boundary);
 
                 // Attach progress and completion handlers.
                 await handleBgPhotoUploadAsync(uploadOp, true);
             }
         }
-
 
         private async Task<HttpResponseMessage> handlePhotoUploadAsync(HttpClient uploadClient, Uri upldUri, HttpMultipartFormDataContent requestUploadContent)
         {
@@ -323,20 +323,21 @@ namespace PlasticWonderland.Pages
             try
             {
                 Progress<UploadOperation> progressCallback = new Progress<UploadOperation>(photoUploadBgAsyncProgress);
-                
+               
+                UploadOperation ulRes;
                 if (start)
                 {
                     // Start the upload and attach a progress handler.
-                    await upload.StartAsync().AsTask(_bgPhotoUploadCTS.Token, progressCallback);
+                    ulRes = await upload.StartAsync().AsTask(_bgPhotoUploadCTS.Token, progressCallback);
                 }
                 else
                 {
                     // The upload was already running when the application started, re-attach the progress handler.
-                    await upload.AttachAsync().AsTask(_bgPhotoUploadCTS.Token, progressCallback);
+                    ulRes = await upload.AttachAsync().AsTask(_bgPhotoUploadCTS.Token, progressCallback);
                 }
 
-                ResponseInformation response = upload.GetResponseInformation();
-                string dummy = "here";
+                ResponseInformation response = ulRes.GetResponseInformation();
+                string dummy = "";
                 switch (response.StatusCode)
                 {
                     case 200:
@@ -465,12 +466,13 @@ namespace PlasticWonderland.Pages
 
         private HttpStatusCode handlePossibleDirectoryIssues(PhotoUploadWrapper upldWraper, string directory) 
         {
-            HttpStatusCode dirExists = HttpHelperFactory.Instance.directoryExists(upldWraper, directory);
-            if (dirExists == HttpStatusCode.NotImplemented)
+            bool dirExists = HttpHelperFactory.Instance.directoryExists(upldWraper, directory);
+            HttpStatusCode result = HttpStatusCode.None;
+            if (!dirExists)
             {
                 return HttpHelperFactory.Instance.createDirectory(upldWraper, directory);
             }
-            return dirExists;
+            return result;
         }
 
         // -------------------------------------------------------------------------------

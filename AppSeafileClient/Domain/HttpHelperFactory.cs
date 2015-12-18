@@ -139,21 +139,38 @@ namespace PlasticWonderland.Domain
             return result;
         }
 
-        public HttpStatusCode directoryExists(PhotoUploadWrapper wrp, string directory)
+        public bool directoryExists(PhotoUploadWrapper wrp, string directory)
         {
+            if (directory.Equals("/"))
+                return true;
+
+            // split it
+            string worker = directory.TrimEnd(new char[] { '/' });
+            int idxLastSlsh = worker.LastIndexOf("/");
+            string leftPart = worker.Substring(0, idxLastSlsh + 1);
+            string rightPart = worker.Substring(idxLastSlsh + 1);
+
+            // take a peek
             var filter = HttpHelperFactory.Instance.getHttpFilter();
-            Uri currentRequestUri = new Uri(wrp.RawUrl + "/api2/" + GlobalVariables.SF_REQ_REPOS + "/" + wrp.RepoId +"/dir/?p=" + directory);
+            Uri currentRequestUri = new Uri(wrp.RawUrl + "/api2/" + GlobalVariables.SF_REQ_REPOS + "/" + wrp.RepoId +"/dir/?p=" + leftPart);
             var HttpClientGetLibrary = new HttpClient(filter);
 
-            HttpClientGetLibrary.DefaultRequestHeaders.Add("Accept", "application/json;charset=utf-8;indent=4");
+            HttpClientGetLibrary.DefaultRequestHeaders.Add("Accept", "application/json;indent=4");
             HttpClientGetLibrary.DefaultRequestHeaders.Add("Authorization", "token " + wrp.AuthToken);
             HttpClientGetLibrary.DefaultRequestHeaders.Add("User-agent", GlobalVariables.WEB_CLIENT_AGENT + this.GetAgentVersion);
 
-            HttpStatusCode result = HttpStatusCode.NotImplemented;
+            bool result = false;
             try
             {
                 HttpResponseMessage libsResponse = HttpClientGetLibrary.GetAsync(currentRequestUri).GetResults();
-                result = libsResponse.StatusCode;
+                if (libsResponse != null && libsResponse.StatusCode == HttpStatusCode.Ok)
+                {
+                    string rawDirs = libsResponse.Content.ToString();
+                    var dirs = JsonConvert.DeserializeObject<List<LibraryRootObject>>(rawDirs);
+                    dirs = dirs.Where(q => q.type.Equals("dir")).ToList();
+                    int cntFound = dirs.Where(q => q.name.Equals(rightPart)).Count();
+                    result = cntFound > 0;
+                }
                 HttpClientGetLibrary.Dispose();
             }
             catch (Exception ex)
