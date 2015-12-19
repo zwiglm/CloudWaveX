@@ -186,9 +186,6 @@ namespace PlasticWonderland.Pages
         /// <param name="uploadUrl"></param>
         private void putPhotosToQueue(PhotoUploadWrapper uploadUrl, PhotoUploadWrapper updateUrl, string authToken, bool bgUpload)
         {
-            //for (ForUploadWrapper uplWrapper; (uplWrapper = SharedDbFactory.Instance.getForUpload()).Count > 0; )
-            //{
-            //}
             IList<LibraryBaseEntry> libBaseForUpload = SharedDbFactory.Instance.getForUpload().ValuesList;
             //int runner = 0;
             //foreach (var item in libBaseForUpload)
@@ -203,9 +200,6 @@ namespace PlasticWonderland.Pages
             //        break;
             //}
 
-            //for (ForUploadWrapper uplWrapper; (uplWrapper = SharedDbFactory.Instance.getForUpdate()).Count > 0; )
-            //{
-            //}
             libBaseForUpload = SharedDbFactory.Instance.getForUpdate().ValuesList;
             //foreach (var item in libBaseForUpload)
             //{
@@ -254,6 +248,10 @@ namespace PlasticWonderland.Pages
                         SharedDbFactory.Instance.resetToUploaded(uploadEntry.ShoreMD5Hash);
                         break;
                     case HttpStatusCode.BadRequest:
+                        break;
+                    case HttpStatusCode.NotFound:
+                        //MaZ attn: try this out. set to for update
+                        //SharedDbFactory.Instance.setToForUpdate(uploadEntry.ShoreMD5Hash);
                         break;
                     case HttpStatusCode.InternalServerError:
                         if (!isUpdate)
@@ -369,7 +367,7 @@ namespace PlasticWonderland.Pages
 
         private void photoUploadAsyncProgress(HttpProgress progress)
         {
-            string dummmy = "here";
+            //string dummmy = "here";
         }
         private void photoUploadBgAsyncProgress(UploadOperation upload)
         {
@@ -470,7 +468,8 @@ namespace PlasticWonderland.Pages
             HttpStatusCode result = HttpStatusCode.None;
             if (!dirExists)
             {
-                return HttpHelperFactory.Instance.createDirectory(upldWraper, directory);
+                result = HttpHelperFactory.Instance.createDirectory(upldWraper, directory);
+                Thread.Sleep(1000);
             }
             return result;
         }

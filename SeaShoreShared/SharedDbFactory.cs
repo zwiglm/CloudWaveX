@@ -156,6 +156,24 @@ namespace SeaShoreShared
             fromOC.NeedsUpdate = false;
         }
 
+        public void setToForUpdate(string hashValue)
+        {
+            using (PhotoUploadContext uploadContext = new PhotoUploadContext(PhotoUploadContext.DBConnectionString))
+            {
+                IQueryable<LibraryBaseEntry> query = from uplEnt in uploadContext.PhotoUploadEntries where uplEnt.ShoreMD5Hash == hashValue select uplEnt;
+                LibraryBaseEntry found = query.FirstOrDefault();
+
+                found.AlreadyUploaded = true;
+                found.NeedsUpdate = true;
+
+                uploadContext.SubmitChanges();
+            }
+
+            LibraryBaseEntry fromOC = this._allUploadEntries[hashValue];
+            fromOC.AlreadyUploaded = true;
+            fromOC.NeedsUpdate = true;
+        }
+
     }
 
 
