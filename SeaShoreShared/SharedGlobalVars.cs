@@ -17,5 +17,6 @@ namespace SeaShoreShared
 
         // Misc
         public static int MAX_DOWNLOAD_PAGE = 80;
+        public static ulong MAX_UPLOAD_SIZE = 50000000;
     }
 }

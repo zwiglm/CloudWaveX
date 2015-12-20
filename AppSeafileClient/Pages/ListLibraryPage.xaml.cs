@@ -188,35 +188,39 @@ namespace PlasticWonderland.Pages
         {
             IList<LibraryBaseEntry> libBaseForUpload = SharedDbFactory.Instance.getForUpload().ValuesList;
             int runner = 0;
-            //foreach (var item in libBaseForUpload)
-            //{
-            //    if (bgUpload)
-            //        this.putUploadsToBackgroundQueue(uploadUrl, libBaseForUpload, authToken);
-            //    else
-            //        this.putUploadsToQueue(uploadUrl, item, authToken, false);
+            foreach (var item in libBaseForUpload)
+            {
+                if (bgUpload)
+                    this.putUploadsToBackgroundQueue(uploadUrl, libBaseForUpload, authToken);
+                else
+                    this.putUploadsToQueue(uploadUrl, item, authToken, false);
 
-            //    runner++;
-            //    if (runner >= SharedGlobalVars.MAX_DOWNLOAD_PAGE)
-            //        break;
-            //}
+                runner++;
+                if (runner >= SharedGlobalVars.MAX_DOWNLOAD_PAGE)
+                    break;
+            }
 
             libBaseForUpload = SharedDbFactory.Instance.getForUpdate().ValuesList;
             runner = 0;
-            //foreach (var item in libBaseForUpload)
-            //{
-            //    this.putUploadsToQueue(updateUrl, item, authToken, true);
+            foreach (var item in libBaseForUpload)
+            {
+                this.putUploadsToQueue(updateUrl, item, authToken, true);
 
-            //    runner++;
-            //    if (runner >= SharedGlobalVars.MAX_DOWNLOAD_PAGE)
-            //        break;
-            //}
+                runner++;
+                if (runner >= SharedGlobalVars.MAX_DOWNLOAD_PAGE)
+                    break;
+            }
         }
         private async void putUploadsToQueue(PhotoUploadWrapper upload, LibraryBaseEntry uploadEntry, string authToken, bool isUpdate)
         {
             StorageFile sFile = null;
             try
             {
+                // if cant create then remove from the DB
                 sFile = await StorageFile.GetFileFromPathAsync(uploadEntry.FullPath);
+                // break if bigger than.....
+                if (uploadEntry.Size > SharedGlobalVars.MAX_UPLOAD_SIZE)
+                    return;
             }
             catch (Exception ex)
             {
@@ -265,8 +269,6 @@ namespace PlasticWonderland.Pages
                     case HttpStatusCode.BadRequest:
                         break;
                     case HttpStatusCode.NotFound:
-                        //MaZ attn: try this out. set to for update
-                        //SharedDbFactory.Instance.setToForUpdate(uploadEntry.ShoreMD5Hash);
                         break;
                     case HttpStatusCode.InternalServerError:
                         if (!isUpdate)
@@ -319,15 +321,17 @@ namespace PlasticWonderland.Pages
                 var upldProgrHandler = new Progress<HttpProgress>(photoUploadAsyncProgress);
                 var responseUpload = 
                     await uploadClient.PostAsync(upldUri, requestUploadContent).AsTask(_bgPhotoUploadCTS.Token, upldProgrHandler);
-
                 result = responseUpload;
-                uploadClient.Dispose();
             }
             catch (TaskCanceledException tcEx)
             {
             }
             catch (Exception ex)
             {
+            }
+            finally
+            {
+                uploadClient.Dispose();
             }
             return result;
         }
