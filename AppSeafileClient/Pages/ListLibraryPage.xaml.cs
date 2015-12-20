@@ -187,7 +187,7 @@ namespace PlasticWonderland.Pages
         private void putPhotosToQueue(PhotoUploadWrapper uploadUrl, PhotoUploadWrapper updateUrl, string authToken, bool bgUpload)
         {
             IList<LibraryBaseEntry> libBaseForUpload = SharedDbFactory.Instance.getForUpload().ValuesList;
-            //int runner = 0;
+            int runner = 0;
             //foreach (var item in libBaseForUpload)
             //{
             //    if (bgUpload)
@@ -201,14 +201,29 @@ namespace PlasticWonderland.Pages
             //}
 
             libBaseForUpload = SharedDbFactory.Instance.getForUpdate().ValuesList;
+            runner = 0;
             //foreach (var item in libBaseForUpload)
             //{
             //    this.putUploadsToQueue(updateUrl, item, authToken, true);
+
+            //    runner++;
+            //    if (runner >= SharedGlobalVars.MAX_DOWNLOAD_PAGE)
+            //        break;
             //}
         }
         private async void putUploadsToQueue(PhotoUploadWrapper upload, LibraryBaseEntry uploadEntry, string authToken, bool isUpdate)
         {
-            StorageFile sFile = await StorageFile.GetFileFromPathAsync(uploadEntry.FullPath);
+            StorageFile sFile = null;
+            try
+            {
+                sFile = await StorageFile.GetFileFromPathAsync(uploadEntry.FullPath);
+            }
+            catch (Exception ex)
+            {
+                SharedDbFactory.Instance.removeFromDB(uploadEntry.ShoreMD5Hash);
+                return;
+            } 
+
             var fileContent = await sFile.OpenReadAsync();
 
             var filter = HttpHelperFactory.Instance.getHttpFilter();
@@ -464,12 +479,13 @@ namespace PlasticWonderland.Pages
 
         private HttpStatusCode handlePossibleDirectoryIssues(PhotoUploadWrapper upldWraper, string directory) 
         {
+            Task.Delay(10000);
             bool dirExists = HttpHelperFactory.Instance.directoryExists(upldWraper, directory);
             HttpStatusCode result = HttpStatusCode.None;
             if (!dirExists)
             {
                 result = HttpHelperFactory.Instance.createDirectory(upldWraper, directory);
-                Thread.Sleep(1000);
+                Task.Delay(10000);
             }
             return result;
         }

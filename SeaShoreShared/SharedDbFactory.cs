@@ -174,6 +174,18 @@ namespace SeaShoreShared
             fromOC.NeedsUpdate = true;
         }
 
+        public void removeFromDB(string hashValue)
+        {
+            using (PhotoUploadContext uploadContext = new PhotoUploadContext(PhotoUploadContext.DBConnectionString))
+            {
+                IQueryable<LibraryBaseEntry> query = from uplEnt in uploadContext.PhotoUploadEntries where uplEnt.ShoreMD5Hash == hashValue select uplEnt;
+                uploadContext.PhotoUploadEntries.DeleteAllOnSubmit(query);
+                uploadContext.SubmitChanges();
+            }
+
+            this._allUploadEntries.Remove(hashValue);
+        }
+
     }
 
 

@@ -19,8 +19,6 @@ namespace PlasticWonderland.Domain
 
         private TaskHelperFactory()
         {
-            //NetworkInterfaces = new ObservableCollection<string>();
-            DeviceNetworkInformation.NetworkAvailabilityChanged += DeviceNetworkInformation_NetworkAvailabilityChanged;
         }
 
         public static TaskHelperFactory Instance
@@ -34,10 +32,6 @@ namespace PlasticWonderland.Domain
                 return _instance;
             }
         }
-
-
-        //public ObservableCollection<string> NetworkInterfaces { get; private set; }
-        public bool IsWifiEnabled { get; private set; }
 
 
         #region Settings in regard to tasks
@@ -91,7 +85,7 @@ namespace PlasticWonderland.Domain
                 return;
             }
 
-            if (this.enabledBackupPhotos() && this.enabledBackupPhotosWifiOnly() && this.IsWifiEnabled)
+            if (this.enabledBackupPhotos() && this.enabledBackupPhotosWifiOnly() && DeviceNetworkInformation.IsWiFiEnabled)
             {
                 this.startIteratingPicturesAgent();
                 return;
@@ -113,7 +107,7 @@ namespace PlasticWonderland.Domain
                 return true;
             }
 
-            if (this.enabledBackupPhotos() && this.enabledBackupPhotosWifiOnly() && this.IsWifiEnabled)
+            if (this.enabledBackupPhotos() && this.enabledBackupPhotosWifiOnly() && DeviceNetworkInformation.IsWiFiEnabled)
             {
                 return true;
             }
@@ -200,16 +194,6 @@ namespace PlasticWonderland.Domain
             {
             }
         }
-
-
-        #region Private
-
-        private void DeviceNetworkInformation_NetworkAvailabilityChanged(object sender, NetworkNotificationEventArgs e)
-        {
-            this.IsWifiEnabled = DeviceNetworkInformation.IsWiFiEnabled;
-        }
-
-        #endregion
 
     }
 }
