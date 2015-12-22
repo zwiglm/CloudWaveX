@@ -187,6 +187,9 @@ namespace PlasticWonderland.Pages
         private void putPhotosToQueue(PhotoUploadWrapper uploadUrl, PhotoUploadWrapper updateUrl, string authToken, bool bgUpload)
         {
             IList<LibraryBaseEntry> libBaseForUpload = SharedDbFactory.Instance.getForUpload().ValuesList;
+            // handle Directory creatin
+            this.createDirsForCreationDict(uploadUrl, libBaseForUpload);
+            // handle upload of Images
             int runner = 0;
             foreach (var item in libBaseForUpload)
             {
@@ -209,6 +212,15 @@ namespace PlasticWonderland.Pages
                 runner++;
                 if (runner >= SharedGlobalVars.MAX_DOWNLOAD_PAGE)
                     break;
+            }
+        }
+        private void createDirsForCreationDict(PhotoUploadWrapper uploadUrl, IList<LibraryBaseEntry> libBaseForUpload)
+        {
+            IEnumerable<IGrouping<string, LibraryBaseEntry>> libGroups = libBaseForUpload.GroupBy(q => (this.makeSeashoreParentDir(q)));
+            foreach (var item in libGroups)
+            {
+                string rawDir = this.makeSeashoreParentDir(item.ElementAt(0));
+                this.handlePossibleDirectoryIssues(uploadUrl, rawDir);
             }
         }
         private async void putUploadsToQueue(PhotoUploadWrapper upload, LibraryBaseEntry uploadEntry, string authToken, bool isUpdate)
@@ -271,8 +283,8 @@ namespace PlasticWonderland.Pages
                     case HttpStatusCode.NotFound:
                         break;
                     case HttpStatusCode.InternalServerError:
-                        if (!isUpdate)
-                            this.handlePossibleDirectoryIssues(upload, parent_dir);
+                        //if (!isUpdate)
+                        //    this.handlePossibleDirectoryIssues(upload, parent_dir);
                         break;
                     default:
                         break;
@@ -481,17 +493,15 @@ namespace PlasticWonderland.Pages
             return true;
         }
 
-        private HttpStatusCode handlePossibleDirectoryIssues(PhotoUploadWrapper upldWraper, string directory) 
+        private async void handlePossibleDirectoryIssues(PhotoUploadWrapper upldWraper, string directory) 
         {
-            Task.Delay(10000);
-            bool dirExists = HttpHelperFactory.Instance.directoryExists(upldWraper, directory);
-            HttpStatusCode result = HttpStatusCode.None;
+            await Task.Delay(2500);
+            bool dirExists = await HttpHelperFactory.Instance.directoryExists(upldWraper, directory);
             if (!dirExists)
             {
-                result = HttpHelperFactory.Instance.createDirectory(upldWraper, directory);
-                Task.Delay(10000);
+                HttpStatusCode created = await HttpHelperFactory.Instance.createDirectory(upldWraper, directory);
+                await Task.Delay(2500);
             }
-            return result;
         }
 
         // -------------------------------------------------------------------------------

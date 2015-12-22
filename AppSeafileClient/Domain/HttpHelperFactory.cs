@@ -139,7 +139,7 @@ namespace PlasticWonderland.Domain
             return result;
         }
 
-        public bool directoryExists(PhotoUploadWrapper wrp, string directory)
+        public async Task<bool> directoryExists(PhotoUploadWrapper wrp, string directory)
         {
             if (directory.Equals("/"))
                 return true;
@@ -162,7 +162,7 @@ namespace PlasticWonderland.Domain
             bool result = false;
             try
             {
-                HttpResponseMessage libsResponse = HttpClientGetLibrary.GetAsync(currentRequestUri).GetResults();
+                HttpResponseMessage libsResponse = await HttpClientGetLibrary.GetAsync(currentRequestUri);
                 if (libsResponse != null && libsResponse.StatusCode == HttpStatusCode.Ok)
                 {
                     string rawDirs = libsResponse.Content.ToString();
@@ -171,16 +171,19 @@ namespace PlasticWonderland.Domain
                     int cntFound = dirs.Where(q => q.name.Equals(rightPart)).Count();
                     result = cntFound > 0;
                 }
-                HttpClientGetLibrary.Dispose();
             }
             catch (Exception ex)
             {
+            }
+            finally
+            {
+                HttpClientGetLibrary.Dispose();
             }
 
             return result;
         }
 
-        public HttpStatusCode createDirectory(PhotoUploadWrapper wrp, string directory)
+        public async Task<HttpStatusCode> createDirectory(PhotoUploadWrapper wrp, string directory)
         {
             var filter = HttpHelperFactory.Instance.getHttpFilter();
             Uri currentRequestUri = new Uri(wrp.RawUrl + "/api2/" + GlobalVariables.SF_REQ_REPOS + "/" + wrp.RepoId + "/dir/?p=" + directory);
@@ -194,17 +197,19 @@ namespace PlasticWonderland.Domain
                new KeyValuePair<string, string>("operation", "mkdir"),
             });
 
-            HttpStatusCode result = HttpStatusCode.NotImplemented;
+            HttpStatusCode result = HttpStatusCode.None;
             try
             {
                 HttpResponseMessage libsResponse = HttpClientGetLibrary.PostAsync(currentRequestUri, msgParms).GetResults();
                 result = libsResponse.StatusCode;
-                HttpClientGetLibrary.Dispose();
             }
             catch (Exception ex)
             {
             }
-
+            finally
+            {
+                HttpClientGetLibrary.Dispose();
+            }
             return result;
         }
 

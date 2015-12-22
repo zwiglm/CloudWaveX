@@ -16,7 +16,7 @@ namespace SeaShoreShared
         public static string UPDATE_LINK_QUALI = "update-link";
 
         // Misc
-        public static int MAX_DOWNLOAD_PAGE = 80;
+        public static int MAX_DOWNLOAD_PAGE = 100;
         public static ulong MAX_UPLOAD_SIZE = 50000000;
     }
 }
