@@ -79,26 +79,31 @@ namespace PlasticWonderland.Domain
 
         public void triggerScheduleAgent()
         {
-            if (this.enabledBackupPhotos() && !this.enabledBackupPhotosWifiOnly())
-            {
-                this.startIteratingPicturesAgent();
-                return;
-            }
+            //if (this.enabledBackupPhotos() && !this.enabledBackupPhotosWifiOnly())
+            //{
+            //    this.startIteratingPicturesAgent();
+            //    return;
+            //}
 
-            if (this.enabledBackupPhotos() && this.enabledBackupPhotosWifiOnly() && DeviceNetworkInformation.IsWiFiEnabled)
-            {
-                this.startIteratingPicturesAgent();
-                return;
-            }
+            //if (this.enabledBackupPhotos() && this.enabledBackupPhotosWifiOnly() && DeviceNetworkInformation.IsWiFiEnabled)
+            //{
+            //    this.startIteratingPicturesAgent();
+            //    return;
+            //}
 
-            if (!this.enabledBackupPhotos())
-            {
+            if (this.enabledBackupPhotos())
+                this.startIteratingPicturesAgent();
+            else
                 this.RemoveTaskAgent(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME);
-                return;
-            }
+            
+            //if (!this.enabledBackupPhotos())
+            //{
+            //    this.RemoveTaskAgent(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME);
+            //    return;
+            //}
 
             // just in case...
-            this.RemoveTaskAgent(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME);
+            //this.RemoveTaskAgent(SharedGlobalVars.CHECK_PHOTO_CHANGES_TASKNAME);
         }
         public bool isAgentEnabled()
         {            
