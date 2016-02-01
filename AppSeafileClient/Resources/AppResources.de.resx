@@ -444,7 +444,7 @@
     <value>Thumbnails herunterladen</value>
   </data>
   <data name="Settings_Photo_Backup" xml:space="preserve">
-    <value>Photos sichern</value>
+    <value>Photos sichern (BETA. Aber sowas von...)</value>
   </data>
   <data name="Settings_Photo_Backup_OnlyOnWifi" xml:space="preserve">
     <value>Sichern nur über WLAN</value>

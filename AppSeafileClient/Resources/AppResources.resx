@@ -442,7 +442,7 @@
     <value>Download Thumbnails</value>
   </data>
   <data name="Settings_Photo_Backup" xml:space="preserve">
-    <value>Backup Photos</value>
+    <value>Backup Photos (Totally BETA)</value>
   </data>
   <data name="Settings_Photo_Backup_OnlyOnWifi" xml:space="preserve">
     <value>Only with Wifi</value>

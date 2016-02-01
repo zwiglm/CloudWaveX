@@ -1042,7 +1042,7 @@ namespace PlasticWonderland.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Backup Photos.
+        ///   Looks up a localized string similar to Backup Photos (Totally BETA).
         /// </summary>
         public static string Settings_Photo_Backup {
             get {
