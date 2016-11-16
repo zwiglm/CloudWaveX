@@ -5,7 +5,7 @@
     <Language code="en-US" />
     <Language code="de" />
   </Languages>
-  <App xmlns="" ProductID="{a81971ba-e1bd-4407-a322-712bdbb75aa4}" Title="Seashore" RuntimeType="Silverlight" Version="1.1.0.0" Genre="apps.normal" Author="Martin Zwigl, Marco Stecher" Description="Seashore is a client application to a file-hosting Seafile-Server.&#xD;&#xA;&#xD;&#xA;Features :&#xD;&#xA;- Access your libraries (crypted and unencrypted) from your Windows Phone.&#xD;&#xA;- View your account information&#xD;&#xA;- etc." SDOptOut="false" BackUpOptOut="false" Publisher="Zwist.org" PublisherID="{3072a6d5-1599-4a47-a79c-a9690a588802}" NotificationService="MPN">
+  <App xmlns="" ProductID="{a81971ba-e1bd-4407-a322-712bdbb75aa4}" Title="Seashore" RuntimeType="Silverlight" Version="1.1.0.0" Genre="apps.normal" Author="Martin Zwigl, Marco Stecher" Description="Seashore is a client application to a file-hosting Seafile-Server.&#xD;&#xA;&#xD;&#xA;Features :&#xD;&#xA;- Access your libraries (crypted and unencrypted) from your Windows Phone.&#xD;&#xA;- View your account information&#xD;&#xA;- etc." SDOptOut="false" BackUpOptOut="false" Publisher="Zwigl.Info" PublisherID="{3072a6d5-1599-4a47-a79c-a9690a588802}" NotificationService="MPN">
     <IconPath IsRelative="true" IsResource="false">Assets\Store\logo2015.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />

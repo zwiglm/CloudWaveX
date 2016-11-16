@@ -43,7 +43,7 @@
             <StackPanel Grid.Row="0" Width="Auto">
                 <TextBlock Text="About" Foreground="Black" FontWeight="Bold" />
                 <TextBlock TextWrapping="Wrap" x:Name="about" FontSize="{StaticResource PhoneFontSizeNormal}" Foreground="Black" Margin="0,0,0,10" >
-                	<Run Text="Application made by Zwist.org"/><LineBreak/>
+                	<Run Text="Application made by ZwiSt"/><LineBreak/>
                 	<Run Text="(Martin Zwigl and Marco Stecher)" /><LineBreak/><LineBreak/>
                     <Run Text="This app uses Newtonsoft.Json, WPClogger and the Coding4Fun Toolkit."/>
                 </TextBlock>
