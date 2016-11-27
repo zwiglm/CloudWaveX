@@ -464,4 +464,7 @@
   <data name="Background_Upload_Task" xml:space="preserve">
     <value>Background Upload</value>
   </data>
+  <data name="Settings_Button_PrivacyUrl" xml:space="preserve">
+    <value>Datenschutzrichtlinien</value>
+  </data>
 </root>

@@ -99,6 +99,18 @@ namespace PlasticWonderland.Pages
             marketplaceReviewTask.Show();
         }
 
+        /// <summary>
+        /// MaZ attn: This is fixed URL in code
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ButtonPrivacyPolicy_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Phone.Tasks.WebBrowserTask wbt = new Microsoft.Phone.Tasks.WebBrowserTask();
+            wbt.Uri = new Uri("http://www.zwigl.info/seashore/Windows-Phone-App/Seashore-Privacy-Policy");
+            wbt.Show();
+        }
+
 
         private static void CleanAndDeleteDirectoryRecursive(string directory)
         {
